@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+  <clz-eigner-vc>307</clz-eigner-vc>
+  <vsh-firmendaten>
+    <crefonummer>3070512010</crefonummer>
+    <firmierung>Mehmet Yücel Automatenaufstellung</firmierung>
+    <name1>Mehmet Yücel</name1>
+    <name2>Automatenaufstellung</name2>
+    <korrespondenz-adresse>
+      <strasse>Leipziger Str.</strasse>
+      <hausnummer>87</hausnummer>
+      <plz>01127</plz>
+      <ort>Dresden</ort>
+      <land>DE</land>
+    </korrespondenz-adresse>
+    <telefon>
+      <landes-vorwahl>+49</landes-vorwahl>
+      <vorwahl>152</vorwahl>
+      <nummer>57074073</nummer>
+    </telefon>
+    <rechtsform>
+      <bezeichnung-rechtsform>Gewerbebetrieb</bezeichnung-rechtsform>
+    </rechtsform>
+    <gruendung genauigkeit="EXAKT" jahr="2014" monat="3" tag="18"/>
+    <statistik>
+      <letzte-recherche>2014-10-13+02:00</letzte-recherche>
+      <letzte-aenderung>2014-10-13+02:00</letzte-aenderung>
+      <vorraetig-bis>2015-10-13+02:00</vorraetig-bis>
+      <anzahl-auskuenfte>1</anzahl-auskuenfte>
+    </statistik>
+    <bonitaet>
+      <zahlungsweise>Zahlungserfahrungen liegen uns noch nicht vor.</zahlungsweise>
+      <krediturteil>Ein Krediturteil wird (noch) nicht vergeben. Die Geschäftsentwicklung bleibt abzuwarten.</krediturteil>
+    </bonitaet>
+    <beteiligte>
+      <firmenbeteiligter>
+        <crefonummer-beteiligter>3070512011</crefonummer-beteiligter>
+        <verflechtungsinfo>
+          <beteiligteneigenschaft>Inhaber</beteiligteneigenschaft>
+          <beteiligt-seit jahr="2014" monat="3" tag="18"/>
+        </verflechtungsinfo>
+      </firmenbeteiligter>
+    </beteiligte>
+    <anzahl-mitarbeiter>
+      <angabe-aus-jahr>2014</angabe-aus-jahr>
+      <anzahl-mitarbeiter genauigkeit="EXAKT">
+        <wert>3</wert>
+      </anzahl-mitarbeiter>
+    </anzahl-mitarbeiter>
+    <branchendaten>
+      <eingetragener-gegenstand>Automatenaufstellung;</eingetragener-gegenstand>
+      <branchenangabe>
+        <rang>1</rang>
+        <branchencode>92001</branchencode>
+        <branchentext>Spielhallen und Betrieb von Spielautomaten</branchentext>
+      </branchenangabe>
+    </branchendaten>
+  </vsh-firmendaten>
+</vsh_firmendatenexport>

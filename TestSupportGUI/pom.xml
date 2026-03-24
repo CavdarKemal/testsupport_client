@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>testsupport_client</groupId>
+        <artifactId>testsupport_client</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>TestSupportGUI</artifactId>
+
+    <properties>
+        <!--CTEWE-1984-->
+        <!-- Artefakt aus dem Project ITSQ.Testfaelle-CTE. Dieses wird per maven-goal aus dem Repo heruntergeladen und in die Distribution eingebettet-->
+        <testfaelle.groupId>testfaelle_cte</testfaelle.groupId>
+        <testfaelle.artifactId>itsq</testfaelle.artifactId>
+        <testfaelle.version>2.0.0-SNAPSHOT</testfaelle.version>
+        <testfaelle.classifier>distribution</testfaelle.classifier>
+        <testfaelle.type>zip</testfaelle.type>
+        <testfaelle.unpacked-dir>/X-TESTS/ITSQ</testfaelle.unpacked-dir>
+        <testfaelle.unpacked-dir>${project.basedir}/../X-TESTS/ITSQ</testfaelle.unpacked-dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>schnittstellen.archivbestand30_jaxb</groupId>
+            <artifactId>mapper_test_helper</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>testsupport_client</groupId>
+            <artifactId>tesun_factory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testsupport_client</groupId>
+            <artifactId>tesun_util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testsupport_client</groupId>
+            <artifactId>tesun_exports_searcher</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testsupport_client</groupId>
+            <artifactId>tesun_logs_searcher</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testsupport_client</groupId>
+            <artifactId>tesun_activiti</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>batch_jvm_client</groupId>
+            <artifactId>jvm_client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testutils_cte</groupId>
+            <artifactId>junit4rules</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>testutils_cte</groupId>
+            <artifactId>log4j12appenders</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>sshj</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <!-- Kopiert TestSupportGUI-${project.version}-distribution.zip und copy4Delivery.sh auf die Test-Rechner, die in der Datei copy4Delivery.sh angegebn wurden -->
+                <!-- Jenkins Job:
+                    - im Bereich "Build Steps":
+                        clean package -Pjenkins -Dmaven.test.skip=true -Djavax.xml.accessExternalSchema=all
+                    - im Bereich "Send files or execute commands over SSH/Exec command":
+                        chmod +x /home/versionuser/cte_delivery/TestSupport/copy4Delivery.sh
+                        /home/versionuser/cte_delivery/TestSupport/copy4Delivery.sh 2.0.0-SNAPSHOT
+                -->
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>wagon-maven-plugin</artifactId>
+                        <version>${wagon-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>wagon-upload-archiv</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>upload-single</goal>
+                                </goals>
+                                <configuration>
+                                    <serverId>artifactory-release-archiv</serverId>
+                                    <fromFile>target/TestSupportGUI-${project.version}-distribution.zip</fromFile>
+                                    <toFile>/home/versionuser/cte_delivery/TestSupport/TestSupportGUI-${project.version}-distribution.zip</toFile>
+                                    <url>scp://artifactory-cte.creditreform.de</url>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>wagon-copy-archiv</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>upload-single</goal>
+                                </goals>
+                                <configuration>
+                                    <serverId>artifactory-release-archiv</serverId>
+                                    <fromFile>../auslieferung/copy4Delivery.sh</fromFile>
+                                    <toFile>/home/versionuser/cte_delivery/TestSupport/copy4Delivery.sh</toFile>
+                                    <url>scp://artifactory-cte.creditreform.de</url>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <!-- Tests -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/Test*.java</include>
+                    </includes>
+                    <argLine>-Duser.language=de -Duser.region=DE -Xmx2048m -Dfile.encoding=${project.build.sourceEncoding}</argLine>
+                </configuration>
+            </plugin>
+            <!-- JAR mit Main-Class Manifest -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>de.creditreform.crefoteam.cte.tesun.gui.TestSupportGUI</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>./</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Download und Entpacken des Testfaelle-Artefakts aus dem Repository -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <!-- Herunterladen und Entpacken ins Projektverzeichnis -->
+                    <execution>
+                        <id>unpack-testfaelle</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${testfaelle.groupId}</groupId>
+                                    <artifactId>${testfaelle.artifactId}</artifactId>
+                                    <version>${testfaelle.version}</version>
+                                    <classifier>${testfaelle.classifier}</classifier>
+                                    <type>${testfaelle.type}</type>
+                                    <outputDirectory>${testfaelle.unpacked-dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <!-- Dependencies in lib-Verzeichnis kopieren -->
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Auslieferbares Artefakt erstellen -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>create-distribution</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

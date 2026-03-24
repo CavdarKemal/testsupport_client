@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+	<clz-eigner-vc>241</clz-eigner-vc>
+  <bezeichnung>Bezeichnung der Firmendatenexport</bezeichnung>
+	<vsh-firmendaten>
+		<firmierung>TGT Handelsgesellschaft mbH</firmierung>
+		<crefonummer>1234567890</crefonummer>
+		<name1>TGT Handelsgesellschaft mbH</name1>
+		<gruendung genauigkeit="EXAKT" tag="12" monat="6" jahr="2009"/>
+		<korrespondenz-adresse>
+			<strasse>Papenstr.</strasse>
+			<hausnummer>3</hausnummer>
+			<bezeichnung>Bezeichnung der Adresse</bezeichnung>
+			<plz>48488</plz>
+			<ort>Emsbüren</ort>
+			<land>DE</land>
+		</korrespondenz-adresse>
+		<bezeichnung>Bezeichnung der Firmendaten</bezeichnung>
+    <ebene1>
+      <ebene2>
+	      <ebene3>
+	        <bezeichnung>Bezeichnung von vsh-firmendaten.ebene1.ebene2.ebene3</bezeichnung>
+	      </ebene3>
+      </ebene2>
+    </ebene1>
+	</vsh-firmendaten>
+  <ebene0>
+    <ebene1>
+      <ebene2>
+        <bezeichnung>Bezeichnung von ebene0.ebene1.ebene2</bezeichnung>
+      </ebene2>
+    </ebene1>
+  </ebene0>
+</vsh_firmendatenexport>

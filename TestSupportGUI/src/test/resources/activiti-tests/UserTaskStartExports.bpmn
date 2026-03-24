@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="%ENV%-UserTaskStartExports" name="CTE %ENV%-UserTaskStartExports" isExecutable="true">
+    <startEvent id="startEvent" name="Start" activiti:initiator="initiator"></startEvent>
+    <endEvent id="endEvent" name="End"></endEvent>
+    <userTask id="UserTaskStartExports" name="Exports starten [StartExports]"></userTask>
+    <sequenceFlow id="flowToUserTaskWaitForExports" sourceRef="UserTaskStartExports" targetRef="UserTaskWaitForExports"></sequenceFlow>
+    <userTask id="UserTaskWaitForExports" name="Export-Ende abwarten [WaitForExports]"></userTask>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="UserTaskStartExports"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="UserTaskWaitForExports" targetRef="endEvent"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%UserTaskStartExports">
+    <bpmndi:BPMNPlane bpmnElement="%ENV%UserTaskStartExports" id="BPMNPlane_%ENV%UserTaskStartExports">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="16.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="460.0" y="28.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskStartExports" id="BPMNShape_UserTaskStartExports">
+        <omgdc:Bounds height="70.0" width="140.0" x="100.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskWaitForExports" id="BPMNShape_UserTaskWaitForExports">
+        <omgdc:Bounds height="70.0" width="140.0" x="280.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToUserTaskWaitForExports" id="BPMNEdge_flowToUserTaskWaitForExports">
+        <omgdi:waypoint x="240.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="51.0" y="44.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="420.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

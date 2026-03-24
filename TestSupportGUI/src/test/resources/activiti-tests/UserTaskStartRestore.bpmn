@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="%ENV%-UserTaskStartRestore" name="CTE %ENV%-UserTaskStartRestore" isExecutable="true">
+    <startEvent id="startEvent" name="Start" activiti:initiator="initiator"></startEvent>
+    <endEvent id="endEvent" name="End"></endEvent>
+    <userTask id="UserTaskStartRestore" name="Restore starten [StartRestore]"></userTask>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="UserTaskStartRestore"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="UserTaskStartRestore" targetRef="endEvent"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%UserTaskStartRestore">
+    <bpmndi:BPMNPlane bpmnElement="%ENV%UserTaskStartRestore" id="BPMNPlane_%ENV%UserTaskStartRestore">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="16.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskStartRestore" id="BPMNShape_UserTaskStartRestore">
+        <omgdc:Bounds height="70.0" width="140.0" x="90.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="51.0" y="44.0"></omgdi:waypoint>
+        <omgdi:waypoint x="90.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="230.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="44.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

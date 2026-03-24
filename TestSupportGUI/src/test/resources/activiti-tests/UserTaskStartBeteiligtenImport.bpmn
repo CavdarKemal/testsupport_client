@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="%ENV%-UserTaskStartBeteiligtenImport" name="CTE %ENV%-UserTaskStartBeteiligtenImport" isExecutable="true">
+    <startEvent id="startEvent" name="Start" activiti:initiator="initiator"></startEvent>
+    <endEvent id="endEvent" name="End"></endEvent>
+    <userTask id="UserTaskStartBeteiligtenImport" name="Beteiligten-Import starten [StartBeteiligtenImport]"></userTask>
+    <sequenceFlow id="flowToUserTaskWaitForBeteiligtenImport" sourceRef="UserTaskStartBeteiligtenImport" targetRef="UserTaskWaitForBeteiligtenImport"></sequenceFlow>
+    <userTask id="UserTaskWaitForBeteiligtenImport" name="Beteiligten-Import abwarten [WaitForBeteiligtenImport]"></userTask>
+    <sequenceFlow id="flow14" sourceRef="startEvent" targetRef="UserTaskStartBeteiligtenImport"></sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="UserTaskWaitForBeteiligtenImport" targetRef="endEvent"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%UserTaskStartBeteiligtenImport">
+    <bpmndi:BPMNPlane bpmnElement="%ENV%UserTaskStartBeteiligtenImport" id="BPMNPlane_%ENV%UserTaskStartBeteiligtenImport">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="16.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="470.0" y="28.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskStartBeteiligtenImport" id="BPMNShape_UserTaskStartBeteiligtenImport">
+        <omgdc:Bounds height="70.0" width="140.0" x="101.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskWaitForBeteiligtenImport" id="BPMNShape_UserTaskWaitForBeteiligtenImport">
+        <omgdc:Bounds height="70.0" width="140.0" x="287.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToUserTaskWaitForBeteiligtenImport" id="BPMNEdge_flowToUserTaskWaitForBeteiligtenImport">
+        <omgdi:waypoint x="241.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="287.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="51.0" y="44.0"></omgdi:waypoint>
+        <omgdi:waypoint x="101.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="427.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

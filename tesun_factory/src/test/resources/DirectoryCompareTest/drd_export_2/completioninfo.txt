@@ -1,0 +1,5 @@
+DrdRelevanzPrueferVersion=0.7.1
+anzahl_gesamt=18630
+anzahl_loeschsaetze=0
+anzahl_fehler=0
+statistics_complete=true

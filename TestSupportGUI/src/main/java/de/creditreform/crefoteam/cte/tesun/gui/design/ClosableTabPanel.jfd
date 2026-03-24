@@ -1,0 +1,45 @@
+JFDML JFormDesigner: "8.2.4.0.393" Java: "17.0.9" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+			"$columnSpecs": "0, 26"
+			"$rowSpecs": "center:0:1.0"
+			"$alignTop": true
+			"$alignLeft": true
+		} ) {
+			name: "this"
+			"border": new javax.swing.border.EtchedBorder( 1, null, null )
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
+				name: "checkBoxSelect"
+				"text": "Tab-Titel"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "buttonClose"
+				"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/cancel.png" )
+				"maximumSize": new java.awt.Dimension( 20, 20 )
+				"minimumSize": new java.awt.Dimension( 20, 20 )
+				"background": new java.awt.Color( 255, 255, 255, 255 )
+				"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				"foreground": sfield java.awt.Color white
+				"iconTextGap": 1
+				"opaque": false
+				"preferredSize": new java.awt.Dimension( 10, 20 )
+				"contentAreaFilled": false
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+					"JavaCodeGenerator.variableName": "buttonClose"
+				}
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridx": 1
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 90, 30 )
+		} )
+	}
+}

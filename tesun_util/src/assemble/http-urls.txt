@@ -1,0 +1,9 @@
+http://http://rhsctem015.ecofis.de:7077/cte_tesun_service/tesun/configinfo
+http://http://rhsctem015.ecofis.de:7077/cte_tesun_service/tesun/systeminfo
+http://http://rhsctem015.ecofis.de:7077/cte_tesun_service/tesun/produktauftrag/list/bycrefo/?crefo=4125877731
+http://http://rhsctem015.ecofis.de:7077/cte_tesun_service/tesun/clzinfo?clz=412
+http://http://rhsctem015.ecofis.de:7077/cte_tesun_service/tesun/entg-list
+http://rhsctem016.ecofis.de:7079/backend/pre-product/by-crefo/5170107860
+http://rhsctem015.ecofis.de:7071/services
+http://rhsctem015.ecofis.de:7051/backend/relevanzdecision/monitoring/5272003071/EXPORT_CTE_TO_RTN
+http://rhsctew002.ecofis.de:7059/jobs

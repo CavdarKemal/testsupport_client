@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+	<clz-eigner-vc>241</clz-eigner-vc>
+	<vsh-firmendaten>
+		<firmierung>TGT Handelsgesellschaft mbH</firmierung>
+		<name1>TGT Handelsgesellschaft mbH</name1>
+		<korrespondenz-adresse>
+			<strasse>Papenstr.</strasse>
+			<hausnummer>3</hausnummer>
+			<plz>48489</plz>
+			<ort>Emsbüren</ort>
+			<land>DE</land>
+		</korrespondenz-adresse>
+		<korrespondenz-adresse>
+			<strasse>Papenstrasse</strasse>
+			<hausnummer>4</hausnummer>
+			<plz>48487</plz>
+			<ort>Emsbüren</ort>
+			<land>DE</land>
+		</korrespondenz-adresse>
+		<rechtsform>
+			<bezeichnung-rechtsform>Gesellschaft1 mit beschränkter Haftung</bezeichnung-rechtsform>
+		</rechtsform>
+		<crefonummer>2410064579</crefonummer>
+		<rechtsform>
+			<bezeichnung-rechtsform>Gesellschaft2 mit beschränkter Haftung</bezeichnung-rechtsform>
+		</rechtsform>
+		<gruendung genauigkeit="EXAKT" tag="12" monat="6" jahr="2009"/>
+		<statistik>
+			<letzte-aenderung>2010-01-21+01:00</letzte-aenderung>
+			<anzahl-auskuenfte>0</anzahl-auskuenfte>
+			<anzahl-nachtragspflichtige-auftraege>3</anzahl-nachtragspflichtige-auftraege>
+		</statistik>
+		<bonitaet>
+			<zahlungsweise>Zahlungserfahrungen liegen uns nicht vor.</zahlungsweise>
+			<krediturteil>Ein Krediturteil wird (noch) nicht vergeben. Die Geschaeftsentwicklung bleibt abzuwarten.</krediturteil>
+		</bonitaet>
+		<branchendaten>
+			<eingetragener-gegenstand>Handel mit und der Vertrieb von Waren und Investionsgütern, insbesondere Maschinen</eingetragener-gegenstand>
+		</branchendaten>
+		<firma-firmenbeteiligte>
+			<firma-firmenbeteiligter-historie>
+				<beteiligteneigenschaft>
+					<bezeichnung>Inhaber</bezeichnung>
+					<id>210</id>
+				</beteiligteneigenschaft>
+				<crefonummer>5190938586</crefonummer>
+				<beteiligt-seit jahr="2011" monat="2" tag="4"/>
+				<herkunft-und-zeitpunkt>
+					<zeitpunkt>2012-03-13T14:55:28.118+01:00</zeitpunkt>
+				</herkunft-und-zeitpunkt>
+			</firma-firmenbeteiligter-historie>
+		</firma-firmenbeteiligte>
+	</vsh-firmendaten>
+</vsh_firmendatenexport>

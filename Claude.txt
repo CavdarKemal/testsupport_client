@@ -1,0 +1,17 @@
+ Neu: ActivitiProcessController.java
+  - prepareStart(helper, env) — synchron auf EDT: BPMN deployen oder bestehenden Prozess mit Confirm-Dialog bestätigen; bei Abbruch → RequestAbortedException
+  - runProcess(helper, env, taskVars, customers, task) — im Worker-Thread: startet UserTaskThread, setzt Callback
+  - stop() — null-safe shutDown() + Reset
+
+  Geändert: TestSupportView.java
+  - userTaskThread → activitiController (Feld)
+  - Controller-Init nach initListeners(): new ActivitiProcessController(this, this::initCustomers)
+  - Start-Listener: ruft prepareStart() sync auf EDT, dann Worker-Thread mit runProcess() (wie in activiti-process-6)
+  - Stop-Listener: delegiert an activitiController.stop()
+  - Methoden doStartActivitiProzess(), checkAndHandleACTIVITIStatus(), getThreadForACTIVITPorocess() — entfernt
+  - notifyClientJob(null)-Zweig: activitiController.stop() statt direkte Thread-Referenz
+  - Nicht mehr benötigte Imports CteActivitiService und UserTaskThread entfernt
+
+✻
+
+-

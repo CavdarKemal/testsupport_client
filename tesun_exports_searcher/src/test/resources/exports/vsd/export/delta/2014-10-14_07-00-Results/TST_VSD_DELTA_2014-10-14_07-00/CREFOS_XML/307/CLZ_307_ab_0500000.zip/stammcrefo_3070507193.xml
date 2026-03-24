@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+  <clz-eigner-vc>307</clz-eigner-vc>
+  <vsh-firmendaten>
+    <crefonummer>3070507193</crefonummer>
+    <firmierung>Peter Fengel Fleischmarkt</firmierung>
+    <name1>Peter Fengel</name1>
+    <name2>Fleischmarkt</name2>
+    <korrespondenz-adresse>
+      <strasse>Schönbrunner Str.</strasse>
+      <hausnummer>33</hausnummer>
+      <plz>01877</plz>
+      <ort>Demitz-Thumitz</ort>
+      <land>DE</land>
+    </korrespondenz-adresse>
+    <rechtsform>
+      <bezeichnung-rechtsform>Gewerbebetrieb</bezeichnung-rechtsform>
+    </rechtsform>
+    <gruendung genauigkeit="EXAKT" jahr="2006" monat="9" tag="8"/>
+    <statistik>
+      <letzte-recherche>2014-10-13+02:00</letzte-recherche>
+      <letzte-aenderung>2014-10-13+02:00</letzte-aenderung>
+      <vorraetig-bis>2015-10-13+02:00</vorraetig-bis>
+      <anzahl-auskuenfte>1</anzahl-auskuenfte>
+    </statistik>
+    <bonitaet>
+      <bonitaets-index>275</bonitaets-index>
+      <zahlungsweise>Innerhalb vereinbarter Ziele.</zahlungsweise>
+      <krediturteil>Kredite werden nicht abgesprochen. Eine Geschäftsverbindung gilt als zulässig.</krediturteil>
+    </bonitaet>
+    <beteiligte>
+      <firmenbeteiligter>
+        <crefonummer-beteiligter>3070045547</crefonummer-beteiligter>
+        <verflechtungsinfo>
+          <beteiligteneigenschaft>Inhaber</beteiligteneigenschaft>
+          <beteiligt-seit jahr="2006" monat="9" tag="8"/>
+        </verflechtungsinfo>
+      </firmenbeteiligter>
+    </beteiligte>
+    <anzahl-mitarbeiter>
+      <angabe-aus-jahr>2014</angabe-aus-jahr>
+      <anzahl-mitarbeiter genauigkeit="EXAKT">
+        <wert>2</wert>
+      </anzahl-mitarbeiter>
+    </anzahl-mitarbeiter>
+    <umsatz>
+      <umsatz-jahr>2013</umsatz-jahr>
+      <umsatz-hoehe genauigkeit="EXAKT">
+        <wert>30000</wert>
+        <waehrung>EUR</waehrung>
+      </umsatz-hoehe>
+    </umsatz>
+    <branchendaten>
+      <eingetragener-gegenstand>Einzelhandel mit Fleisch- und Wurstwaren;</eingetragener-gegenstand>
+      <branchenangabe>
+        <rang>1</rang>
+        <branchencode>4722</branchencode>
+        <branchentext>Einzelhandel mit Fleisch und Fleischwaren</branchentext>
+      </branchenangabe>
+    </branchendaten>
+  </vsh-firmendaten>
+</vsh_firmendatenexport>

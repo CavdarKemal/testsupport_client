@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>  
+ 
+							<rtb-bilanz xmlns="http://www.creditreform.de/crefoteam/cte/cte_rtn_bilanzen/2019/10"> 
+
+							<crefonummer>2030002431</crefonummer> 
+
+							<bilanzjahr>2009</bilanzjahr> 
+<konzernbilanz>false</konzernbilanz> 
+<rechtskreis>1</rechtskreis> 
+<offenlegungs-befreiung>true</offenlegungs-befreiung><bilanz-inhalte><stichtag>2009-12-31</stichtag> 
+<groesse>2</groesse> 
+<anzahl-mitarbeiter>124</anzahl-mitarbeiter> 
+<g-u-v-berechnungs-art>1</g-u-v-berechnungs-art> 
+<pruefer-name>PricewaterhouseCoopers AG, Hannover</pruefer-name> 
+<pruefungs-urteil>1</pruefungs-urteil> 
+<bilanz-position-strukturen> 
+<aktiva-position>
+						<position-nr>1</position-nr> 
+
+						<wert-oder-betrag>1355300000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>9</position-nr> 
+
+						<wert-oder-betrag>842600000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>10</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>11</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>22</position-nr> 
+
+						<wert-oder-betrag>5600000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>23</position-nr> 
+
+						<wert-oder-betrag>4200000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>33</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>37</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>44</position-nr> 
+
+						<wert-oder-betrag>836300000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>45</position-nr> 
+
+						<wert-oder-betrag>719600000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>52</position-nr> 
+
+						<wert-oder-betrag>88300000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>55</position-nr> 
+
+						<wert-oder-betrag>26400000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>60</position-nr> 
+
+						<wert-oder-betrag>2000000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>88</position-nr> 
+
+						<wert-oder-betrag>512700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>109</position-nr> 
+
+						<wert-oder-betrag>512600000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>111</position-nr> 
+
+						<wert-oder-betrag>6100000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>112</position-nr> 
+
+						<wert-oder-betrag>6100000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>125</position-nr> 
+
+						<wert-oder-betrag>505700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>126</position-nr> 
+
+						<wert-oder-betrag>491700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>127</position-nr> 
+
+						<wert-oder-betrag>14000000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>128</position-nr> 
+
+						<wert-oder-betrag>7400000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>131</position-nr> 
+
+						<wert-oder-betrag>100000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>132</position-nr> 
+
+						<wert-oder-betrag>100000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>139</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>140</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>167</position-nr> 
+
+						<wert-oder-betrag>100000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<aktiva-position>
+						<position-nr>9209</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</aktiva-position> 
+<passiva-position>
+						<position-nr>183</position-nr> 
+
+						<wert-oder-betrag>1355300000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>184</position-nr> 
+
+						<wert-oder-betrag>306100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>185</position-nr> 
+
+						<wert-oder-betrag>77000000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>186</position-nr> 
+
+						<wert-oder-betrag>77000000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>206</position-nr> 
+
+						<wert-oder-betrag>50000000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>214</position-nr> 
+
+						<wert-oder-betrag>179100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>215</position-nr> 
+
+						<wert-oder-betrag>7700000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>222</position-nr> 
+
+						<wert-oder-betrag>171400000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>234</position-nr> 
+
+						<wert-oder-betrag>800000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>237</position-nr> 
+
+						<wert-oder-betrag>600000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>238</position-nr> 
+
+						<wert-oder-betrag>600000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>251</position-nr> 
+
+						<wert-oder-betrag>18400000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>252</position-nr> 
+
+						<wert-oder-betrag>9100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>257</position-nr> 
+
+						<wert-oder-betrag>100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>264</position-nr> 
+
+						<wert-oder-betrag>9200000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>274</position-nr> 
+
+						<wert-oder-betrag>1030000000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>299</position-nr> 
+
+						<wert-oder-betrag>1500000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>301</position-nr> 
+
+						<wert-oder-betrag>1500000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>330</position-nr> 
+
+						<wert-oder-betrag>992800000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>332</position-nr> 
+
+						<wert-oder-betrag>128700000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>337</position-nr> 
+
+						<wert-oder-betrag>864100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>339</position-nr> 
+
+						<wert-oder-betrag>864100000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>344</position-nr> 
+
+						<wert-oder-betrag>4500000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>346</position-nr> 
+
+						<wert-oder-betrag>4500000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>358</position-nr> 
+
+						<wert-oder-betrag>31200000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>360</position-nr> 
+
+						<wert-oder-betrag>3400000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>361</position-nr> 
+
+						<wert-oder-betrag>200000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>362</position-nr> 
+
+						<wert-oder-betrag>300000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>368</position-nr> 
+
+						<wert-oder-betrag>27800000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>369</position-nr> 
+
+						<wert-oder-betrag>11200000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>370</position-nr> 
+
+						<wert-oder-betrag>16600000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>9106</position-nr> 
+
+						<wert-oder-betrag>200000</wert-oder-betrag> 
+
+							</passiva-position> 
+<passiva-position>
+						<position-nr>9124</position-nr> 
+
+						<wert-oder-betrag>2900000</wert-oder-betrag> 
+
+							</passiva-position> 
+<guv-position>
+						<position-nr>385</position-nr> 
+
+						<wert-oder-betrag>0</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>386</position-nr> 
+
+						<wert-oder-betrag>22700000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>388</position-nr> 
+
+						<wert-oder-betrag>6300000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>408</position-nr> 
+
+						<wert-oder-betrag>-16400000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>412</position-nr> 
+
+						<wert-oder-betrag>16400000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>414</position-nr> 
+
+						<wert-oder-betrag>16400000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>415</position-nr> 
+
+						<wert-oder-betrag>-25500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>417</position-nr> 
+
+						<wert-oder-betrag>48200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>458</position-nr> 
+
+						<wert-oder-betrag>13700000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>459</position-nr> 
+
+						<wert-oder-betrag>15800000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>461</position-nr> 
+
+						<wert-oder-betrag>11400000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>464</position-nr> 
+
+						<wert-oder-betrag>4400000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>466</position-nr> 
+
+						<wert-oder-betrag>3000000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>469</position-nr> 
+
+						<wert-oder-betrag>500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>471</position-nr> 
+
+						<wert-oder-betrag>500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>475</position-nr> 
+
+						<wert-oder-betrag>500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>482</position-nr> 
+
+						<wert-oder-betrag>22900000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>496</position-nr> 
+
+						<wert-oder-betrag>200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>504</position-nr> 
+
+						<wert-oder-betrag>300000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>613</position-nr> 
+
+						<wert-oder-betrag>61800000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>614</position-nr> 
+
+						<wert-oder-betrag>-13600000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>636</position-nr> 
+
+						<wert-oder-betrag>40500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>637</position-nr> 
+
+						<wert-oder-betrag>37700000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>638</position-nr> 
+
+						<wert-oder-betrag>2800000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>640</position-nr> 
+
+						<wert-oder-betrag>59200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>642</position-nr> 
+
+						<wert-oder-betrag>59200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>643</position-nr> 
+
+						<wert-oder-betrag>2600000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>644</position-nr> 
+
+						<wert-oder-betrag>100000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>645</position-nr> 
+
+						<wert-oder-betrag>2500000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>648</position-nr> 
+
+						<wert-oder-betrag>6200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>650</position-nr> 
+
+						<wert-oder-betrag>6200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>654</position-nr> 
+
+						<wert-oder-betrag>34200000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>660</position-nr> 
+
+						<wert-oder-betrag>6300000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>663</position-nr> 
+
+						<wert-oder-betrag>19800000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>665</position-nr> 
+
+						<wert-oder-betrag>19100000</wert-oder-betrag> 
+
+							</guv-position> 
+<guv-position>
+						<position-nr>9150</position-nr> 
+
+						<wert-oder-betrag>22400000</wert-oder-betrag> 
+
+							</guv-position> 
+<ergebnisverwendung-position>
+						<position-nr>379</position-nr> 
+
+						<wert-oder-betrag>429400000</wert-oder-betrag> 
+
+							</ergebnisverwendung-position> 
+<ergebnisverwendung-position>
+						<position-nr>381</position-nr> 
+
+						<wert-oder-betrag>149000000</wert-oder-betrag> 
+
+							</ergebnisverwendung-position> 
+<ergebnisverwendung-position>
+						<position-nr>6734</position-nr> 
+
+						<wert-oder-betrag>67100000</wert-oder-betrag> 
+
+							</ergebnisverwendung-position> 
+<ergebnisverwendung-position>
+						<position-nr>6736</position-nr> 
+
+						<wert-oder-betrag>213300000</wert-oder-betrag> 
+
+							</ergebnisverwendung-position> 
+<anlagegitter-position>
+						<position-nr>9000</position-nr> 
+
+						<wert-oder-betrag>0</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9001</position-nr> 
+
+						<wert-oder-betrag>816500000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9002</position-nr> 
+
+						<wert-oder-betrag>82200000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9003</position-nr> 
+
+						<wert-oder-betrag>6700000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9006</position-nr> 
+
+						<wert-oder-betrag>34700000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9007</position-nr> 
+
+						<wert-oder-betrag>49400000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9008</position-nr> 
+
+						<wert-oder-betrag>842600000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9009</position-nr> 
+
+						<wert-oder-betrag>0</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9010</position-nr> 
+
+						<wert-oder-betrag>3700000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9011</position-nr> 
+
+						<wert-oder-betrag>200000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9015</position-nr> 
+
+						<wert-oder-betrag>200000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9016</position-nr> 
+
+						<wert-oder-betrag>3200000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+<anlagegitter-position>
+						<position-nr>9017</position-nr> 
+
+						<wert-oder-betrag>700000</wert-oder-betrag> 
+
+							</anlagegitter-position> 
+</bilanz-position-strukturen></bilanz-inhalte></rtb-bilanz>

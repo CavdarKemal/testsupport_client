@@ -1,0 +1,118 @@
+JFDML JFormDesigner: "8.2.4.0.393" Java: "17.0.9" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			auxiliary() {
+				"JavaCodeGenerator.variableGetter": true
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0:1.0, 0:1.0"
+				"$rowSpecs": "0, 0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignLeft": true
+				"$alignTop": true
+			} ) {
+				name: "panelControls"
+				"border": new javax.swing.border.BevelBorder( 1, null, null, null, null )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonRefreshScanResults"
+					"text": "Aktualisieren"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/refresh.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"insets": new java.awt.Insets( 2, 2, 2, 0 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonLoadScanResults"
+					"text": "Scan Results Laden..."
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_up.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"insets": new java.awt.Insets( 2, 2, 2, 0 )
+					"gridx": 1
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonSaveScanResults"
+					"text": "Scan Results Speichern"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/save.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"insets": new java.awt.Insets( 2, 2, 2, 0 )
+					"gridx": 2
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label1"
+					"text": "Diff-Tool:"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"insets": new java.awt.Insets( 1, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "comboBoxDiffTools"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 1
+					"gridy": 1
+					"insets": new java.awt.Insets( 1, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonStartDifTool"
+					"text": "Start Diff-Tool"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"insets": new java.awt.Insets( 1, 2, 2, 2 )
+					"gridx": 2
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "First"
+			} )
+			add( new FormContainer( "javax.swing.JSplitPane", new FormLayoutManager( class javax.swing.JSplitPane ) ) {
+				name: "splitPanelTreeView"
+				"dividerLocation": 100
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.CardLayout ) ) {
+					name: "panelScanResults"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "right"
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPaneScanCustomers"
+					add( new FormComponent( "javax.swing.JTree" ) {
+						name: "treeCustomers"
+						"minimumSize": new java.awt.Dimension( 120, 0 )
+						auxiliary() {
+							"JavaCodeGenerator.variableGetter": true
+						}
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "left"
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 575, 445 )
+		} )
+	}
+}

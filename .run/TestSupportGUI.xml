@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TestSupportGUI" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
+    <envs>
+      <env name="restInvoker.traceInvokers" value="1" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="de.creditreform.crefoteam.cte.tesun.gui.activiti.TestSupportGUI" />
+    <module name="TestSupportGUI" />
+    <option name="PROGRAM_PARAMETERS" value="-ucavdark -psirinda" />
+    <option name="VM_PARAMETERS" value="-Dlog4j.debug=true -Dlog4j.configuration=file:log4j.properties" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="de.creditreform.crefoteam.cte.tesun.gui.activiti.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

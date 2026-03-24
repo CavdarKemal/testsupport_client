@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arc:archivbestand xmlns:arc="http://www.creditreform.de/crefoteam/archivbestandv2_0">
+<arc:adressen>
+    <arc:adresse-historie>
+      <arc:enum-herkunft>-1</arc:enum-herkunft>
+      <arc:gueltig>true</arc:gueltig>
+      <arc:enum-gueltigkeit>1</arc:enum-gueltigkeit>
+      <arc:gueltig-von jahr="2013" monat="8" tag="24"/>
+      <arc:anlage datum="2013-08-24T04:59:42.000+02:00"/>
+      <arc:aenderung datum="2013-08-24T04:59:42.000+02:00"/>
+      <arc:enum-adressart>1</arc:enum-adressart>
+      <arc:enum-adressbereich>8</arc:enum-adressbereich>
+      <arc:enum-zustellbarkeit>-1</arc:enum-zustellbarkeit>
+      <arc:enum-land>22</arc:enum-land>
+      <arc:plz>5071</arc:plz>
+      <arc:ort>Wals bei Salzburg</arc:ort>
+      <arc:strasse>Käferheimerstraße</arc:strasse>
+      <arc:hausnummer>36</arc:hausnummer>
+      <arc:enum-adresszusatz>-1</arc:enum-adresszusatz>
+      <arc:besteadresse>true</arc:besteadresse>
+      <arc:auskunftsadresse>true</arc:auskunftsadresse>
+      <arc:geschaeftsadresse>false</arc:geschaeftsadresse>
+    </arc:adresse-historie>
+  </arc:adressen>
+  <arc:bonitaet>
+    <arc:enum-krediturteil-vorschlag>-1</arc:enum-krediturteil-vorschlag>
+    <arc:enum-unternehmensentwicklung-vorschlag>-1</arc:enum-unternehmensentwicklung-vorschlag>
+    <arc:enum-zahlungsweise-vorschlag>-1</arc:enum-zahlungsweise-vorschlag>
+    <arc:keine-bilanz-bonitaet>false</arc:keine-bilanz-bonitaet>
+  </arc:bonitaet>
+  <arc:kommunikation/>
+  <arc:statistik>
+    <arc:anzahl-telefonauskuenfte>0</arc:anzahl-telefonauskuenfte>
+    <arc:anzahl-auskuenfte>0</arc:anzahl-auskuenfte>
+    <arc:anzahl-nachtragspflichtige-auftraege>0</arc:anzahl-nachtragspflichtige-auftraege>
+  </arc:statistik>
+  <arc:steuerung>
+    <arc:crefonummer>9122016515</arc:crefonummer>
+    <arc:firma>false</arc:firma>
+    <arc:enum-waehrung-eignervc-land>20000</arc:enum-waehrung-eignervc-land>
+    <arc:enum-clz-zustaendiger-vc>913</arc:enum-clz-zustaendiger-vc>
+    <arc:enum-clz-eigner-vc>913</arc:enum-clz-eigner-vc>
+    <arc:provisorisch>false</arc:provisorisch>
+  </arc:steuerung>
+  <arc:verwaltung>
+    <arc:letzte-automatische-aenderung>2014-04-02T03:27:30.359+02:00</arc:letzte-automatische-aenderung>
+    <arc:letzte-aenderung>2014-04-02T03:27:30.359+02:00</arc:letzte-aenderung>
+    <arc:automatisierung-erlaubt>true</arc:automatisierung-erlaubt>
+    <arc:crefofactoring-kunde>false</arc:crefofactoring-kunde>
+    <arc:bdsg-enum-medium>-1</arc:bdsg-enum-medium>
+    <arc:enum-selbstauskunftstatus>-1</arc:enum-selbstauskunftstatus>
+    <arc:vorraetig>false</arc:vorraetig>
+    <arc:enum-personenstatus>8</arc:enum-personenstatus>
+    <arc:personenstatus-seit>2013-08-24+02:00</arc:personenstatus-seit>
+    <arc:fuer-die-auskunft-gesperrt>false</arc:fuer-die-auskunft-gesperrt>
+    <arc:erloschen>false</arc:erloschen>
+    <arc:ruhend>false</arc:ruhend>
+    <arc:anstehende-recherche>false</arc:anstehende-recherche>
+    <arc:warenkreditversicherung>false</arc:warenkreditversicherung>
+    <arc:factoring-allgemein>unknown</arc:factoring-allgemein>
+    <arc:enum-letztes-rating>-1</arc:enum-letztes-rating>
+    <arc:beteiligung-gesperrt>false</arc:beteiligung-gesperrt>
+    <arc:in-ueberwachung>false</arc:in-ueberwachung>
+    <arc:erfassung>2013-08-24+02:00</arc:erfassung>
+    <arc:qualitaet>
+      <arc:anmerkung-adresse-jva>true</arc:anmerkung-adresse-jva>
+      <arc:anmerkung-adresshistorie>true</arc:anmerkung-adresshistorie>
+      <arc:anmerkung-btg-fbt>true</arc:anmerkung-btg-fbt>
+      <arc:anmerkung-immobilie-von-cis2-ohne-kapitel>true</arc:anmerkung-immobilie-von-cis2-ohne-kapitel>
+      <arc:anmerkung-privatperson-anschriften>true</arc:anmerkung-privatperson-anschriften>
+      <arc:anmerkung-weitere-kommunikationswege>true</arc:anmerkung-weitere-kommunikationswege>
+      <arc:bilanz-konzernbilanz>true</arc:bilanz-konzernbilanz>
+      <arc:branche-34c-gewo>true</arc:branche-34c-gewo>
+      <arc:branche-gegenstandhistorie>true</arc:branche-gegenstandhistorie>
+      <arc:branche-rechtsform-etc>true</arc:branche-rechtsform-etc>
+      <arc:branche-standorte>true</arc:branche-standorte>
+      <arc:branche-steuernummer>true</arc:branche-steuernummer>
+      <arc:branche-unbekannt-verzogen>true</arc:branche-unbekannt-verzogen>
+      <arc:firmenbeteiligter-negativinformation>false</arc:firmenbeteiligter-negativinformation>
+      <arc:firmenbeteiligter-nicht-in-cis2>true</arc:firmenbeteiligter-nicht-in-cis2>
+      <arc:firmenbeteiligter-vertretungsbefugnis>true</arc:firmenbeteiligter-vertretungsbefugnis>
+      <arc:mitarbeiter-differenzierte-mitarbeiterarten>true</arc:mitarbeiter-differenzierte-mitarbeiterarten>
+      <arc:privatperson-immobilien>true</arc:privatperson-immobilien>
+      <arc:privatperson-sterbedatum>true</arc:privatperson-sterbedatum>
+      <arc:privatperson-vornamen-etc>true</arc:privatperson-vornamen-etc>
+      <arc:register-hr-zusammenlegung>false</arc:register-hr-zusammenlegung>
+      <arc:register-name123-ungleich-firmierung>true</arc:register-name123-ungleich-firmierung>
+      <arc:register-sitzverlegung>false</arc:register-sitzverlegung>
+      <arc:register-umfirmierung>true</arc:register-umfirmierung>
+      <arc:umsatz-umsatzart-ungleich-umsatz>true</arc:umsatz-umsatzart-ungleich-umsatz>
+    </arc:qualitaet>
+  </arc:verwaltung>
+  <arc:privatperson-name>
+    <arc:vorsteuerabzugsberechtigt>false</arc:vorsteuerabzugsberechtigt>
+    <arc:privatperson-name-historie>
+      <arc:enum-herkunft>40151</arc:enum-herkunft>
+      <arc:gueltig>true</arc:gueltig>
+      <arc:enum-gueltigkeit>1</arc:enum-gueltigkeit>
+      <arc:gueltig-von jahr="2013" monat="8" tag="24"/>
+      <arc:anlage datum="2013-08-24T04:59:42.000+02:00"/>
+      <arc:aenderung datum="2014-04-02T03:27:30.000+02:00"/>
+      <arc:vorname>Josef</arc:vorname>
+      <arc:nachname>Koch</arc:nachname>
+      <arc:enum-anrede>1</arc:enum-anrede>
+      <arc:enum-briefanrede>1</arc:enum-briefanrede>
+      <arc:enum-titel>-1</arc:enum-titel>
+      <arc:enum-nachtitel>-1</arc:enum-nachtitel>
+      <arc:enum-zustellbarkeit>-1</arc:enum-zustellbarkeit>
+    </arc:privatperson-name-historie>
+  </arc:privatperson-name>
+  <arc:privatperson-zusatz>
+    <arc:arbeitslosenbescheid>false</arc:arbeitslosenbescheid>
+    <arc:geburtsdatum jahr="1955" monat="2" tag="3" enum-genauigkeit="0" gesperrt="false"/>
+    <arc:sterbekennzeichen>false</arc:sterbekennzeichen>
+    <arc:sterbedatum enum-genauigkeit="0" gesperrt="false"/>
+    <arc:rentenbescheid>false</arc:rentenbescheid>
+    <arc:sozialversicherungsbescheid>false</arc:sozialversicherungsbescheid>
+  </arc:privatperson-zusatz>
+</arc:archivbestand>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+  <clz-eigner-vc>307</clz-eigner-vc>
+  <vsh-firmendaten>
+    <crefonummer>3070507726</crefonummer>
+    <firmierung>Ute Wiebershausen Gaststätte &amp;quot;Sonnenblick&amp;quot;</firmierung>
+    <name1>Ute Wiebershausen</name1>
+    <name2>Gaststätte &amp;quot;Sonnenblick&amp;quot;</name2>
+    <korrespondenz-adresse>
+      <strasse>Kohlbergstr.</strasse>
+      <hausnummer>15</hausnummer>
+      <hausnummer-zusatz>a</hausnummer-zusatz>
+      <plz>01796</plz>
+      <ort>Pirna</ort>
+      <land>DE</land>
+    </korrespondenz-adresse>
+    <rechtsform>
+      <bezeichnung-rechtsform>Gewerbebetrieb</bezeichnung-rechtsform>
+    </rechtsform>
+    <gruendung genauigkeit="EXAKT" jahr="2014" monat="6" tag="20"/>
+    <statistik>
+      <letzte-recherche>2014-06-27+02:00</letzte-recherche>
+      <letzte-aenderung>2014-08-20+02:00</letzte-aenderung>
+      <vorraetig-bis>2015-06-27+02:00</vorraetig-bis>
+      <anzahl-auskuenfte>7</anzahl-auskuenfte>
+    </statistik>
+    <bonitaet>
+      <zahlungsweise>Zahlungserfahrungen liegen uns noch nicht vor.</zahlungsweise>
+      <krediturteil>Ein Krediturteil wird (noch) nicht vergeben. Die Geschäftsentwicklung bleibt abzuwarten.</krediturteil>
+    </bonitaet>
+    <beteiligte>
+      <firmenbeteiligter>
+        <crefonummer-beteiligter>2011761607</crefonummer-beteiligter>
+        <verflechtungsinfo>
+          <beteiligteneigenschaft>Inhaber</beteiligteneigenschaft>
+          <beteiligt-seit jahr="2014" monat="6" tag="20"/>
+        </verflechtungsinfo>
+      </firmenbeteiligter>
+    </beteiligte>
+    <branchendaten>
+      <eingetragener-gegenstand>Gaststätte &amp;quot;Sonnenblick&amp;quot;</eingetragener-gegenstand>
+      <branchenangabe>
+        <rang>1</rang>
+        <branchencode>5610001</branchencode>
+        <branchentext>Gaststätte</branchentext>
+      </branchenangabe>
+    </branchendaten>
+  </vsh-firmendaten>
+</vsh_firmendatenexport>

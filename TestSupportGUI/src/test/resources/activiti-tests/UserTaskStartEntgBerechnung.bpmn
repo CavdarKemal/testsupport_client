@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="%ENV%-UserTaskStartEntgBerechnung" name="CTE %ENV%-UserTaskStartEntgBerechnung" isExecutable="true">
+    <startEvent id="startEvent" name="Start" activiti:initiator="initiator"></startEvent>
+    <endEvent id="endEvent" name="End"></endEvent>
+    <userTask id="UserTaskStartEntgBerechnung" name="ENTG-Berechnung starten [StartEntgBerechnung]"></userTask>
+    <userTask id="UserTaskWaitForEntgBerechnung" name="ENTG-Ber. abwarten [WaitForEntgBerechnung]"></userTask>
+    <sequenceFlow id="flowToUserTaskWaitForEntgBerechnung" sourceRef="UserTaskStartEntgBerechnung" targetRef="UserTaskWaitForEntgBerechnung"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="UserTaskWaitForEntgBerechnung" targetRef="endEvent"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="startEvent" targetRef="UserTaskStartEntgBerechnung"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%UserTaskStartEntgBerechnung">
+    <bpmndi:BPMNPlane bpmnElement="%ENV%UserTaskStartEntgBerechnung" id="BPMNPlane_%ENV%UserTaskStartEntgBerechnung">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="16.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="490.0" y="28.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskStartEntgBerechnung" id="BPMNShape_UserTaskStartEntgBerechnung">
+        <omgdc:Bounds height="70.0" width="140.0" x="90.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskWaitForEntgBerechnung" id="BPMNShape_UserTaskWaitForEntgBerechnung">
+        <omgdc:Bounds height="70.0" width="140.0" x="300.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToUserTaskWaitForEntgBerechnung" id="BPMNEdge_flowToUserTaskWaitForEntgBerechnung">
+        <omgdi:waypoint x="230.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="440.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="51.0" y="44.0"></omgdi:waypoint>
+        <omgdi:waypoint x="90.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

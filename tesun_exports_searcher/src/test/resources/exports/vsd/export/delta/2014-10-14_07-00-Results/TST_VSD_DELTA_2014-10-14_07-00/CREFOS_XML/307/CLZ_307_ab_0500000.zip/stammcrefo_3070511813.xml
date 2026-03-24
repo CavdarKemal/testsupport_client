@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+  <clz-eigner-vc>307</clz-eigner-vc>
+  <vsh-firmendaten>
+    <crefonummer>3070511813</crefonummer>
+    <firmierung>Enrico Poldrack Innenausbau</firmierung>
+    <name1>Enrico Poldrack</name1>
+    <name2>Innenausbau</name2>
+    <korrespondenz-adresse>
+      <strasse>Am Park</strasse>
+      <hausnummer>1</hausnummer>
+      <hausnummer-zusatz>a</hausnummer-zusatz>
+      <plz>01561</plz>
+      <ort>Großenhain</ort>
+      <land>DE</land>
+    </korrespondenz-adresse>
+    <rechtsform>
+      <bezeichnung-rechtsform>Gewerbebetrieb</bezeichnung-rechtsform>
+    </rechtsform>
+    <gruendung genauigkeit="EXAKT" jahr="2012" monat="12" tag="12"/>
+    <statistik>
+      <letzte-recherche>2014-10-06+02:00</letzte-recherche>
+      <letzte-aenderung>2014-10-13+02:00</letzte-aenderung>
+      <vorraetig-bis>2015-10-06+02:00</vorraetig-bis>
+      <anzahl-auskuenfte>1</anzahl-auskuenfte>
+    </statistik>
+    <bonitaet>
+      <bonitaets-index>600</bonitaets-index>
+      <zahlungsweise>Negativmerkmale</zahlungsweise>
+      <krediturteil>Kredite werden abgelehnt. Von einer Geschäftsverbindung wird abgeraten.</krediturteil>
+    </bonitaet>
+    <beteiligte>
+      <firmenbeteiligter>
+        <crefonummer-beteiligter>3070148848</crefonummer-beteiligter>
+        <verflechtungsinfo>
+          <beteiligteneigenschaft>Inhaber</beteiligteneigenschaft>
+          <beteiligt-seit jahr="2012" monat="12" tag="12"/>
+        </verflechtungsinfo>
+      </firmenbeteiligter>
+    </beteiligte>
+    <anzahl-mitarbeiter>
+      <angabe-aus-jahr>2014</angabe-aus-jahr>
+      <anzahl-mitarbeiter genauigkeit="EXAKT">
+        <wert>1</wert>
+      </anzahl-mitarbeiter>
+    </anzahl-mitarbeiter>
+    <branchendaten>
+      <eingetragener-gegenstand>Innenausbau, Montagebau, Ladenbau, Eventgastronomie;</eingetragener-gegenstand>
+      <branchenangabe>
+        <rang>2</rang>
+        <branchencode>56210</branchencode>
+        <branchentext>Event-Caterer</branchentext>
+      </branchenangabe>
+      <branchenangabe>
+        <rang>1</rang>
+        <branchencode>43320</branchencode>
+        <branchentext>Bautischlerei und -schlosserei</branchentext>
+      </branchenangabe>
+    </branchendaten>
+  </vsh-firmendaten>
+</vsh_firmendatenexport>

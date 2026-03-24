@@ -1,0 +1,387 @@
+package de.creditreform.crefoteam.cte.tesun.util;
+
+import de.creditreform.crefoteam.cte.restservices.xmlbinding.statistikentscheidungstraegerberechnung.EntscheidungstraegerInfo;
+import de.creditreform.crefoteam.cte.restservices.xmlbinding.statistikentscheidungstraegerberechnung.EntscheidungstraegerInfosAlleCrefos;
+import de.creditreform.crefoteam.cte.restservices.xmlbinding.statistikentscheidungstraegerberechnung.EntscheidungstraegerInfosProCrefo;
+import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
+import de.creditreform.crefoteam.cte.tesun.rest.TesunRestService;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
+
+public class AB30MapperUtil {
+    protected static final String TAG_STEUERUNGSDATEN = "STEUERUNGSDATEN";
+    protected static final String TAG_FIRMENBETEILIGTER = "FIRMENBETEILIGTER";
+    protected static final String TAG_VERFAHRENSBETEILIGTER = "VERFAHRENSBETEILIGTER";
+    protected static final String TAG_KONZERN_ZUGEHOERKT = "KAPITEL-KONZERNZUGEHOERIGKEIT";
+    protected String alternateDownloadSourcePath;
+
+    private TesunRestService tesunRestServiceWLS;
+    private final TesunClientJobListener tesunClientJobListener;
+    protected final boolean mustExtendEntgsFromREST;
+
+    public AB30MapperUtil(EnvironmentConfig environmentConfig, TesunClientJobListener tesunClientJobListener, boolean mustExtendEntgsFromREST, File alternateSourceDir) throws PropertiesException {
+        this.tesunClientJobListener = tesunClientJobListener;
+        tesunRestServiceWLS = new TesunRestService(environmentConfig.getRestServiceConfigsForMasterkonsole().get(0), tesunClientJobListener);
+        if (alternateSourceDir != null) {
+            alternateDownloadSourcePath = alternateSourceDir.getAbsolutePath();
+        }
+        this.mustExtendEntgsFromREST = mustExtendEntgsFromREST;
+    }
+
+    public Map<Long, AB30XMLProperties> extendAb30CrefoPropertiesWithOldAttributes(String strInfoPrefix, File testCrefosFile, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws IOException {
+        Map<Long, AB30XMLProperties> oldAb30CrefoToPropertiesMap = initAb30CrefoPropertiesMap(testCrefosFile);
+        Iterator<Long> iterator = oldAb30CrefoToPropertiesMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            Long crefoNr = iterator.next();
+            AB30XMLProperties oldAb30XMLProperties = oldAb30CrefoToPropertiesMap.get(crefoNr);
+            AB30XMLProperties newAb30XMLProperties = ab30CrefoToPropertiesMap.get(crefoNr);
+            if (newAb30XMLProperties != null) {
+                notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " textendAb30CrefoPropertiesWithOldAttributes():: Ergänze Attributes von AB30XMLProperties '" + newAb30XMLProperties + "' aus altem 'TestCrefos.properties' - Datei...");
+                Long auftragClz = oldAb30XMLProperties.getAuftragClz();
+                if (auftragClz != null) {
+                    newAb30XMLProperties.setAuftragClz(auftragClz);
+                }
+                AB30XMLProperties.BILANZEN_TYPE bilanzType = oldAb30XMLProperties.getBilanzType();
+                if (bilanzType != null) {
+                    newAb30XMLProperties.setBilanzType(bilanzType);
+                }
+                AB30XMLProperties.EH_PROD_AUFTR_TYPE ehProduktAuftragType = oldAb30XMLProperties.getEhProduktAuftragType();
+                if (ehProduktAuftragType != null) {
+                    newAb30XMLProperties.setEhProdAuftrType(ehProduktAuftragType);
+                }
+                boolean mitCtaStatistik = oldAb30XMLProperties.isMitCtaStatistik();
+                newAb30XMLProperties.setMitCtaStatistik(mitCtaStatistik);
+                boolean mitDsgVoSperre = oldAb30XMLProperties.isMitDsgVoSperre();
+                newAb30XMLProperties.setDsgVoSperre(mitDsgVoSperre);
+                notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " extendAb30CrefoPropertiesWithOldAttributes():: Neue AB30XMLProperties:" + newAb30XMLProperties);
+            } else {
+                notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " extendAb30CrefoPropertiesWithOldAttributes():: AB30XMLProperties " + oldAb30XMLProperties + " aus altem 'TestCrefos.properties' - Datei ist nicht mehr im Testpaket!");
+                File xmlToRename = new File(testCrefosFile.getParentFile(), oldAb30XMLProperties.getCrefoNr() + ".xml");
+                if(xmlToRename.exists()) {
+                    notifyTesunClientJobListener(Level.INFO,"\t==> Datei wird umbenannt!");
+                    xmlToRename.renameTo(new File(xmlToRename.getParentFile(), xmlToRename.getName() + ".deleted"));
+                }
+            }
+        }
+        return ab30CrefoToPropertiesMap;
+    }
+
+    public Map<Long, AB30XMLProperties> extendAb30CrefoPropertiesMapWithBtlgs(String strInfoPrefix, File archivBestandsPhaseFile, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws Exception {
+        Map<Long, AB30XMLProperties> ab30CrefoToPropertiesResult = new TreeMap<>(ab30CrefoToPropertiesMap);
+        notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " textendAb30CrefoPropertiesMapWithBtlgs()...");
+        Iterator<Long> iterator = ab30CrefoToPropertiesMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            Long crefoNr = iterator.next();
+            AB30XMLProperties ab30XMLProperties = ab30CrefoToPropertiesMap.get(crefoNr);
+            if (ab30XMLProperties == null) {
+                throw new IllegalStateException("Für die Test-Crefo " + crefoNr + " existiert kein AB30XMLProperties-Eintrag in der Map!");
+            }
+            // behandle die Beteiligten...
+            handleBTLGsFromCrefoXMLFile(strInfoPrefix , archivBestandsPhaseFile, ab30XMLProperties, ab30CrefoToPropertiesResult);
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + "Mapping für Test-Crefo " + crefoNr + " wird angelegt.");
+            ab30CrefoToPropertiesResult.put(crefoNr, ab30XMLProperties);
+            if(mustExtendEntgsFromREST) {
+                // erweitere die Map um AB30XMLProperties-Einträge für Entschedidungsträger der Crefo, falls nicht vorhanden
+                if (!ab30XMLProperties.getBtlgCrefosList().isEmpty()) {
+                    extendEntgsFromREST(strInfoPrefix, archivBestandsPhaseFile, ab30XMLProperties, ab30CrefoToPropertiesResult);
+                }
+            }
+        }
+        return ab30CrefoToPropertiesResult;
+    }
+
+    public Map<Long, AB30XMLProperties> filterAb30CrefoPropertiesMap(String strInfoPrefix, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap,
+                                                                     Map<String, TestCustomer> customerTestInfoMap,
+                                                                     boolean isPhase2) {
+        Map<Long, AB30XMLProperties> usedAb30CrefoToPropertiesMap = new HashMap<>();
+        notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " Filtere Ab30CrefoPropertiesMap für aktive Kunden-Test-Crefos...");
+        for (Map.Entry<String, TestCustomer> testCustomerEntry : customerTestInfoMap.entrySet()) {
+            TestCustomer testCustomer = testCustomerEntry.getValue();
+            List<Long> allTestCrefos = testCustomer.getAllTestCrefosAsLongList(true, false); // nur die aktive und positive+negative Testfälle!
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + "Verarbeite " + allTestCrefos.size() + " Test-Crefos für Kunde " + testCustomer.getCustomerKey() + "...");
+            for (Long testCrefo : allTestCrefos) {
+                AB30XMLProperties newAb30XMLProperties = insertToUsedMap(strInfoPrefix, "Test", testCrefo, isPhase2, ab30CrefoToPropertiesMap, usedAb30CrefoToPropertiesMap);
+                // behandle die Beteiligten... für jeden Beteiligten einen zus. AB30XMLProperties-Satz anlegen, dabei diesem auch den altuellen Kunden als "usedByCustomer" hinzufügen, falls noch nicht geschehen!
+                AB30XMLProperties ab30XMLProperties = ab30CrefoToPropertiesMap.get(testCrefo);
+                if (ab30XMLProperties != null) {
+                    for (Long btlgCrefo : ab30XMLProperties.getBtlgCrefosList()) {
+                        AB30XMLProperties btlgAb30XMLProperties = insertToUsedMap(strInfoPrefix, " Beteiligten", btlgCrefo, isPhase2, ab30CrefoToPropertiesMap, usedAb30CrefoToPropertiesMap);
+                        if (btlgAb30XMLProperties != null) {
+                            boolean contains = btlgAb30XMLProperties.getUsedByCustomersList().contains(testCustomer.getCustomerKey());
+                            if (!contains) {
+                                btlgAb30XMLProperties.getUsedByCustomersList().add(testCustomer.getCustomerKey());
+                            }
+                        }
+                    }
+                } else {
+                     throw new IllegalStateException(strInfoPrefix + " !Die Map enthält keinen Eintrag für Beteiligten-Crefo " +  testCrefo);
+                }
+            }
+        }
+        return usedAb30CrefoToPropertiesMap;
+    }
+
+    private AB30XMLProperties insertToUsedMap(String strInfoPrefix, String strInfo,
+                                              Long crefoNr, boolean isPhase2,
+                                              Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap,
+                                              Map<Long, AB30XMLProperties> usedAb30CrefoToPropertiesMap) {
+        AB30XMLProperties ab30XMLProperties = ab30CrefoToPropertiesMap.get(crefoNr);
+        if (ab30XMLProperties != null) {
+            if (usedAb30CrefoToPropertiesMap.containsKey(crefoNr)) {
+                // notifyTesunClientJobListener(Level.INFO, strInfoPrefix + "Mapping-Eintrag für " + strInfo + "-Crefo " + crefoNr + " existiert schon.");
+            } else {
+                // notifyTesunClientJobListener(Level.INFO, strInfoPrefix + "Mapping-Eintrag für " + strInfo + "-Crefo " + crefoNr + " wird angelegt.");
+                usedAb30CrefoToPropertiesMap.put(crefoNr, ab30XMLProperties);
+            }
+        } else {
+            if (isPhase2) {
+                throw new IllegalStateException(strInfoPrefix + "!Die Map enthält keinen Eintrag für "+ strInfo +"-Crefo " + crefoNr);
+            }
+        }
+        return ab30XMLProperties;
+    }
+
+    public Map<Long, AB30XMLProperties> initAb30CrefoPropertiesMapFromRefExports(String strInfoPrefix, File archivBestandsPhaseFile, Map<String, TestCustomer> customerTestInfoMap) throws Exception {
+        Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap = new TreeMap<>();
+        for (Map.Entry<String, TestCustomer> testCustomerEntry : customerTestInfoMap.entrySet()) {
+            TestCustomer testCustomer = testCustomerEntry.getValue();
+            List<Long> allTestCrefos = testCustomer.getAllTestCrefosAsLongList(false, false); // nur die aktive und positive+negative Testfälle!
+            for (Long testCrefo : allTestCrefos) {
+                File crefoXmlFile = new File(archivBestandsPhaseFile, testCrefo + ".xml");
+                // prüfe, ob die XML-Datei für die Test-Crefo existiert
+                if (!crefoXmlFile.exists()) {
+                    // die XML-Datei für die Test-Crefo existiert nicht, downloaden...
+                    downloadCrefoAnsSave(strInfoPrefix + " [TestCrefo]", testCrefo, archivBestandsPhaseFile);
+                }
+                AB30XMLProperties ab30XMLProperties = ab30CrefoToPropertiesMap.get(testCrefo);
+                if (ab30XMLProperties != null) {
+                    final List<String> usedByCustomersList = ab30XMLProperties.getUsedByCustomersList();
+                    if (!usedByCustomersList.contains(testCustomer.getCustomerKey())) {
+                        usedByCustomersList.add(testCustomer.getCustomerKey());
+                    }
+                } else {
+                    ab30XMLProperties = new AB30XMLProperties(testCrefo);
+                    ab30XMLProperties.getUsedByCustomersList().add(testCustomer.getCustomerKey());
+                }
+                ab30CrefoToPropertiesMap.put(testCrefo, ab30XMLProperties);
+            }
+        }
+        return ab30CrefoToPropertiesMap;
+    }
+
+    public Map<Long, AB30XMLProperties> initAb30CrefoPropertiesMap(File propsFile) throws IOException {
+        Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap = new HashMap<>();
+        if (!propsFile.exists()) {
+            return ab30CrefoToPropertiesMap;
+        }
+        List<String> strLines = FileUtils.readLines(propsFile);
+        int version = 1;
+        for (String strLine : strLines) {
+            if (!strLine.isBlank()) {
+                if (strLine.startsWith(AB30XMLProperties.VERSION_STR)) {
+                    String[] split = strLine.split("::");
+                    if (split.length > 1) {
+                        version = Integer.valueOf(split[1].trim());
+                    }
+                }
+                if (!strLine.startsWith("#")) {
+                    AB30XMLProperties ab30XMLProperties = new AB30XMLProperties(strLine, version);
+                    ab30CrefoToPropertiesMap.put(ab30XMLProperties.getCrefoNr(), ab30XMLProperties);
+                }
+            }
+        }
+        return ab30CrefoToPropertiesMap;
+    }
+
+    public void writeCrefoToCustomerMappingFile(File newFile, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws IOException {
+        if (newFile.exists()) {
+            newFile.renameTo(new File(newFile.getParentFile(), newFile.getName() + ".old"));
+            newFile.delete();
+        }
+        Map<String, List<Long>> customerToCrefoListMap = new HashMap<>();
+        for (Long creoNummer : ab30CrefoToPropertiesMap.keySet()) {
+            AB30XMLProperties ab30XMLProperties = ab30CrefoToPropertiesMap.get(creoNummer);
+            List<String> customersList = ab30XMLProperties.getUsedByCustomersList();
+            customersList.stream().forEach(customerKey -> {
+                List<Long> crefosList = customerToCrefoListMap.get(customerKey);
+                if(crefosList == null) {
+                    crefosList = new ArrayList<>();
+                    customerToCrefoListMap.put(customerKey, crefosList);
+                }
+                crefosList.add(creoNummer);
+            });
+        }
+        List<String> strLines = new ArrayList<>();
+        for (String customerKey : customerToCrefoListMap.keySet()) {
+            strLines.add(customerKey);
+            List<Long> crefosList = customerToCrefoListMap.get(customerKey);
+            strLines.add("\t" + crefosList);
+        }
+        FileUtils.writeLines(newFile, strLines);
+    }
+
+    public void writeAb30CrefoToPropertiesMapToFile(File newPorpsFile, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws IOException {
+        if (newPorpsFile.exists()) {
+            newPorpsFile.renameTo(new File(newPorpsFile.getParentFile(), TestSupportClientKonstanten.EXTENDED_CREFOS_PROPS_FILENAME + ".old"));
+            newPorpsFile.delete();
+        }
+        List<String> strLines = new ArrayList<>();
+        strLines.add(AB30XMLProperties.HEADER);
+        strLines.add(AB30XMLProperties.VERSION_STR + " " + AB30XMLProperties.VERSION);
+        for (Map.Entry<Long, AB30XMLProperties> ab30XMLPropertiesEntry : ab30CrefoToPropertiesMap.entrySet()) {
+            AB30XMLProperties ab30XMLProperties = ab30XMLPropertiesEntry.getValue();
+            strLines.add(ab30XMLProperties.toString());
+        }
+        strLines.sort(Comparator.naturalOrder());
+        FileUtils.writeLines(newPorpsFile, strLines);
+    }
+
+    public void extendEntgsFromREST(String strInfoPrefix, File ab30XmlsDir, AB30XMLProperties ab30XMLPropertiesCrefo, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws Exception {
+        final EntscheidungstraegerInfosAlleCrefos entscheidungstraegerInfosAlleCrefos = tesunRestServiceWLS.readEntscheidugsTraeger(ab30XMLPropertiesCrefo.getCrefoNr());
+        if (!entscheidungstraegerInfosAlleCrefos.getEntscheidungstraegerInfosProCrefo().isEmpty()) {
+            final EntscheidungstraegerInfosProCrefo entscheidungstraegerInfosProCrefo = entscheidungstraegerInfosAlleCrefos.getEntscheidungstraegerInfosProCrefo().get(0);
+            for (EntscheidungstraegerInfo entscheidungstraegerInfo : entscheidungstraegerInfosProCrefo.getEntscheidungstraegerInfo()) {
+                final long entgCrefo = entscheidungstraegerInfo.getEntscheidungstragerCrefo();
+                final long directFirmaCrefo = entscheidungstraegerInfo.getDirectFirmaCrefo();
+                try {
+                    notifyTesunClientJobListener(Level.INFO, (strInfoPrefix + "Verarbeite DirectFirmaCrefo per REST für Testfall-Crefo " + directFirmaCrefo + "..."));
+                    handleBtlgOrEntg(strInfoPrefix, "DirectFirmaCrefo", directFirmaCrefo, ab30XmlsDir, ab30XMLPropertiesCrefo, ab30CrefoToPropertiesMap);
+                    notifyTesunClientJobListener(Level.INFO, (strInfoPrefix + "Verarbeite EntscheidungstragerCrefo per REST für Testfall-Crefo " + directFirmaCrefo + "..."));
+                    notifyTesunClientJobListener(Level.INFO, String.format(strInfoPrefix + "Verarbeite EntscheidungstragerCrefo per REST für Testfall-Crefo ", entgCrefo + "..."));
+                    handleBtlgOrEntg(strInfoPrefix, "EntscheidungstragerCrefo", entgCrefo, ab30XmlsDir, ab30XMLPropertiesCrefo, ab30CrefoToPropertiesMap);
+                } catch (Exception ex) {
+                    notifyTesunClientJobListener(Level.INFO, ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void handleBTLGsFromCrefoXMLFile(String strInfoPrefix, File ab30XmlsDir, AB30XMLProperties ab30XMLPropertiesCrefo, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws Exception {
+        Long testCrefo = ab30XMLPropertiesCrefo.getCrefoNr();
+        notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " handleBTLGsFromCrefoXMLFile(): Suche Beteiligten für Testfall-Crefo " + testCrefo + " in der XML-Datei...");
+
+        // prüfe, ob die XML-Datei für die Test-Crefo existiert
+        File crefoXmlFile = new File(ab30XmlsDir, testCrefo + ".xml");
+
+        // Alle XML-Tags "crefonummer" aus der XML-Datei ermitteln...
+        Map<String, List<Long>> crefoListsMap = parseCrefosFromXmlContent(crefoXmlFile);
+
+        List<Long> btlgCrefosList = crefoListsMap.get(TAG_FIRMENBETEILIGTER);
+        for (Long btlgCrefo : btlgCrefosList) {
+            handleBtlgOrEntg(strInfoPrefix, "Beteiligten", btlgCrefo, ab30XmlsDir, ab30XMLPropertiesCrefo, ab30CrefoToPropertiesMap);
+        }
+        List<Long> verfBtlgCrefosList = crefoListsMap.get(TAG_VERFAHRENSBETEILIGTER);
+        for (Long verfBtlgCrefo : verfBtlgCrefosList) {
+            handleBtlgOrEntg(strInfoPrefix, "Verfahrens-Beteiligten", verfBtlgCrefo, ab30XmlsDir, ab30XMLPropertiesCrefo, ab30CrefoToPropertiesMap);
+        }
+        List<Long> konzernZugList = crefoListsMap.get(TAG_KONZERN_ZUGEHOERKT);
+        for (Long konzernZug : konzernZugList) {
+            handleBtlgOrEntg(strInfoPrefix, "Konzer-Zugehörig", konzernZug, ab30XmlsDir, ab30XMLPropertiesCrefo, ab30CrefoToPropertiesMap);
+        }
+    }
+
+    public void handleBtlgOrEntg(String strInfoPrefix, String strBtlgEntg, Long btlgEntgCrefo, File ab30XmlsDir, AB30XMLProperties ab30XMLPropertiesCrefo, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) throws Exception {
+        Long testCrefo = ab30XMLPropertiesCrefo.getCrefoNr();
+        if (btlgEntgCrefo.equals(testCrefo)) {
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + strBtlgEntg + " "  + btlgEntgCrefo + " und Haupt-Crefo sind identisch, braucht nicht nochmal hochgeladen zu werden.");
+            return;
+        }
+        TreeSet<Long> btlgCrefosList = ab30XMLPropertiesCrefo.getBtlgCrefosList();
+        // wenn diese BTLG-Crefo noch nicht in der Beteiligten-Liste  existiert, dann hinzufügen
+        if (!btlgCrefosList.contains(btlgEntgCrefo)) {
+            btlgCrefosList.add(btlgEntgCrefo);
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " Nehme " + strBtlgEntg + " " + btlgEntgCrefo + " in die Beteiligten-Liste auf.");
+            // prüfe, ob die XML-Datei für den Beteiligten der Test-Crefo existiert...
+            File btlgCrefoXmlFile = new File(ab30XmlsDir, btlgEntgCrefo + ".xml");
+            if (!btlgCrefoXmlFile.exists()) {
+                // die XML-Datei für die btlgEntgCrefo-Crefo existiert nicht, downloaden...
+                downloadCrefoAnsSave(strInfoPrefix + strBtlgEntg, btlgEntgCrefo, ab30XmlsDir);
+            }
+        }
+        // wenn diese BTLG-Crefo noch nicht in der neuen Map existiert, dann hinzufügen (sonst wird kein "replacement" durchgeführt!)
+        if (!ab30CrefoToPropertiesMap.containsKey(btlgEntgCrefo)) {
+            AB30XMLProperties ab30XMLPropertiesBTLG = new AB30XMLProperties(btlgEntgCrefo);
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + " Nehme " + strBtlgEntg + " " + btlgEntgCrefo+ " in die Mapping-Zeile auf.");
+            ab30CrefoToPropertiesMap.put(btlgEntgCrefo, ab30XMLPropertiesBTLG);
+        } else {
+            notifyTesunClientJobListener(Level.INFO, strInfoPrefix + strBtlgEntg + " " + btlgEntgCrefo + " wurde schon als Mapping-Zeile aufgenommen!");
+        }
+    }
+
+    public boolean downloadCrefoAnsSave(String strInfoPrefix, Long testCrefo, File otuputDir) throws Exception {
+        try {
+            String strInfo = strInfoPrefix + "Versuche den " + testCrefo + " aus der Datenbank herunterzuladen...";
+            notifyTesunClientJobListener(Level.INFO, strInfo);
+            String crefoXML = tesunRestServiceWLS.downloadCrefo(testCrefo);
+            File outputFile = new File(otuputDir, testCrefo + ".xml");
+            outputFile.getParentFile().mkdirs();
+            final String formattedXMLContent = TesunUtilites.toPrettyString(crefoXML, 2);
+            FileUtils.writeStringToFile(outputFile, formattedXMLContent, Charset.forName("UTF-8"));
+            strInfo = strInfoPrefix + "! Für Test-Crefo " + testCrefo+ " musste AB30-XML-Datei heruntergeladen werden und wurde im Verzeichnis " + TesunUtilites.shortPath(outputFile, 50)  + " abgespeichert.";
+            notifyTesunClientJobListener(Level.WARN, strInfo);
+            return true;
+        } catch (Exception ex) {
+            String strInfo = strInfoPrefix + "!!! Download-Versuch für die Crefo " + testCrefo + " gescheitert: " + ex.getMessage();
+            notifyTesunClientJobListener(Level.ERROR, strInfo);
+            throw new IOException(strInfo);
+        }
+    }
+
+    public void copyFileFromAlternateDir(String strInfoPrefix, Long testCrefo, File ab30XmlsDir) throws Exception {
+        File sourceFile = new File(alternateDownloadSourcePath, testCrefo + ".xml");
+        if (sourceFile.exists()) {
+            File destFile = new File(ab30XmlsDir.getAbsolutePath(), testCrefo + ".xml");
+            FileUtils.copyFile(sourceFile, destFile);
+            File copySourceFile = new File(new File(alternateDownloadSourcePath, "COPIED"), testCrefo + ".xml");
+            FileUtils.copyFile(sourceFile, copySourceFile);
+            String strInfo = strInfoPrefix + "!!! Test-Crefo " + testCrefo + " wurde aus alternativer Source-Verzeichnis " + alternateDownloadSourcePath + " kopiert.";
+            notifyTesunClientJobListener(Level.WARN, strInfo);
+        } else {
+            throw new IOException("Die Crefo " + testCrefo + " existiert nicht im alternativen Verzeichnis " + alternateDownloadSourcePath);
+        }
+    }
+
+    protected void notifyTesunClientJobListener(Level level, String notifyInfo) {
+        if (tesunClientJobListener != null) {
+            tesunClientJobListener.notifyClientJob(level, notifyInfo);
+        }
+    }
+
+    protected Map<String, List<Long>> parseCrefosFromXmlContent(File ab30CrefoXmlFile) throws XPathExpressionException {
+        Map<String, List<Long>> crefoListsMap = new HashMap<>();
+        crefoListsMap.put(TAG_STEUERUNGSDATEN, new ArrayList<>());
+        crefoListsMap.put(TAG_FIRMENBETEILIGTER, new ArrayList<>());
+        crefoListsMap.put(TAG_VERFAHRENSBETEILIGTER, new ArrayList<>());
+        crefoListsMap.put(TAG_KONZERN_ZUGEHOERKT, new ArrayList<>());
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        InputSource xml = new InputSource(ab30CrefoXmlFile.getAbsolutePath());
+        NodeList result = (NodeList) xPath.evaluate("//*[starts-with(local-name(), 'crefonummer')]", xml, XPathConstants.NODESET);
+        for (int i = 0; i < result.getLength(); i++) {
+            Node node = result.item(i);
+            String key = node.getParentNode().getNodeName().toUpperCase(Locale.ROOT);
+            if (key.startsWith("ARC:")) {
+                key = key.substring(4);
+            }
+            List<Long> crefosList = crefoListsMap.get(key);
+            if (crefosList == null) {
+                crefosList = new ArrayList<>();
+            }
+            crefosList.add(Long.valueOf(node.getTextContent()));
+            crefoListsMap.put(key, crefosList);
+        }
+        return crefoListsMap;
+    }
+
+}

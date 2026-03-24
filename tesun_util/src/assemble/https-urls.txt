@@ -1,0 +1,9 @@
+https://rhsctew002.ecofis.de/cte_tesun_service/tesun/configinfo
+https://rhsctew002.ecofis.de/cte_tesun_service/tesun/systeminfo
+https://rhsctew002.ecofis.de/cte_tesun_service/tesun/produktauftrag/list/bycrefo/?crefo=4125877731
+https://rhsctew002.ecofis.de/cte_tesun_service/tesun/clzinfo?clz=412
+https://rhsctew002.ecofis.de/cte_tesun_service/tesun/entg-list
+https://rhsctew002.ecofis.de/backend/pre-product/by-crefo/5170107860
+https://flx.enb.creditreform.de/services
+https://flx.enb.creditreform.de/backend/relevanzdecision/monitoring/5272003071/EXPORT_CTE_TO_RTN
+https://rhsctew002.ecofis.de/jobs

@@ -1,0 +1,3 @@
+[submodule "remote_recipes"]
+	path = remote_recipes
+	url = git@git.creditreform.de:cte/cte_openrewrite_recipes.git

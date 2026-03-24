@@ -1,0 +1,115 @@
+JFDML JFormDesigner: "7.0.0.6.255" Java: "1.8.0_202" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		"$setComponentNames": true
+		auxiliary() {
+			"JavaCodeGenerator.defaultVariableGetter": true
+		}
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			auxiliary() {
+				"JavaCodeGenerator.variableGetter": true
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 72:1.0, 47, 287:1.0, 30"
+				"$rowSpecs": "0, 0, 0, 0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignLeft": true
+				"$alignTop": true
+			} ) {
+				name: "panelControls"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelFile"
+					"text": "Verzeichnis:"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"insets": new java.awt.Insets( 2, 1, 1, 1 )
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "textFieldFile"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 1
+					"insets": new java.awt.Insets( 2, 1, 1, 1 )
+					"gridwidth": 3
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonFile"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_up.png" )
+					"preferredSize": new java.awt.Dimension( 34, 24 )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 4
+					"insets": new java.awt.Insets( 2, 1, 1, 1 )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelExtensions"
+					"text": "Extensions:"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"insets": &Insets0 new java.awt.Insets( 1, 1, 1, 1 )
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "textFieldExtensions"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 1
+					"gridy": 1
+					"insets": &Insets1 new java.awt.Insets( 1, 1, 1, 1 )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelSearchFor"
+					"text": "Suchbegriff:"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"insets": #Insets0
+					"gridx": 2
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "textFieldSearchFor"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 3
+					"gridy": 1
+					"insets": #Insets1
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonStartStopSearch"
+					"text": "Suche starten"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_view.png" )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 1
+					"gridy": 2
+					"insets": new java.awt.Insets( 1, 1, 1, 1 )
+					"gridwidth": 3
+				} )
+				add( new FormComponent( "javax.swing.JProgressBar" ) {
+					name: "progressBarSearching"
+					"border": new javax.swing.border.BevelBorder( 1, null, null, null, null )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 3
+					"gridwidth": 5
+					"insets": new java.awt.Insets( 0, 2, 0, 2 )
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "North"
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+				name: "panelSearchResult"
+				"border": new javax.swing.border.EtchedBorder( 1, null, null )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPaneSearchResults"
+					add( new FormComponent( "javax.swing.JTextArea" ) {
+						name: "textAreaSearchResults"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "Center"
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 590, 470 )
+		} )
+	}
+}
+

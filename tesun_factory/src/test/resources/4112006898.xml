@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arc:archivbestand xmlns:arc="http://www.creditreform.de/crefoteam/archivbestandv3_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.creditreform.de/crefoteam/archivbestandv3_0 file:///E:/Projekte/CTE/Schnittstellen.archivbestand30_jaxb/ab30_xsd/src/main/xsd/schnittstellen/archivbestand30/archivbestandv3_0.xsd">
+	<arc:steuerungsdaten>
+		<arc:crefonummer>4112006898</arc:crefonummer>
+		<arc:firma>true</arc:firma>
+		<arc:clz-eigner-vc>419</arc:clz-eigner-vc>
+		<arc:land-fachlich>1</arc:land-fachlich>
+		<arc:personenstatus>1</arc:personenstatus>
+		<arc:vorraetig-bis>2099-01-15</arc:vorraetig-bis>
+		<arc:letzte-archivaenderung>2022-04-28T16:51:04.119</arc:letzte-archivaenderung>
+		<arc:anstehende-recherche>false</arc:anstehende-recherche>
+		<arc:letzte-recherche>2022-04-24</arc:letzte-recherche>
+		<arc:anzahl-auskuenfte>0</arc:anzahl-auskuenfte>
+		<arc:anzahl-telefonauskuenfte>0</arc:anzahl-telefonauskuenfte>
+		<arc:letzte-manuelle-archivaenderung>2022-04-28T16:51:04.119</arc:letzte-manuelle-archivaenderung>
+		<arc:provisorisch>false</arc:provisorisch>
+		<arc:erfassung>2022-04-28</arc:erfassung>
+		<arc:anzahl-nachtragspflichtige-auftraege>0</arc:anzahl-nachtragspflichtige-auftraege>
+		<arc:ctb-aktiv>true</arc:ctb-aktiv>
+	</arc:steuerungsdaten>
+	<arc:kapitel-rechtsform>
+		<arc:rechtsform>8001</arc:rechtsform>
+		<arc:auslaendisches-recht>false</arc:auslaendisches-recht>
+	</arc:kapitel-rechtsform>
+	<arc:kapitel-gruendung>
+		<arc:datum-erste-rechtsform>2022-04-08+02:00</arc:datum-erste-rechtsform>
+		<arc:erste-rechtsform>8001</arc:erste-rechtsform>
+	</arc:kapitel-gruendung>
+	<arc:kapitel-handelsregister>
+		<arc:register-aufnahme>2022-04-08+02:00</arc:register-aufnahme>
+		<arc:amtsgericht>406</arc:amtsgericht>
+		<arc:registerart>1</arc:registerart>
+		<arc:registernummer>621323</arc:registernummer>
+		<arc:letzter-eintrag>2022-04-08+02:00</arc:letzter-eintrag>
+		<arc:grund-letzter-eintrag>19</arc:grund-letzter-eintrag>
+		<arc:qualitaet-letzter-eintrag>
+			<arc:zeitpunkt>2022-04-28T16:49:21.625+02:00</arc:zeitpunkt>
+		</arc:qualitaet-letzter-eintrag>
+		<arc:kein-sonder-registerstatus-lu>false</arc:kein-sonder-registerstatus-lu>
+	</arc:kapitel-handelsregister>
+	<arc:kapitel-historie>
+		<arc:haken-freigabe-umfirmierungen>true</arc:haken-freigabe-umfirmierungen>
+		<arc:haken-freigabe-sitzverlegungen>true</arc:haken-freigabe-sitzverlegungen>
+	</arc:kapitel-historie>
+	<arc:kapitel-standorte>
+		<arc:haken-freigabe>true</arc:haken-freigabe>
+		<arc:juristischer-sitz>
+			<arc:gueltig>true</arc:gueltig>
+			<arc:datum-von>
+				<arc:jahr>2022</arc:jahr>
+				<arc:monat>4</arc:monat>
+				<arc:tag>28</arc:tag>
+			</arc:datum-von>
+			<arc:anschrift>
+				<arc:adresse>
+					<arc:land>1</arc:land>
+					<arc:plz>58119</arc:plz>
+					<arc:ort>Hagen</arc:ort>
+					<arc:ortsteil>Hohenlimburg</arc:ortsteil>
+					<arc:strasse>Grüner Weg</arc:strasse>
+					<arc:hausnummer>14</arc:hausnummer>
+					<arc:herkunft-qualitaet>
+						<arc:zeitpunkt>2022-04-28T16:49:07+02:00</arc:zeitpunkt>
+					</arc:herkunft-qualitaet>
+				</arc:adresse>
+			</arc:anschrift>
+		</arc:juristischer-sitz>
+	</arc:kapitel-standorte>
+	<arc:kapitel-firmenbeteiligte>
+		<arc:firmenbeteiligter>
+			<arc:verflechtungsinfo>
+				<arc:beteiligteneigenschaft>300</arc:beteiligteneigenschaft>
+				<arc:aktiv>true</arc:aktiv>
+				<arc:beteiligt-seit>
+					<arc:jahr>2022</arc:jahr>
+					<arc:monat>4</arc:monat>
+					<arc:tag>28</arc:tag>
+				</arc:beteiligt-seit>
+			</arc:verflechtungsinfo>
+			<arc:crefonummer-beteiligter>4112006897</arc:crefonummer-beteiligter>
+			<arc:herkunft-qualitaet>
+				<arc:zeitpunkt>2022-04-28T16:49:21.625+02:00</arc:zeitpunkt>
+			</arc:herkunft-qualitaet>
+		</arc:firmenbeteiligter>
+	</arc:kapitel-firmenbeteiligte>
+	<arc:kapitel-firmenidentifikation>
+		<arc:anschrift>
+			<arc:name1>Spedition NPE TEST INKASSO</arc:name1>
+			<arc:adresse>
+				<arc:land>1</arc:land>
+				<arc:plz>58119</arc:plz>
+				<arc:ort>Hagen</arc:ort>
+				<arc:ortsteil>Hohenlimburg</arc:ortsteil>
+				<arc:strasse>Grüner Weg</arc:strasse>
+				<arc:hausnummer>14</arc:hausnummer>
+				<arc:herkunft-qualitaet>
+					<arc:zeitpunkt>2022-04-28T16:49:07+02:00</arc:zeitpunkt>
+				</arc:herkunft-qualitaet>
+			</arc:adresse>
+		</arc:anschrift>
+		<arc:firmierung>Spedition NPE TEST INKASSO</arc:firmierung>
+	</arc:kapitel-firmenidentifikation>
+	<arc:kapitel-inkassoakten>
+		<arc:inkassoakte>
+			<!--I4-Akte, UEBERWACHUNGSSACHE :: alle I4-Felder fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>UEBERWACHUNGSSACHE</arc:verfahrensart>
+			<!-- <arc:glaeubiger-vc/> -->
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<!-- <arc:aktennummer/> -->
+			<arc:inkasso40-referenznummer>Akte 5456451</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<!-- <arc:erledigungskennzeichen/> -->
+			<arc:inkasso40-bewertungsklasse>2</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>10</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000019</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000019</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--I4-Akte, UEBERWACHUNGSSACHE :: alle I4-Felder fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>UEBERWACHUNGSSACHE</arc:verfahrensart>
+			<!-- <arc:glaeubiger-vc/> -->
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<!-- <arc:aktennummer/> -->
+			<arc:inkasso40-referenznummer>Akte 5456452</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<!-- <arc:erledigungskennzeichen/> -->
+			<arc:inkasso40-bewertungsklasse>3</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>10</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000020</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000020</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--I4-Akte, MAHNSACHE :: alle I4-Felder ausser glaeubiger-vc fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<arc:glaeubiger-vc>517</arc:glaeubiger-vc>
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<!-- <arc:aktennummer/> -->
+			<arc:inkasso40-referenznummer>Akte 5456480</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<!-- <arc:erledigungskennzeichen/> -->
+			<arc:inkasso40-bewertungsklasse>1</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>11</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000021</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000021</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--I4-Akte, MAHNSACHE :: alle I4-Felder ausser aktennummer fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<!--<arc:glaeubiger-vc>517</arc:glaeubiger-vc>-->
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<arc:aktennummer>12345678</arc:aktennummer>
+			<arc:inkasso40-referenznummer>Akte 5456480</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<!-- <arc:erledigungskennzeichen/> -->
+			<arc:inkasso40-bewertungsklasse>2</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>10</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000022</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000022</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--I4-Akte, UEBERWACHUNGSSACHE :: alle I4-Felder ausser aktennummer fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>UEBERWACHUNGSSACHE</arc:verfahrensart>
+			<!-- <arc:glaeubiger-vc/> -->
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<arc:aktennummer>9876543</arc:aktennummer>
+			<arc:inkasso40-referenznummer>Akte 5456457</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<!-- <arc:erledigungskennzeichen/> -->
+			<arc:inkasso40-bewertungsklasse>4</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>6</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000022</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000022</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--I4-Akte, UEBERWACHUNGSSACHE :: alle I4-Felder ausser erledigungskennzeichen fehlen, neue Felder sind dabei-->
+			<arc:verfahrensart>UEBERWACHUNGSSACHE</arc:verfahrensart>
+			<!-- <arc:glaeubiger-vc/> -->
+			<arc:inkasso40-inkassobuero>VC 411 / I4.0</arc:inkasso40-inkassobuero>
+			<arc:inkasso40-telefon>02131-VC 411 / I4.0</arc:inkasso40-telefon>
+			<!-- <arc:aktennummer>9876543</arc:aktennummer> -->
+			<arc:inkasso40-referenznummer>Akte 5456457</arc:inkasso40-referenznummer>
+			<arc:datum-erledigung>2010-05-23+02:00</arc:datum-erledigung>
+			<arc:datum-eingang>2009-10-10+02:00</arc:datum-eingang>
+			<arc:datum-verzug>2009-10-01+02:00</arc:datum-verzug>
+			<arc:erledigungskennzeichen>123</arc:erledigungskennzeichen>
+			<arc:inkasso40-bewertungsklasse>4</arc:inkasso40-bewertungsklasse>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>600</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>1100</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>6</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000022</arc:mitgliedsnummer>
+			<arc:inkasso40-mitgliedsname>Mitglied 411000022</arc:inkasso40-mitgliedsname>
+			<arc:inkasso40-mitglied-fuer-auskunft-gesperrt>false</arc:inkasso40-mitglied-fuer-auskunft-gesperrt>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--Alte Akte, MAHNSACHE  mit allen Feldern-->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<arc:glaeubiger-vc>411</arc:glaeubiger-vc>
+			<arc:aktennummer>1233344222</arc:aktennummer>
+			<arc:datum-letzte-aktion>2022-04-28T01:01:01.001+02:00</arc:datum-letzte-aktion>
+			<arc:datum-eingang>2022-03-14+01:00</arc:datum-eingang>
+			<arc:datum-verzug>2022-03-12+01:00</arc:datum-verzug>
+			<arc:erledigungskennzeichen>45</arc:erledigungskennzeichen>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>12</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000018</arc:mitgliedsnummer>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--Alte Akte, MAHNSACHE mit allen Feldern ausser glaeubiger-vc -->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<!--<arc:glaeubiger-vc>411</arc:glaeubiger-vc> -->
+			<arc:aktennummer>1233344222</arc:aktennummer>
+			<arc:datum-letzte-aktion>2022-04-28T01:01:01.001+02:00</arc:datum-letzte-aktion>
+			<arc:datum-eingang>2022-03-14+01:00</arc:datum-eingang>
+			<arc:datum-verzug>2022-03-12+01:00</arc:datum-verzug>
+			<arc:erledigungskennzeichen>6645</arc:erledigungskennzeichen>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>12</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000030</arc:mitgliedsnummer>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--Alte Akte, MAHNSACHE mit allen Feldern ausser aktennummer -->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<arc:glaeubiger-vc>411</arc:glaeubiger-vc>
+			<!-- <arc:aktennummer>1233344222</arc:aktennummer> -->
+			<arc:datum-letzte-aktion>2022-04-28T01:01:01.001+02:00</arc:datum-letzte-aktion>
+			<arc:datum-eingang>2022-03-14+01:00</arc:datum-eingang>
+			<arc:datum-verzug>2022-03-12+01:00</arc:datum-verzug>
+			<arc:erledigungskennzeichen>6655</arc:erledigungskennzeichen>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>12</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000033</arc:mitgliedsnummer>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--Alte Akte, MAHNSACHE mit allen Feldern ausser erledigungskennzeichen -->
+			<arc:verfahrensart>MAHNSACHE</arc:verfahrensart>
+			<arc:glaeubiger-vc>411</arc:glaeubiger-vc>
+			<arc:aktennummer>1233344222</arc:aktennummer>
+			<!-- <arc:erledigungskennzeichen>total erledigt!</arc:erledigungskennzeichen> -->
+			<arc:datum-letzte-aktion>2022-04-28T01:01:01.001+02:00</arc:datum-letzte-aktion>
+			<arc:datum-eingang>2022-03-14+01:00</arc:datum-eingang>
+			<arc:datum-verzug>2022-03-12+01:00</arc:datum-verzug>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>6</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000034</arc:mitgliedsnummer>
+		</arc:inkassoakte>
+		<arc:inkassoakte>
+			<!--Alte Akte, UEBERWACHUNGSSACHE   mit allen Feldern-->
+			<arc:verfahrensart>UEBERWACHUNGSSACHE</arc:verfahrensart>
+			<arc:glaeubiger-vc>411</arc:glaeubiger-vc>
+			<arc:aktennummer>1233344</arc:aktennummer>
+			<arc:datum-letzte-aktion>2022-04-28T01:01:01.001+02:00</arc:datum-letzte-aktion>
+			<arc:datum-eingang>2022-03-14+01:00</arc:datum-eingang>
+			<arc:datum-verzug>2022-03-12+01:00</arc:datum-verzug>
+			<arc:erledigungskennzeichen>676</arc:erledigungskennzeichen>
+			<arc:gesamtforderung-ist>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-ist>
+			<arc:gesamtforderung-plan>
+				<arc:unbekannt>false</arc:unbekannt>
+				<arc:dekoration-betrag>
+					<arc:betragswert>2500</arc:betragswert>
+					<arc:dekoration>EXAKT</arc:dekoration>
+					<arc:waehrung>20000</arc:waehrung>
+				</arc:dekoration-betrag>
+			</arc:gesamtforderung-plan>
+			<arc:forderungsgrund>10</arc:forderungsgrund>
+			<arc:mitgliedsnummer>411000017</arc:mitgliedsnummer>
+		</arc:inkassoakte>
+	</arc:kapitel-inkassoakten>
+</arc:archivbestand>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://rhsctem015.ecofis.de:7077/statusdispatchrestservice/processinformationlist?processName=Import%20Cycle&processStatus=finished&timeFrom=2016-03-30%2000:00:00.000&timeUntil=2016-04-02%2000:00:00.000 -->
+<stat:processinformation-list>
+	<processinformation>
+		<process-pk>3656</process-pk>
+		<process-id>1459326842610_10.4.51.110_Import Cycle_42634240</process-id>
+		<process-name>Import Cycle</process-name>
+		<process-status>finished</process-status>
+		<process-start-time>2016-03-30T10:34:02.678+02:00</process-start-time>
+		<process-stop-time>2016-03-30T11:11:14.545+02:00</process-stop-time>
+		<current-job-name>CT Delta Import</current-job-name>
+		<current-job-status>finished</current-job-status>
+		<job-status-time>2016-03-30T11:11:14.545+02:00</job-status-time>
+		<message-text xsi:nil="true"/>
+		<information-text xsi:nil="true"/>
+	</processinformation>
+	<processinformation>
+		<process-pk>3650</process-pk>
+		<process-id>1459298358152_10.4.51.110_Import Cycle_741203820</process-id>
+		<process-name>Import Cycle</process-name>
+		<process-status>finished</process-status>
+		<process-start-time>2016-03-30T02:39:18.224+02:00</process-start-time>
+		<process-stop-time>2016-03-30T03:25:45.438+02:00</process-stop-time>
+		<current-job-name>CT Delta Import</current-job-name>
+		<current-job-status>finished</current-job-status>
+		<job-status-time>2016-03-30T03:25:45.438+02:00</job-status-time>
+		<message-text xsi:nil="true"/>
+		<information-text xsi:nil="true"/>
+	</processinformation>
+	<processinformation>
+		<process-pk>3649</process-pk>
+		<process-id>1459295551368_10.4.51.110_Import Cycle_1500615934</process-id>
+		<process-name>Import Cycle</process-name>
+		<process-status>finished</process-status>
+		<process-start-time>2016-03-30T01:52:31.485+02:00</process-start-time>
+		<process-stop-time>2016-03-30T02:39:14.426+02:00</process-stop-time>
+		<current-job-name>CT Delta Import</current-job-name>
+		<current-job-status>finished</current-job-status>
+		<job-status-time>2016-03-30T02:39:14.426+02:00</job-status-time>
+		<message-text xsi:nil="true"/>
+		<information-text xsi:nil="true"/>
+	</processinformation>
+	<processinformation>
+		<process-pk>3648</process-pk>
+		<process-id>1459292690836_10.4.51.110_Import Cycle_2001186759</process-id>
+		<process-name>Import Cycle</process-name>
+		<process-status>finished</process-status>
+		<process-start-time>2016-03-30T01:04:50.968+02:00</process-start-time>
+		<process-stop-time>2016-03-30T01:52:26.590+02:00</process-stop-time>
+		<current-job-name>CT Delta Import</current-job-name>
+		<current-job-status>finished</current-job-status>
+		<job-status-time>2016-03-30T01:52:26.590+02:00</job-status-time>
+		<message-text xsi:nil="true"/>
+		<information-text xsi:nil="true"/>
+	</processinformation>
+	<processinformation>
+		<process-pk>3647</process-pk>
+		<process-id>1459245829311_10.4.51.110_Import Cycle_431720259</process-id>
+		<process-name>Import Cycle</process-name>
+		<process-status>finished</process-status>
+		<process-start-time>2016-03-29T12:03:49.407+02:00</process-start-time>
+		<process-stop-time>2016-03-30T01:04:45.812+02:00</process-stop-time>
+		<current-job-name>CT Delta Import</current-job-name>
+		<current-job-status>finished</current-job-status>
+		<job-status-time>2016-03-30T01:04:45.812+02:00</job-status-time>
+		<message-text xsi:nil="true"/>
+		<information-text xsi:nil="true"/>
+	</processinformation>
+</stat:processinformation-list>

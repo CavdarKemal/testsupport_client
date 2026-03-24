@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="%ENV%-UserTaskStartBtlgAktualisierung" name="CTE %ENV%-UserTaskStartBtlgAktualisierung" isExecutable="true">
+    <startEvent id="startEvent" name="Start" activiti:initiator="initiator"></startEvent>
+    <endEvent id="endEvent" name="End"></endEvent>
+    <userTask id="UserTaskStartBtlgAktualisierung" name="BtlgAkt starten [StartBtlgAktualisierung]"></userTask>
+    <userTask id="UserTaskWaitForBtlgAktualisierung" name="BtlgAkt abwarten [WaitForBtlgAktualisierung]"></userTask>
+    <sequenceFlow id="flowToUserTaskWaitForBtlgAktualisierung" sourceRef="UserTaskStartBtlgAktualisierung" targetRef="UserTaskWaitForBtlgAktualisierung"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="UserTaskStartBtlgAktualisierung"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="UserTaskWaitForBtlgAktualisierung" targetRef="endEvent"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%UserTaskStartBtlgAktualisierung">
+    <bpmndi:BPMNPlane bpmnElement="%ENV%UserTaskStartBtlgAktualisierung" id="BPMNPlane_%ENV%UserTaskStartBtlgAktualisierung">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="16.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="470.0" y="27.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskStartBtlgAktualisierung" id="BPMNShape_UserTaskStartBtlgAktualisierung">
+        <omgdc:Bounds height="70.0" width="140.0" x="90.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTaskWaitForBtlgAktualisierung" id="BPMNShape_UserTaskWaitForBtlgAktualisierung">
+        <omgdc:Bounds height="70.0" width="140.0" x="280.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToUserTaskWaitForBtlgAktualisierung" id="BPMNEdge_flowToUserTaskWaitForBtlgAktualisierung">
+        <omgdi:waypoint x="230.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="51.0" y="44.0"></omgdi:waypoint>
+        <omgdi:waypoint x="90.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="420.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="44.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

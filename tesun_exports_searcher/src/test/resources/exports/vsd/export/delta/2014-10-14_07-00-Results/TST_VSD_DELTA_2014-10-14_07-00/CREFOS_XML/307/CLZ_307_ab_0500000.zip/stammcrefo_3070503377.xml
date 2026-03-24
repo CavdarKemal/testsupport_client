@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><vsh_firmendatenexport xmlns="http://www.creditreform.de/crefoteam/cte_vsh/2012/01">
+  <clz-eigner-vc>307</clz-eigner-vc>
+  <vsh-firmendaten>
+    <crefonummer>3070503377</crefonummer>
+    <firmierung>Aydin Aydin 
+Firat Kebap Haus</firmierung>
+    <name1>Aydin Aydin</name1>
+    <name2>Firat Kebap Haus</name2>
+    <steuer-nummer>203/202/06767</steuer-nummer>
+    <korrespondenz-adresse>
+      <strasse>Bergstr.</strasse>
+      <hausnummer>68</hausnummer>
+      <plz>01069</plz>
+      <ort>Dresden</ort>
+      <land>DE</land>
+    </korrespondenz-adresse>
+    <url>www.firat-dresden.com</url>
+    <telefon>
+      <landes-vorwahl>+49</landes-vorwahl>
+      <vorwahl>351</vorwahl>
+      <nummer>8210857</nummer>
+    </telefon>
+    <rechtsform>
+      <bezeichnung-rechtsform>Gewerbebetrieb</bezeichnung-rechtsform>
+    </rechtsform>
+    <gruendung genauigkeit="EXAKT" jahr="2012" monat="9" tag="1"/>
+    <statistik>
+      <letzte-recherche>2014-03-13+01:00</letzte-recherche>
+      <letzte-aenderung>2014-10-13+02:00</letzte-aenderung>
+      <vorraetig-bis>2015-03-13+01:00</vorraetig-bis>
+      <anzahl-auskuenfte>3</anzahl-auskuenfte>
+    </statistik>
+    <bonitaet>
+      <bonitaets-index>295</bonitaets-index>
+      <zahlungsweise>Innerhalb vereinbarter Ziele.</zahlungsweise>
+      <krediturteil>Kredite werden nicht abgesprochen. Eine Geschäftsverbindung gilt als zulässig.</krediturteil>
+    </bonitaet>
+    <beteiligte>
+      <firmenbeteiligter>
+        <crefonummer-beteiligter>3070496365</crefonummer-beteiligter>
+        <verflechtungsinfo>
+          <beteiligteneigenschaft>Inhaber</beteiligteneigenschaft>
+          <beteiligt-seit jahr="2012" monat="9" tag="1"/>
+        </verflechtungsinfo>
+      </firmenbeteiligter>
+    </beteiligte>
+    <branchendaten>
+      <eingetragener-gegenstand>Döner Kebap Haus</eingetragener-gegenstand>
+      <branchenangabe>
+        <rang>1</rang>
+        <branchencode>56103</branchencode>
+        <branchentext>Imbissstuben u.Ä.</branchentext>
+      </branchenangabe>
+    </branchendaten>
+  </vsh-firmendaten>
+</vsh_firmendatenexport>

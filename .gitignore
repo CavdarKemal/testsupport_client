@@ -1,0 +1,27 @@
+*.iml
+*.iws
+*.ipr
+*.idea
+*.settings
+*.metadata
+*.recommenders
+*.project
+*.classpath
+*.log
+logs
+.hg
+.target 
+.hgignore
+rewrite.yml
+import/
+target/
+SearchLOGsGUI.properties
+SearchXMLsGUI.properties
+TestSupport-GUI.properties
+/X-TESTS
+
+# Secrets
+auslieferung/cte_private_key_lieferant.asc
+
+# Claude Code local settings
+.claude/
