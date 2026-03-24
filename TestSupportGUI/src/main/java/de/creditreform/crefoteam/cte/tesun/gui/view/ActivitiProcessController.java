@@ -60,10 +60,10 @@ public class ActivitiProcessController {
             bpmnFileList.forEach(bpmnFile ->
                     callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess-Definitionsdatei '" + bpmnFile.getName() + "' deployed."));
         } else {
-            Boolean confirmed = (Boolean) callback.askClientJob(
+            Integer answer = (Integer) callback.askClientJob(
                     TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE,
                     "Um weiter zu machen, muss das Verzeichnis TEST_OUTPUTS mit den Daten aktualisiert werden.\nWurde das Verzeichnis aktualisiert?");
-            if (!Boolean.TRUE.equals(confirmed)) {
+            if (answer != javax.swing.JOptionPane.YES_OPTION) {
                 throw new RequestAbortedException("Abbruch durch Benutzer!");
             }
             onCustomersReload.run();
