@@ -38,6 +38,7 @@ public class ActivitiProcessController {
     private CteActivitiService cteActivitiServices;
     private Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> selectedCustomersMapMap;
     private Integer processInstanceID;
+    private Integer mainProcessInstanceID;
     private CteActivitiTask activitUserTaskToContinue;
 
     public ActivitiProcessController(TesunClientJobListener callback, Runnable onCustomersReload) {
@@ -108,6 +109,7 @@ public class ActivitiProcessController {
         } else {
             processInstanceID = activitUserTaskToContinue.getId();
         }
+        mainProcessInstanceID = processInstanceID;
         while (running) {
             if (isProcessEnded()) {
                 callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess beendet.");
@@ -186,7 +188,7 @@ public class ActivitiProcessController {
         try {
             List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(
                     environmentConfig.getActivitiProcessName(), new HashMap<>());
-            return processes.stream().noneMatch(p -> processInstanceID.equals(p.getId()));
+            return processes.stream().noneMatch(p -> mainProcessInstanceID.equals(p.getId()));
         } catch (Exception e) {
             return false;
         }
