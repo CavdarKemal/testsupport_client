@@ -109,7 +109,7 @@ public class ActivitiProcessController {
             }
             processInstanceID = cteActivitiProcess.getId();
         } else {
-            processInstanceID = activitUserTaskToContinue.getId();
+            processInstanceID = activitUserTaskToContinue.getProcessInstanceId();
         }
         mainProcessInstanceID = processInstanceID;
         while (running) {
