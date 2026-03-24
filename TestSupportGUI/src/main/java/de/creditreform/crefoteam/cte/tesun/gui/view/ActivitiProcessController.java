@@ -184,10 +184,9 @@ public class ActivitiProcessController {
 
     private boolean isProcessEnded() {
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("processInstanceId", processInstanceID.toString());
-            List<CteActivitiTask> tasks = cteActivitiServices.listTasks(params);
-            return tasks == null || tasks.isEmpty();
+            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(
+                    environmentConfig.getActivitiProcessName(), new HashMap<>());
+            return processes.stream().noneMatch(p -> processInstanceID.equals(p.getId()));
         } catch (Exception e) {
             return false;
         }
