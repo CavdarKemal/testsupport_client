@@ -2,6 +2,7 @@ package de.creditreform.crefoteam.cte.tesun.gui.view;
 
 import de.creditreform.crefoteam.activiti.CteActivitiProcess;
 import de.creditreform.crefoteam.activiti.CteActivitiService;
+import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 import de.creditreform.crefoteam.activiti.CteActivitiTask;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
@@ -183,10 +184,12 @@ public class ActivitiProcessController {
 
     private boolean isProcessEnded() {
         try {
-            CteActivitiProcess process = cteActivitiServices.getProcessInstanceByID(processInstanceID);
-            return process.isEnded();
+            Map<String, Object> params = new HashMap<>();
+            params.put("processInstanceId", processInstanceID.toString());
+            List<CteActivitiTask> tasks = cteActivitiServices.listTasks(params);
+            return tasks == null || tasks.isEmpty();
         } catch (Exception e) {
-            return true;
+            return false;
         }
     }
 
