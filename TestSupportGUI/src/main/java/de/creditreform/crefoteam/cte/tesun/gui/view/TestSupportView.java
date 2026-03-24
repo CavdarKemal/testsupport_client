@@ -96,7 +96,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
         getSplitPaneMain().setDividerLocation(500);
         getCheckBoxScrollToEnd().setSelected(true);
-        getCheckBoxDemoMode().setSelected(false);
+        getCheckBoxDemoMode().setSelected(true); // CLAUDE_MODE
+        getCheckBoxDemoMode().setEnabled(false); // CLAUDE_MODE
 
         initEnvironmentsComboBox();
         initITSQRevisionsComboBox();
@@ -108,7 +109,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
         initForEnvironment();
 
-        getCheckBoxDemoMode().setSelected(Boolean.FALSE);
         getCheckBoxUseOnlyTestCLZs().setSelected(currentEnvironment.isLastUseOnlyTestClz());
         getCheckBoxUploadSynthetics().setSelected(currentEnvironment.isLastUploadSynthetics());
 
@@ -404,9 +404,11 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             try {
                 notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...", getComboBoxEnvironment().getSelectedItem()));
                 testSupportHelper = getTestSupportHelper();
+/* CLAUDE_MODE
                 TesunSystemInfo tesunSystemInfo = testSupportHelper.getTesunRestServiceWLS().getTesunSystemInfo();
                 String versionsInfoInTitle = String.format("[ %s ] - [ CTE-Version: %s ]", currentEnvironment.getAppVersionsInfo(), tesunSystemInfo.getCteVersion());
                 guiFrame.setVersionsInfoInTitle(versionsInfoInTitle);
+*/
                 initCustomers();
             } catch (Throwable ex) {
                 notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Konfiguration laden", ex));
@@ -460,7 +462,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> customerTestInfoMapMap = currentEnvironment.getCustomerTestInfoMapMap();
         notifyClientJob(Level.INFO, "\n\tErmittle TesunConfigInfo für die Kunden...");
         TesunRestService tesunRestServiceWLS = testSupportHelper.getTesunRestServiceWLS();
+/* CLAUDE_MODE
         SystemInfo systemInfo = tesunRestServiceWLS.getSystemPropertiesInfo();
+*/
         notifyClientJob(Level.INFO, "\n\tErmittle KundenKonfigList für die Kunden...");
         Iterator<TestSupportClientKonstanten.TEST_PHASE> iterator = customerTestInfoMapMap.keySet().iterator();
         while (iterator.hasNext()) {
@@ -471,7 +475,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 try {
                     TestCustomer testCustomer = testCustomerEntry.getValue();
                     notifyClientJob(Level.INFO, "\n\t\tInitialisiere Testfälle des Kunden für " + testCustomer.getCustomerName() + " aus " + testPhase);
+/* CLAUDE_MODE
                     tesunRestServiceWLS.extendTestCustomerProperiesInfos(testCustomer, systemInfo);
+*/
                 } catch (Exception ex) {
                     notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Konfiguration vervollständigen", ex));
                 }

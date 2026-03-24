@@ -90,7 +90,9 @@ public class ActivitiProcessController {
         callback.notifyClientJob(Level.INFO, "\nStarte ACTIVITI-Prozess '" + activitiProcessName + "'...");
         callback.notifyClientJob(Level.INFO, "\n===========   Activiti-Process gestartet.   ===========");
         TimelineLogger.info(ActivitiProcessController.class, "\n===========    Activiti-Process gestartet.    ===========");
+/* CLAUDE_MODE
         helper.checkStartCoinditions(activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_2), true);
+*/
 
         processThread = new Thread(this::runLoop);
         processThread.start();
