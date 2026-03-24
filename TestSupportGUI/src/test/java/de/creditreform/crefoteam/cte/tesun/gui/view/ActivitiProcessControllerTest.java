@@ -15,13 +15,9 @@ import static org.junit.Assert.*;
 /**
  * Tests für ActivitiProcessController#prepareStart().
  *
- * Dokumentiert den Bug: callback.askClientJob() liefert Integer,
- * wird aber nach Boolean gecastet — mit folgenden Konsequenzen:
- *
- * 1. ClassCastException bei jedem Integer-Rückgabewert
- * 2. Selbst wenn kein Cast-Fehler auftreten würde: Boolean.TRUE.equals(Integer)
- *    ist immer false → RequestAbortedException wird IMMER geworfen,
- *    d.h. der Benutzer kann den Prozess nie fortsetzen.
+ * Dokumentiert das korrigierte Verhalten: callback.askClientJob() liefert Integer
+ * (JOptionPane.YES_OPTION = 0 bzw. NO_OPTION = 1).
+ * Der Fix behebt den früheren Boolean-Cast und die falsche Logik.
  */
 public class ActivitiProcessControllerTest {
 
@@ -56,56 +52,6 @@ public class ActivitiProcessControllerTest {
         expect(helper.killOrContinueRunningActivitiProcess(
                 "ENE", "ENE-TestAutomationProcess", true))
                 .andReturn(existingTask);
-    }
-
-    // -----------------------------------------------------------------------
-    // BUG-Test 1:
-    // askClientJob() liefert Integer(0) = YES_OPTION.
-    // (Boolean) Integer(0) → ClassCastException
-    // -----------------------------------------------------------------------
-    @Test
-    public void testPrepareStart_askReturnsInteger0_throwsClassCastException() throws Exception {
-        expectExistingTask();
-        expect(callback.askClientJob(
-                eq(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE),
-                anyObject()))
-                .andReturn(0);  // Integer statt Boolean
-
-        replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
-
-        try {
-            controller.prepareStart(helper, env);
-            fail("Es muss eine ClassCastException geworfen werden");
-        } catch (ClassCastException e) {
-            // erwartetes Verhalten — der Cast (Boolean) schlägt fehl
-        }
-
-        verify(callback, helper, env);
-    }
-
-    // -----------------------------------------------------------------------
-    // BUG-Test 2:
-    // askClientJob() liefert Integer(1) = NO_OPTION.
-    // Auch hier → ClassCastException (gleicher Fehler wie bei YES).
-    // -----------------------------------------------------------------------
-    @Test
-    public void testPrepareStart_askReturnsInteger1_throwsClassCastException() throws Exception {
-        expectExistingTask();
-        expect(callback.askClientJob(
-                eq(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE),
-                anyObject()))
-                .andReturn(1);  // Integer statt Boolean
-
-        replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
-
-        try {
-            controller.prepareStart(helper, env);
-            fail("Es muss eine ClassCastException geworfen werden");
-        } catch (ClassCastException e) {
-            // erwartet
-        }
-
-        verify(callback, helper, env);
     }
 
     // -----------------------------------------------------------------------
