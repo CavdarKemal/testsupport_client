@@ -79,20 +79,19 @@ public class ActivitiProcessControllerTest {
     // und BESTEHT nach dem Fix.
     // -----------------------------------------------------------------------
     @Test
-    public void testPrepareStart_afterFix_askReturnsInteger0_callsOnCustomersReloadAndReturnsTask() throws Exception {
+    public void testPrepareStart_askReturnsInteger0_returnsTaskWithoutCustomersReload() throws Exception {
         expectExistingTask();
         expect(callback.askClientJob(
                 eq(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE),
                 anyObject()))
                 .andReturn(0);  // YES_OPTION
-        onCustomersReload.run();
-        expectLastCall().once();
 
         replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
 
         CteActivitiTask result = controller.prepareStart(helper, env);
 
         assertSame("Der zurückgegebene Task muss der existingTask sein", existingTask, result);
+        // onCustomersReload.run() darf beim Resume NICHT aufgerufen werden
         verify(callback, onCustomersReload, helper, env);
     }
 

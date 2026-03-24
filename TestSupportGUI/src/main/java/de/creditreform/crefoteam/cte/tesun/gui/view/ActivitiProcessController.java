@@ -66,7 +66,6 @@ public class ActivitiProcessController {
             if (answer != javax.swing.JOptionPane.YES_OPTION) {
                 throw new RequestAbortedException("Abbruch durch Benutzer!");
             }
-            onCustomersReload.run();
         }
         return cteActivitiTask;
     }
