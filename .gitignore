@@ -15,9 +15,12 @@ logs
 rewrite.yml
 import/
 target/
-SearchLOGsGUI.properties
-SearchXMLsGUI.properties
-TestSupport-GUI.properties
+*-config.properties
+*.crt
+*.gpg
+*.xml
+*.zip
+
 /X-TESTS
 
 # Secrets

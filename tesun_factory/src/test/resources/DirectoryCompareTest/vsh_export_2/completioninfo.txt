@@ -1,6 +1,0 @@
-VshRelevanzPrueferVersion=1.7.1
-anzahl_gesamt=163092
-anzahl_loeschsaetze=0
-anzahl_fehler=0
-Export-Betriebsart=Voll-Export
-statistics_complete=true

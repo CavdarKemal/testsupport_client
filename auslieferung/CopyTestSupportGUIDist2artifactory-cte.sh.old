@@ -1,4 +1,0 @@
-# Kopieren  des TestSupportGUI Tools auf den artifactory-cte Rechner wird vom Jenkins aufgerufen
-#!/bin/bash
-scp -i ~/.ssh/id_rsa_for_tesun /opt/jenkins/workspace/TestUtils_Ausliefern/TestSupportGUI/target/TestSupportGUI-*-distribution.zip versionuser@artifactory-cte.creditreform.de:/opt/home/versionuser/cte_delivery/TestSupport
-
