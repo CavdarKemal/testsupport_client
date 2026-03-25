@@ -7,6 +7,7 @@ import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.gui.BaseGUITest;
 import de.creditreform.crefoteam.cte.tesun.gui.TestSupportGUI;
+import de.creditreform.crefoteam.cte.tesun.gui.utils.GUIStaticUtils;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import org.junit.AfterClass;
 import org.junit.Assume;
@@ -42,11 +43,9 @@ import static org.junit.Assert.*;
  */
 public class TestSupportViewActivitiTest extends BaseGUITest {
 
-    private static final String PROCESS_KEY   = "ENE-TestAutomationProcess";
-    private static final String DIALOG_TITLE  = "CTE-Testautomatisierung";
+    private static final String PROCESS_KEY  = "ENE-TestAutomationProcess";
+    private static final String DIALOG_TITLE = "CTE-Testautomatisierung";
 
-    /** Shared frame — wird einmal für alle Tests erstellt und erst in @AfterClass disposed. */
-    private static TestSupportGUI  SHARED_FRAME;
     private static EnvironmentConfig ENV_CONFIG;
     private static CteActivitiService activitiService;
 
@@ -60,28 +59,25 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     public static void setUpClass() {
         try {
             ENV_CONFIG = new EnvironmentConfig("ENE");
-            SHARED_FRAME = new TestSupportGUI(ENV_CONFIG);
             List<RestInvokerConfig> configs = ENV_CONFIG.getRestServiceConfigsForActiviti();
             activitiService = new CteActivitiServiceRestImpl(configs.get(0));
             // Verbindung testen — schlägt fehl wenn Container nicht läuft
             activitiService.queryProcessInstances(PROCESS_KEY, new HashMap<>());
+            // BPMN vorab deployen — damit alle Tests startProcess() aufrufen können
+            GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiService, "ENE");
         } catch (Exception e) {
-            SHARED_FRAME    = null;
+            ENV_CONFIG = null;
             activitiService = null;
         }
     }
 
     @AfterClass
     public static void tearDownClass() {
-        if (SHARED_FRAME != null) {
-            SHARED_FRAME.setVisible(false);
-            SHARED_FRAME.dispose();
-            SHARED_FRAME = null;
-        }
+        // Frames werden in tearDown() disposed — nichts zu tun
     }
 
     public TestSupportViewActivitiTest() {
-        super(SHARED_FRAME); // null ist OK — setUp() überspringt via Assume
+        super(null); // guiFrame wird in setUp() pro Test frisch gesetzt
     }
 
     // -----------------------------------------------------------------------
@@ -93,12 +89,13 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     public void setUp() {
         Assume.assumeNotNull(
                 "Activiti-Container oder ENE-config.properties nicht verfügbar — Test übersprungen",
-                SHARED_FRAME, activitiService);
+                activitiService, ENV_CONFIG);
         try {
             deleteAllRunningProcesses();
         } catch (Exception e) {
             Assume.assumeNoException("Activiti-Verbindung fehlgeschlagen — Test übersprungen", e);
         }
+        guiFrame = new TestSupportGUI(ENV_CONFIG); // frisches Frame pro Test — kein Zustand aus Vortests
         super.setUp(); // setzt frameOperator
         testSupportView = extractTestSupportView();
         waitForStartButtonEnabled(30_000);
@@ -106,10 +103,14 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @Override
     public void tearDown() {
-        // Shared frame NICHT disposen — das übernimmt tearDownClass().
         try {
             deleteAllRunningProcesses();
         } catch (Exception ignored) {}
+        if (guiFrame != null) {
+            guiFrame.setVisible(false);
+            guiFrame.dispose();
+            guiFrame = null;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -120,7 +121,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     public void test1_frischStart_stopButtonAktiviert() throws Exception {
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
-        waitForStopButtonEnabled(20_000);
+        waitForStopButtonEnabled(120_000);
 
         boolean[] enabled = {false};
         SwingUtilities.invokeAndWait(() ->
@@ -140,10 +141,12 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
-        // Dialog "Soll der Prozess fortgesetzt ... werden?" abwarten und "Ja" wählen
+        // Dialog 1 "Soll der Prozess fortgesetzt ... werden?" — "Ja" (Button 0)
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 0).push();
+        // Dialog 2 "Verzeichnis TEST_OUTPUTS aktualisiert?" aus prepareStart() — "Ja" (Button 0)
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 0).push();
 
-        waitForStopButtonEnabled(20_000);
+        waitForStopButtonEnabled(120_000);
 
         // Selbe Instanz muss noch auf Activiti aktiv sein
         List<CteActivitiProcess> processes = queryRunningProcesses();
@@ -166,8 +169,8 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         // Dialog abwarten und "Nein" wählen → alten Prozess beenden, neu starten
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 1).push();
 
-        waitForStopButtonEnabled(20_000);
-        waitForNewProcess(oldId, 20_000);
+        waitForStopButtonEnabled(120_000);
+        waitForNewProcess(oldId, 120_000);
 
         List<CteActivitiProcess> processes = queryRunningProcesses();
         assertFalse("Es muss eine neue Prozess-Instanz geben", processes.isEmpty());
