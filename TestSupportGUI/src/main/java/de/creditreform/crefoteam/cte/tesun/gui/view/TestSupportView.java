@@ -750,8 +750,10 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 strLogToConsole = "\n***********    UserTasks-Thread beendet.    ***********\n===========    Activiti-Process beendet.    ===========\nTest-Results sind im Output-Ordner gespeichert";
                 strLogToFile = strLogToConsole;
                 activitiController.stop();
+/* CLAUDE_MODE
                 Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getAndCheckActiveCustomers();
                 viewTestResults.refreshTestResultsForMap(activeTestCustomersMapMap, true);
+*/
                 TimelineLogger.info(TestSupportView.class, strLogToFile);
                 enableComponentsToOnOff(true);
                 GUIStaticUtils.setWaitCursor(this, false);

@@ -47,7 +47,7 @@ public class TestFallFileUtil {
         final List<File> entries = new ArrayList<>();
         List<Path> fileNamesList = listFolderContentAsFilenames(folderName, extension);
         fileNamesList.stream().forEach(fileName -> {
-            InputStream inputStream = TestFallFileUtil.class.getResourceAsStream("/" + fileName);
+            InputStream inputStream = TestFallFileUtil.class.getResourceAsStream("/bpmns/" + fileName);
             try {
                 String xmlContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                 File theFile = new File(outputDir, new File(fileName.toString()).getName());
