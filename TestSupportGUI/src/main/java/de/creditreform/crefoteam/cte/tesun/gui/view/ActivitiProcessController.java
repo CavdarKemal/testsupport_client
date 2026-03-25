@@ -2,8 +2,6 @@ package de.creditreform.crefoteam.cte.tesun.gui.view;
 
 import de.creditreform.crefoteam.activiti.CteActivitiProcess;
 import de.creditreform.crefoteam.activiti.CteActivitiService;
-import java.util.HashMap;
-import java.util.concurrent.TimeoutException;
 import de.creditreform.crefoteam.activiti.CteActivitiTask;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.activiti.handlers.UserTaskRunnable;
@@ -16,6 +14,7 @@ import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,15 +23,12 @@ import org.apache.log4j.Level;
 
 public class ActivitiProcessController {
 
-    private static final int MAX_TRIES = 3;
-
     private final TesunClientJobListener callback;
     private final Runnable onCustomersReload;
 
     // Process state — set in runProcess(), used in runLoop() and stop()
     private volatile Thread processThread;
     private volatile boolean running;
-    private int nTries;
     private EnvironmentConfig environmentConfig;
     private Map<String, Object> taskVariablesMap;
     private CteActivitiService cteActivitiServices;
@@ -52,17 +48,13 @@ public class ActivitiProcessController {
      */
     public CteActivitiTask prepareStart(TestSupportHelper helper, EnvironmentConfig env) throws Exception {
         CteActivitiService activitiRestService = helper.getActivitiRestService();
-        CteActivitiTask cteActivitiTask = helper.killOrContinueRunningActivitiProcess(
-                env.getActivitProcessKey(), env.getActivitiProcessName(), true);
+        CteActivitiTask cteActivitiTask = helper.killOrContinueRunningActivitiProcess(env.getActivitProcessKey(), env.getActivitiProcessName(), true);
         if (cteActivitiTask == null) {
             callback.notifyClientJob(Level.INFO, "Deploye ACTIVITI-Prozess-Definitionsdateien für " + env.getCurrentEnvName());
             List<File> bpmnFileList = GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiRestService, env.getCurrentEnvName());
-            bpmnFileList.forEach(bpmnFile ->
-                    callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess-Definitionsdatei '" + bpmnFile.getName() + "' deployed."));
+            bpmnFileList.forEach(bpmnFile -> callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess-Definitionsdatei '" + bpmnFile.getName() + "' deployed."));
         } else {
-            Integer answer = (Integer) callback.askClientJob(
-                    TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE,
-                    "Um weiter zu machen, muss das Verzeichnis TEST_OUTPUTS mit den Daten aktualisiert werden.\nWurde das Verzeichnis aktualisiert?");
+            Integer answer = (Integer) callback.askClientJob(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE, "Um weiter zu machen, muss das Verzeichnis TEST_OUTPUTS mit den Daten aktualisiert werden.\nWurde das Verzeichnis aktualisiert?");
             if (answer != javax.swing.JOptionPane.YES_OPTION) {
                 throw new RequestAbortedException("Abbruch durch Benutzer!");
             }
@@ -73,17 +65,13 @@ public class ActivitiProcessController {
     /**
      * Async part: starts the process loop in a new thread. No GUI calls here.
      */
-    public void runProcess(TestSupportHelper helper, EnvironmentConfig env,
-            Map<String, Object> taskVariablesMap,
-            Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap,
-            CteActivitiTask cteActivitiTask) throws Exception {
+    public void runProcess(TestSupportHelper helper, EnvironmentConfig env, Map<String, Object> taskVariablesMap, Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap, CteActivitiTask cteActivitiTask) throws Exception {
         this.environmentConfig = env;
         this.taskVariablesMap = taskVariablesMap;
         this.cteActivitiServices = helper.getActivitiRestService();
         this.selectedCustomersMapMap = activeTestCustomersMapMap;
         this.activitUserTaskToContinue = cteActivitiTask;
         this.running = true;
-        this.nTries = 0;
 
         String activitiProcessName = env.getActivitiProcessName();
         callback.notifyClientJob(Level.INFO, "\nStarte ACTIVITI-Prozess '" + activitiProcessName + "'...");
@@ -92,7 +80,6 @@ public class ActivitiProcessController {
 /* CLAUDE_MODE
         helper.checkStartCoinditions(activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_2), true);
 */
-
         processThread = new Thread(this::runLoop);
         processThread.start();
     }
@@ -103,8 +90,8 @@ public class ActivitiProcessController {
             try {
                 String processDefinitionKey = (String) taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME);
                 cteActivitiProcess = cteActivitiServices.startProcess(processDefinitionKey, taskVariablesMap);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
             processInstanceID = cteActivitiProcess.getId();
         } else {
@@ -130,11 +117,8 @@ public class ActivitiProcessController {
                     throw new RuntimeException(ex);
                 }
                 try {
-                    if (++nTries > MAX_TRIES) {
-                        cteActivitiServices.signalEventReceived("cancelProcessSignal");
-                        break;
-                    }
-                    Thread.sleep(300);
+                    cteActivitiServices.signalEventReceived("cancelProcessSignal");
+                    break;
                 } catch (Exception ex1) {
                     throw new RuntimeException(ex1);
                 }
@@ -187,8 +171,7 @@ public class ActivitiProcessController {
 
     private boolean isProcessEnded() {
         try {
-            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(
-                    environmentConfig.getActivitiProcessName(), new HashMap<>());
+            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances( environmentConfig.getActivitiProcessName(), new HashMap<>());
             return processes.stream().noneMatch(p -> mainProcessInstanceID.equals(p.getId()));
         } catch (Exception e) {
             return false;
@@ -236,13 +219,8 @@ public class ActivitiProcessController {
      */
     public void stop() throws Exception {
         if (running) {
-            cteActivitiServices.signalEventReceived(
-                    taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ENVIRONMENT) + "cancelProcessSignal");
+            cteActivitiServices.signalEventReceived(taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ENVIRONMENT) + "cancelProcessSignal");
             running = false;
         }
-    }
-
-    public boolean isRunning() {
-        return processThread != null;
     }
 }
