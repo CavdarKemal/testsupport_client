@@ -16,7 +16,7 @@ rewrite.yml
 auslieferung/
 import/
 target/
-*-config.properties
+
 *.crt
 *.gpg
 *.xml
