@@ -138,50 +138,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         getComboBoxTestJobs().addActionListener(e -> doChangeTestJob());
         getButtonRefreshEnvironment().addActionListener(e -> initForEnvironment());
         getButtonManageJVMs().addActionListener(e -> doManageJVMs());
-        getButtonStartProcess().addActionListener(e -> {
-            // Reset test customer results
-            Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewcustomersSelection().getActiveTestCustomersMapMap();
-            activeTestCustomersMapMap.keySet().forEach(testPhase ->
-                    activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
-            // Check and handle Activiti status (sync, on EDT)
-            CteActivitiTask cteActivitiTask;
-            enableComponentsToOnOff(false);
-            GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
-            try {
-                cteActivitiTask = activitiController.prepareStart(testSupportHelper, currentEnvironment);
-            } catch (RequestAbortedException abortEx) {
-                return;
-            } catch (Exception ex) {
-                GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler beim Vorbereiten von ACTIVITI-Prozess!", ex);
-                return;
-            } finally {
-                GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
-                enableComponentsToOnOff(true);
-            }
-            // Start worker thread (GUI state managed by view, like in activiti-process)
-            CteActivitiTask finalTask = cteActivitiTask;
-            Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers = getViewcustomersSelection().getActiveTestCustomersMapMap();
-            new Thread(() -> {
-                GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
-                enableComponentsToOnOff(false);
-                getButtonStopUserTasksThread().setEnabled(true);
-                try {
-                    Map<String, Object> taskVariablesMap = setTaskVariablesMap(getCheckBoxDemoMode().isSelected());
-                    activitiController.runProcess(testSupportHelper, currentEnvironment, taskVariablesMap, activeCustomers, finalTask);
-                } catch (Exception ex) {
-                    notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler beim Starten des Activiti-Prozesses!", ex));
-                    enableComponentsToOnOff(true);
-                    GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
-                }
-            }).start();
-        });
+        getButtonStartProcess().addActionListener(e -> { startActivitiProcess(); });
         getButtonStopUserTasksThread().addActionListener(e -> {
-            try {
-                activitiController.stop();
-                getButtonStopUserTasksThread().setEnabled(false);
-            } catch (Exception ex) {
-                notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Test-Prozess abbrechen", ex));
-            }
+            stopActivitiProcess();
         });
         getButtonStartTestJob().addActionListener(e -> {
             TestJobsComboBoxItem testJobsComboBoxItem = (TestJobsComboBoxItem) getComboBoxTestJobs().getSelectedItem();
@@ -189,6 +148,52 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         });
 
         getButtonClearLOGPanel().addActionListener(e -> getTextAreaTaskListenerInfo().setText(""));
+    }
+
+    private void stopActivitiProcess() {
+        try {
+            activitiController.stop();
+            getButtonStopUserTasksThread().setEnabled(false);
+        } catch (Exception ex) {
+            notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Test-Prozess abbrechen", ex));
+        }
+    }
+
+    protected void startActivitiProcess() {
+        // Reset test customer results
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewcustomersSelection().getActiveTestCustomersMapMap();
+        activeTestCustomersMapMap.keySet().forEach(testPhase -> activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
+        // Check and handle Activiti status (sync, on EDT)
+        CteActivitiTask cteActivitiTask;
+        enableComponentsToOnOff(false);
+        GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
+        try {
+            cteActivitiTask = activitiController.prepareStart(testSupportHelper, currentEnvironment);
+        } catch (RequestAbortedException abortEx) {
+            return;
+        } catch (Exception ex) {
+            GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler beim Vorbereiten von ACTIVITI-Prozess!", ex);
+            return;
+        } finally {
+            GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
+            enableComponentsToOnOff(true);
+        }
+        // Start worker thread (GUI state managed by view, like in activiti-process)
+        CteActivitiTask finalTask = cteActivitiTask;
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers = getViewcustomersSelection().getActiveTestCustomersMapMap();
+        new Thread(() -> {
+            GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
+            enableComponentsToOnOff(false);
+            getButtonStopUserTasksThread().setEnabled(true);
+            try {
+                Map<String, Object> taskVariablesMap = setTaskVariablesMap(getCheckBoxDemoMode().isSelected());
+                activitiController.runProcess(testSupportHelper, currentEnvironment, taskVariablesMap, activeCustomers, finalTask);
+            } catch (Exception ex) {
+                notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler beim Starten des Activiti-Prozesses!", ex));
+                enableComponentsToOnOff(true);
+                GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
+            }
+        }).start();
     }
 
     private void doChangeComboBoxesHost() {
