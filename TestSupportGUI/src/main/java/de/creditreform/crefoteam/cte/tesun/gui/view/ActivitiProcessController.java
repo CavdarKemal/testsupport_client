@@ -113,13 +113,15 @@ public class ActivitiProcessController {
                 }
                 handleCurrentTask(currentUserTask);
             } catch (Exception ex) {
-                if (ex.getMessage().contains("is already claimed by someone else.")) {
+                ex.printStackTrace(); // DEBUG: zeigt Root-Cause des Fehlers in Maven-Ausgabe
+                if (ex.getMessage() != null && ex.getMessage().contains("is already claimed by someone else.")) {
                     throw new RuntimeException(ex);
                 }
                 try {
-                    cteActivitiServices.signalEventReceived("cancelProcessSignal");
+                    cteActivitiServices.signalEventReceived(environmentConfig.getCurrentEnvName() + "cancelProcessSignal");
                     break;
                 } catch (Exception ex1) {
+                    ex1.printStackTrace(); // DEBUG: zeigt warum das Signal fehlschlug
                     throw new RuntimeException(ex1);
                 }
             }
