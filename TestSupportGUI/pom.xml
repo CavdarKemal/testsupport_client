@@ -181,7 +181,7 @@
                         <include>**/*Test.java</include>
                         <include>**/Test*.java</include>
                     </includes>
-                    <argLine>-Duser.language=de -Duser.region=DE -Xmx2048m -Dfile.encoding=${project.build.sourceEncoding}</argLine>
+                    <argLine>-Duser.language=de -Duser.region=DE -Xmx2048m -Dfile.encoding=${project.build.sourceEncoding} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <!-- JAR mit Main-Class Manifest -->
