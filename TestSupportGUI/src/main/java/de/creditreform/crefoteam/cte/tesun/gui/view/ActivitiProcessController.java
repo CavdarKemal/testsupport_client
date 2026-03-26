@@ -113,7 +113,7 @@ public class ActivitiProcessController {
                 }
                 handleCurrentTask(currentUserTask);
             } catch (Exception ex) {
-                ex.printStackTrace(); // DEBUG: zeigt Root-Cause des Fehlers in Maven-Ausgabe
+                TimelineLogger.error(ActivitiProcessController.class, "runLoop: Exception in handleCurrentTask", ex);
                 if (ex.getMessage() != null && ex.getMessage().contains("is already claimed by someone else.")) {
                     throw new RuntimeException(ex);
                 }
@@ -121,7 +121,7 @@ public class ActivitiProcessController {
                     cteActivitiServices.signalEventReceived(environmentConfig.getCurrentEnvName() + "cancelProcessSignal");
                     break;
                 } catch (Exception ex1) {
-                    ex1.printStackTrace(); // DEBUG: zeigt warum das Signal fehlschlug
+                    TimelineLogger.error(ActivitiProcessController.class, "runLoop: signalEventReceived fehlgeschlagen", ex1);
                     throw new RuntimeException(ex1);
                 }
             }
