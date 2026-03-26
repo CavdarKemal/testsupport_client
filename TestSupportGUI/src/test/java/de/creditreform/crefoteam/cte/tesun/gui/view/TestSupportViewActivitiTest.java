@@ -62,7 +62,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             List<RestInvokerConfig> configs = ENV_CONFIG.getRestServiceConfigsForActiviti();
             activitiService = new CteActivitiServiceRestImpl(configs.get(0));
             // Verbindung testen — schlägt fehl wenn Container nicht läuft
-            activitiService.queryProcessInstances(PROCESS_KEY, new HashMap<>());
+            // Laufende Prozesse vorab löschen, damit das Deployment gelöscht werden kann (FK-Constraint)
+            for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, new HashMap<>())) {
+                activitiService.deleteProcessInstance(p.getId());
+            }
             // BPMN vorab deployen — damit alle Tests startProcess() aufrufen können
             GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiService, "ENE");
         } catch (Exception e) {
@@ -141,10 +144,14 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
-        // Dialog 1 "Soll der Prozess fortgesetzt ... werden?" — "Ja" (Button 0)
-        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 0).push();
-        // Dialog 2 "Verzeichnis TEST_OUTPUTS aktualisiert?" aus prepareStart() — "Ja" (Button 0)
-        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 0).push();
+        // Dialog 1 "Soll der Prozess fortgesetzt ... werden?" — "Ja"
+        // Hinweis: showConfirmDialog verwendet JScrollPane mit VERTICAL_SCROLLBAR_ALWAYS,
+        // dadurch enthält die Dialog-Komponenten-Hierarchie BasicArrowButton-Instanzen des
+        // Scrollbars vor den eigentlichen Optionen-Buttons → Index-basierte Suche unzuverlässig,
+        // stattdessen nach Button-Text suchen.
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+        // Dialog 2 "Verzeichnis TEST_OUTPUTS aktualisiert?" aus prepareStart() — "Ja"
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
         waitForStopButtonEnabled(120_000);
 
@@ -167,7 +174,8 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
         // Dialog abwarten und "Nein" wählen → alten Prozess beenden, neu starten
-        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), 1).push();
+        // (Text-basierte Suche, da VERTICAL_SCROLLBAR_ALWAYS die Button-Indizes verschiebt)
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Nein").push();
 
         waitForStopButtonEnabled(120_000);
         waitForNewProcess(oldId, 120_000);
