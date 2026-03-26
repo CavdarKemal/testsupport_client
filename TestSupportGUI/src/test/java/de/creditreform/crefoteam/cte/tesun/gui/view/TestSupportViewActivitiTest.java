@@ -145,13 +145,11 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
-        // Dialog 1 "Soll der Prozess fortgesetzt ... werden?" — "Ja"
+        // Dialog "Soll der Prozess fortgesetzt ... werden?" — "Ja"
         // Hinweis: showConfirmDialog verwendet JScrollPane mit VERTICAL_SCROLLBAR_ALWAYS,
         // dadurch enthält die Dialog-Komponenten-Hierarchie BasicArrowButton-Instanzen des
         // Scrollbars vor den eigentlichen Optionen-Buttons → Index-basierte Suche unzuverlässig,
         // stattdessen nach Button-Text suchen.
-        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
-        // Dialog 2 "Verzeichnis TEST_OUTPUTS aktualisiert?" aus prepareStart() — "Ja"
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
         waitForStopButtonEnabled(120_000);

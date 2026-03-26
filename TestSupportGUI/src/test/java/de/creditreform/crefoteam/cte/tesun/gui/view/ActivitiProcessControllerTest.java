@@ -71,42 +71,35 @@ public class ActivitiProcessControllerTest {
     }
 
     // -----------------------------------------------------------------------
-    // KORREKTES Verhalten (nach Fix):
-    // askClientJob() liefert Integer(0) = YES_OPTION →
-    // onCustomersReload.run() wird aufgerufen, existingTask wird zurückgegeben.
-    //
-    // Dieser Test SCHEITERT mit dem aktuellen Code (ClassCastException)
-    // und BESTEHT nach dem Fix.
+    // Korrektes Verhalten: killOrContinueRunningActivitiProcess liefert
+    // existingTask (User hat "Ja" gewählt) → prepareStart gibt ihn direkt
+    // zurück, ohne askClientJob aufzurufen.
     // -----------------------------------------------------------------------
     @Test
-    public void testPrepareStart_askReturnsInteger0_returnsTaskWithoutCustomersReload() throws Exception {
+    public void testPrepareStart_existingTask_returnedDirectlyWithoutAskClientJob() throws Exception {
         expectExistingTask();
-        expect(callback.askClientJob(
-                eq(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE),
-                anyObject()))
-                .andReturn(0);  // YES_OPTION
-
+        // askClientJob darf NICHT aufgerufen werden — Dialog liegt in killOrContinueRunningActivitiProcess
         replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
 
         CteActivitiTask result = controller.prepareStart(helper, env);
 
         assertSame("Der zurückgegebene Task muss der existingTask sein", existingTask, result);
-        // onCustomersReload.run() darf beim Resume NICHT aufgerufen werden
         verify(callback, onCustomersReload, helper, env);
     }
 
     // -----------------------------------------------------------------------
-    // KORREKTES Verhalten (nach Fix):
-    // askClientJob() liefert Integer(1) = NO_OPTION →
-    // RequestAbortedException wird geworfen, onCustomersReload NICHT aufgerufen.
+    // Korrektes Verhalten: killOrContinueRunningActivitiProcess wirft
+    // RequestAbortedException (User hat "Abbrechen" gewählt) →
+    // prepareStart propagiert die Exception.
     // -----------------------------------------------------------------------
     @Test
-    public void testPrepareStart_afterFix_askReturnsInteger1_throwsRequestAbortedException() throws Exception {
-        expectExistingTask();
-        expect(callback.askClientJob(
-                eq(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE),
-                anyObject()))
-                .andReturn(1);  // NO_OPTION — Abbruch
+    public void testPrepareStart_killOrContinueThrowsRequestAbortedException_propagates() throws Exception {
+        expect(helper.getActivitiRestService()).andReturn(activitiService);
+        expect(env.getActivitProcessKey()).andReturn("ENE");
+        expect(env.getActivitiProcessName()).andReturn("ENE-TestAutomationProcess");
+        expect(helper.killOrContinueRunningActivitiProcess(
+                "ENE", "ENE-TestAutomationProcess", true))
+                .andThrow(new RequestAbortedException("Aborted!"));
 
         replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
 
@@ -114,10 +107,9 @@ public class ActivitiProcessControllerTest {
             controller.prepareStart(helper, env);
             fail("RequestAbortedException erwartet");
         } catch (RequestAbortedException e) {
-            // erwartet
+            // erwartet — CANCEL-Antwort im Dialog von killOrContinueRunningActivitiProcess
         }
 
-        // onCustomersReload darf NICHT aufgerufen worden sein
         verify(callback, onCustomersReload, helper, env);
     }
 }
