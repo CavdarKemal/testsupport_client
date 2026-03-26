@@ -148,12 +148,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void stopActivitiProcess() {
-        try {
-            activitiController.stop();
-            getButtonStopUserTasksThread().setEnabled(false);
-        } catch (Exception ex) {
-            notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Test-Prozess abbrechen", ex));
-        }
+        activitiController.stop();
+        getButtonStopUserTasksThread().setEnabled(false);
     }
 
     protected void startActivitiProcess() {
@@ -795,11 +791,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             // Activiti process has ended
             TimelineLogger.info(this.getClass(), "===========    Activiti-Process beendet.    ===========");
             String msg = "\n***********    UserTasks-Thread beendet.    ***********\n===========    Activiti-Process beendet.    ===========\nTest-Results sind im Output-Ordner gespeichert";
-            try {
-                activitiController.stop();
-            } catch (Exception ex) {
-                TimelineLogger.error(getClass(), "Fehler beim Stoppen des Controllers", ex);
-            }
+            activitiController.stop();
 /* CLAUDE_MODE
             Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getAndCheckActiveCustomers();
             viewTestResults.refreshTestResultsForMap(activeTestCustomersMapMap, true);

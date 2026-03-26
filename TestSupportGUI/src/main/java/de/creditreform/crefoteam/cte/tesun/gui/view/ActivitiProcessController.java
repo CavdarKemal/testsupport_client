@@ -216,11 +216,19 @@ public class ActivitiProcessController {
 
     /**
      * Stops the running process. Safe to call even if no process is running.
+     * running = false wird ZUERST gesetzt, damit runLoop beim nächsten Zyklus
+     * sicher abbricht — unabhängig davon ob das Signal erfolgreich gesendet wird.
      */
-    public void stop() throws Exception {
+    public void stop() {
         if (running) {
-            cteActivitiServices.signalEventReceived(taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ENVIRONMENT) + "cancelProcessSignal");
             running = false;
+            try {
+                cteActivitiServices.signalEventReceived(taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ENVIRONMENT) + "cancelProcessSignal");
+            } catch (Exception ex) {
+                // Activiti schließt die Verbindung wenn der Prozess durch das Signal beendet wird
+                // → ConnectionClosedException ist kein Fehler, running ist bereits false
+                TimelineLogger.warn(ActivitiProcessController.class, "stop: signalEventReceived fehlgeschlagen (Prozess evtl. bereits beendet)", ex);
+            }
         }
     }
 }
