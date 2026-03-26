@@ -168,7 +168,7 @@ public class EnvironmentConfig {
             this.setLastLoadPath(getProperty(PROPNAME_LAST_LOAD_PATH, false, testResourcesRoot.getAbsolutePath().replaceAll("\\\\", "/")));
             this.setLastCfgFileName(getProperty(PROPNAME_LAST_CFG_FILENAME, false, (testResourcesRoot.getAbsolutePath().replaceAll("\\\\", "/"))));
             String property = getProperty(PROPNAME_LAST_CFG_FILENAMES_LIST, false, "");
-            if (property != null) {
+            if (property != null && !property.isEmpty()) {
                 split = property.split("[;,]");
                 for (int i = 0; i < split.length; i++) {
                     lastCfgFileNamesList.add(split[i].trim());
