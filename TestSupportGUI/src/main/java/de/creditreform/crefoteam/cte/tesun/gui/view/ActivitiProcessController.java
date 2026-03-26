@@ -50,15 +50,13 @@ public class ActivitiProcessController {
         CteActivitiService activitiRestService = helper.getActivitiRestService();
         CteActivitiTask cteActivitiTask = helper.killOrContinueRunningActivitiProcess(env.getActivitProcessKey(), env.getActivitiProcessName(), true);
         if (cteActivitiTask == null) {
+            // Kein laufender Prozess oder User hat NO gewählt (Prozess wurde bereits gelöscht)
+            // → BPMN deployen und frisch starten
             callback.notifyClientJob(Level.INFO, "Deploye ACTIVITI-Prozess-Definitionsdateien für " + env.getCurrentEnvName());
             List<File> bpmnFileList = GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiRestService, env.getCurrentEnvName());
             bpmnFileList.forEach(bpmnFile -> callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess-Definitionsdatei '" + bpmnFile.getName() + "' deployed."));
-        } else {
-            Integer answer = (Integer) callback.askClientJob(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE, "Um weiter zu machen, muss das Verzeichnis TEST_OUTPUTS mit den Daten aktualisiert werden.\nWurde das Verzeichnis aktualisiert?");
-            if (answer != javax.swing.JOptionPane.YES_OPTION) {
-                throw new RequestAbortedException("Abbruch durch Benutzer!");
-            }
         }
+        // cteActivitiTask != null → User hat YES gewählt → Prozess fortsetzen
         return cteActivitiTask;
     }
 
