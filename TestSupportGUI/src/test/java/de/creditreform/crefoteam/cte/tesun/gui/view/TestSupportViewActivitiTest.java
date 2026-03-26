@@ -9,6 +9,7 @@ import de.creditreform.crefoteam.cte.tesun.gui.BaseGUITest;
 import de.creditreform.crefoteam.cte.tesun.gui.TestSupportGUI;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.GUIStaticUtils;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
+import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
@@ -192,9 +193,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     private CteActivitiProcess startProcessOnActiviti() throws Exception {
         Map<String, Object> vars = new HashMap<>();
-        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,
-                ENV_CONFIG.getActivitProcessKey());
+        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
         vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
+        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
         return activitiService.startProcess(PROCESS_KEY, vars);
     }
 
