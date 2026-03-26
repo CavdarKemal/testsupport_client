@@ -11,6 +11,8 @@ import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.TestCustomer;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
+import org.apache.log4j.Level;
+
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -18,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.http.impl.execchain.RequestAbortedException;
-import org.apache.log4j.Level;
 
 public class ActivitiProcessController {
 
@@ -92,10 +92,13 @@ public class ActivitiProcessController {
                 throw new RuntimeException(ex);
             }
             processInstanceID = cteActivitiProcess.getId();
+            mainProcessInstanceID = processInstanceID;
         } else {
+            // Task kann im Sub-Prozess liegen → processInstanceId wäre Sub-Prozess-ID.
+            // Hauptprozess-ID separat abfragen, damit isProcessEnded() korrekt funktioniert.
             processInstanceID = activitUserTaskToContinue.getProcessInstanceId();
+            mainProcessInstanceID = findMainProcessInstanceId();
         }
-        mainProcessInstanceID = processInstanceID;
         while (running) {
             if (isProcessEnded()) {
                 callback.notifyClientJob(Level.INFO, "\nACTIVITI-Prozess beendet.");
@@ -129,6 +132,7 @@ public class ActivitiProcessController {
     }
 
     private void handleCurrentTask(CteActivitiTask currentUserTask) throws Exception {
+        dumpUserTask(currentUserTask);
         processInstanceID = currentUserTask.getProcessInstanceId();
         notifyAboutProcessImage();
         callback.notifyClientJob(Level.INFO, currentUserTask);
@@ -145,6 +149,17 @@ public class ActivitiProcessController {
 
         Map<String, Object> mapForACTIVITI = convertMapForACTIVITI(taskVariablesMap);
         cteActivitiServices.completeTask(currentUserTask, mapForACTIVITI);
+    }
+
+    private void dumpUserTask(CteActivitiTask currentUserTask) {
+        TimelineLogger.info(this.getClass(), "CteActivitiTask:: "
+                + "\tName: " + currentUserTask.getName()
+                + ", Id: " + currentUserTask.getId()
+                + ", ProcessDefinitionId: " + currentUserTask.getProcessDefinitionId()
+                + ", TaskDefinitionKey: " + currentUserTask.getTaskDefinitionKey()
+                + ", ProcessInstanceId: " + currentUserTask.getProcessInstanceId()
+                + ", ExecutionId: " + currentUserTask.getExecutionId()
+        );
     }
 
     private Map<String, Object> convertMapForACTIVITI(Map<String, Object> userTasksMap) {
@@ -169,10 +184,43 @@ public class ActivitiProcessController {
         return activitiMap;
     }
 
+    /**
+     * Baut eine minimale Query-Map mit nur MEIN_KEY.
+     * Wird für isProcessEnded() und findMainProcessInstanceId() verwendet,
+     * damit die Activiti-Abfrage unabhängig von der Variablenmenge im taskVariablesMap funktioniert.
+     */
+    private Map<String, Object> buildMinimalQueryMap() {
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,
+                taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY));
+        return queryMap;
+    }
+
+    /**
+     * Ermittelt die Hauptprozess-Instanz-ID beim Fortsetzen eines laufenden Prozesses.
+     * Notwendig, weil activitUserTaskToContinue.getProcessInstanceId() die Sub-Prozess-ID
+     * liefert wenn der Prozess im Sub-Prozess gestoppt wurde.
+     */
+    private Integer findMainProcessInstanceId() {
+        try {
+            List<CteActivitiProcess> procs = cteActivitiServices.queryProcessInstances(
+                    environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
+            if (procs != null && !procs.isEmpty()) {
+                return procs.get(0).getId();
+            }
+        } catch (Exception e) {
+            TimelineLogger.warn(ActivitiProcessController.class, "findMainProcessInstanceId fehlgeschlagen — verwende processInstanceID als Fallback", e);
+        }
+        return processInstanceID;
+    }
+
     private boolean isProcessEnded() {
         try {
-            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances( environmentConfig.getActivitiProcessName(), new HashMap<>());
-            return processes.stream().noneMatch(p -> mainProcessInstanceID.equals(p.getId()));
+            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(
+                    environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
+            TimelineLogger.info(ActivitiProcessController.class, "isProcessEnded: MainProcessInstanceID=" + mainProcessInstanceID +
+                    ", gefundene Instanzen=" + (processes == null ? "null" : processes.size()));
+            return processes == null || processes.stream().noneMatch(p -> mainProcessInstanceID.equals(p.getId()));
         } catch (Exception e) {
             return false;
         }
