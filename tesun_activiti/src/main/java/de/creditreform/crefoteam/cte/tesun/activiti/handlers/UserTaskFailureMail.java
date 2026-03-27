@@ -4,6 +4,7 @@ import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
+import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
 import org.apache.log4j.Level;
 
 import java.util.Map;
@@ -22,7 +23,12 @@ public class UserTaskFailureMail extends AbstractUserTaskRunnable {
         }
         String emailSubject = "CTE Test-Automatisierung: " + environmentConfig.getCurrentEnvName();
         String emailContent = "Fehler beim Ausführen des ACTIVITI-Prozesses!";
-        TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, null);
+        try {
+            TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, null);
+        } catch (Exception e) {
+            TimelineLogger.warn(this.getClass(), "E-Mail konnte nicht gesendet werden (SMTP nicht erreichbar?): " + e.getMessage());
+            notifyUserTask(Level.WARN, "\nWARNING: E-Mail konnte nicht gesendet werden: " + e.getMessage());
+        }
         return taskVariablesMap;
     }
 
