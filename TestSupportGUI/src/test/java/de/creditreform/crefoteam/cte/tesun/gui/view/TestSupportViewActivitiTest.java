@@ -104,6 +104,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             Assume.assumeNoException("Activiti-Verbindung fehlgeschlagen — Test übersprungen", e);
         }
         guiFrame = new TestSupportGUI(ENV_CONFIG); // frisches Frame pro Test — kein Zustand aus Vortests
+        guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // verhindert System.exit() beim dispose() im Test
         super.setUp(); // setzt frameOperator
         testSupportView = extractTestSupportView();
         waitForStartButtonEnabled(30_000);
@@ -111,9 +112,6 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @Override
     public void tearDown() {
-        try {
-            deleteAllRunningProcesses();
-        } catch (Exception ignored) {}
         if (guiFrame != null) {
             guiFrame.setVisible(false);
             guiFrame.dispose();
