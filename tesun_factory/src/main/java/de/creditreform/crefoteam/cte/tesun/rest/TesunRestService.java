@@ -1,7 +1,6 @@
 package de.creditreform.crefoteam.cte.tesun.rest;
 
 import de.creditreform.crefoteam.cte.jobadapter.jvminfo.xmlbinding.ServicesList;
-import de.creditreform.crefoteam.cte.monitoringbackend.xmlbinding.CteCrefoTrackingErgebnis;
 import de.creditreform.crefoteam.cte.monitoringbackend.xmlbinding.RelevanzDecisionMonitoring;
 import de.creditreform.crefoteam.cte.rest.RestInvoker;
 import de.creditreform.crefoteam.cte.rest.RestInvokerApache4;
@@ -1022,27 +1021,6 @@ public class TesunRestService {
         KundenKonfig kundenKonfig = systemInfo.findFachwertconfigInfoForCustomer(testCustomer);
         testCustomer.setFwAktualisierungsdatum(TesunDateUtils.formatCalendar(kundenKonfig.getAktualisierungsdatum()));
         testCustomer.setPdVersion(kundenKonfig.getPdversion());
-    }
-
-    public CteCrefoTrackingErgebnis getCrefoTrackingErgebnis(Long crefo) {
-        final String SERVICE_URL = "/backend/crefotracking/" + crefo;
-        URI uri = restServiceInvoker.buildURI();
-        try {
-            restServiceInvoker.init(REST_INVOKER_TIMEOUT);
-            restServiceInvoker.appendPath(SERVICE_URL);
-            uri = restServiceInvoker.buildURI();
-            tesunClientJobListener.notifyClientJob(Level.INFO, String.format("AbstractTrackingInfo#getCrefoTrackingErgebnis:: %s", uri));
-            RestInvokerResponse response = restServiceInvoker.invokeGet(RestInvoker.CONTENT_TYPE_XML).expectStatusOK();
-
-            String responseBody = response.getResponseBody();
-            Unmarshaller unmarshaller = JAXBContext.newInstance(CteCrefoTrackingErgebnis.class.getPackage().getName()).createUnmarshaller();
-            CteCrefoTrackingErgebnis cteCrefoTrackingErgebnis = (CteCrefoTrackingErgebnis) unmarshaller.unmarshal(new StringReader(responseBody));
-            return cteCrefoTrackingErgebnis;
-        } catch (Exception ex) {
-            throw new RuntimeException("getCrefoTrackingErgebnis()", ex);
-        } finally {
-            restServiceInvoker.close();
-        }
     }
 
     /**

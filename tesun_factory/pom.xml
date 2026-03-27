@@ -11,6 +11,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>ctreader</groupId>
+      <artifactId>ctreaderutil</artifactId>
+    </dependency>
+    <dependency>
       <groupId>schnittstellen.archivbestand30_jaxb</groupId>
       <artifactId>mapper_test_helper</artifactId>
       <scope>compile</scope>
@@ -169,6 +173,10 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>jaxb_basics</groupId>
+      <artifactId>jaxb_util</artifactId>
+    </dependency>
     <dependency>
       <groupId>jaxb_basics</groupId>
       <artifactId>json_util_jackson</artifactId>

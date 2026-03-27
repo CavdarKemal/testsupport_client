@@ -71,19 +71,27 @@ public class JobExecutionInfoCallable<E> implements Callable {
             tesunExecutionInfo = tesunRestService.getTesunJobExecutionInfo(testCustomer.getProcessIdentifier());
             String jobStatus = tesunExecutionInfo.getJobStatus();
             if (jobStatus != null) {
-                if (jobStatus.equals("COMPLETED")) {
                     Calendar lastCompletitionDate = tesunExecutionInfo.getLastCompletitionDate();
                     if (lastCompletitionDate != null) {
                         String strOnfo = "\n\t\tFür den Export-Job '" + testCustomer.getProcessIdentifier() + "' wurde COMPLETED-Time " + TesunDateUtils.formatCalendar(lastCompletitionDate) + " ermittelt, prüfe, ob dieser jung genug ist...";
                         tesunClientJobListener.notifyClientJob(Level.INFO, strOnfo);
                         boolean isAfter = TesunDateUtils.isSameOrAfter(lastCompletitionDate, testCustomer.getLastJobStartetAt());
                         if (isAfter) {
+                        if (jobStatus.equals("COMPLETED")) {
                             String msg = "Export-Job '" + testCustomer.getProcessIdentifier() + "' wurde beendet.";
                             TimelineLogger.end(testCustomer.getProcessIdentifier(), msg);
                             tesunClientJobListener.notifyClientJob(Level.INFO, "\n\t\t" + msg);
                             testCustomer.setLastJobStartetAt(lastCompletitionDate);
                             return tesunExecutionInfo;
                         }
+                        else {
+                            String errorStr = "\n\t!!! Für den Export-Job '" + testCustomer.getProcessIdentifier() + "' wurde als Job-Status '" + jobStatus + "' geliefert!";
+                            TestResults.ResultInfo resultInfo = new TestResults.ResultInfo(errorStr);
+                            testCustomer.addResultInfo(COMMAND, resultInfo);
+                            tesunClientJobListener.notifyClientJob(Level.ERROR, errorStr);
+                            throw new RuntimeException(errorStr);
+                        }
+                    }
                     } else {
                         String errorStr = "\n\t!!! Für den Export-Job '" + testCustomer.getProcessIdentifier() + "' konnte kein lastCompletitionDates ermittelt werden!";
                         TestResults.ResultInfo resultInfo = new TestResults.ResultInfo(errorStr);
@@ -91,7 +99,6 @@ public class JobExecutionInfoCallable<E> implements Callable {
                         tesunClientJobListener.notifyClientJob(Level.ERROR, errorStr);
                         return tesunExecutionInfo;
                     }
-                }
             } else {
                 String errorStr = "\n\t!!! Für den Export-Job '" + testCustomer.getProcessIdentifier() + "' konnte kein jobStatus ermittelt werden!";
                 TestResults.ResultInfo resultInfo = new TestResults.ResultInfo(errorStr);

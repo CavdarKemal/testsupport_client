@@ -113,9 +113,9 @@
         <cte.beteiligten.baum.xsd.version>1.17.6</cte.beteiligten.baum.xsd.version>
 
         <path_abstraction_version>1.0.4</path_abstraction_version>
-        <restinvoker.version>1.0.27</restinvoker.version>
+        <restinvoker.version>2.0.0-SNAPSHOT</restinvoker.version>
         <testutils_cte.version>2.0.5</testutils_cte.version>
-        <jaxb-basics.version>1.2.9</jaxb-basics.version>
+        <jaxb-basics.version>1.2.11</jaxb-basics.version>
         <ctcbaseVersion>1.18.15</ctcbaseVersion>
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
@@ -445,6 +445,11 @@
                 <groupId>schnittstellen.cte_inso_monitor_xsd</groupId>
                 <artifactId>cte_inso_monitor_xsd</artifactId>
                 <version>${cte_inso_monitor_xsd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctreader</groupId>
+                <artifactId>ctreaderutil</artifactId>
+                <version>${ctreader.version}</version>
             </dependency>
             <dependency>
                 <groupId>ctreader</groupId>

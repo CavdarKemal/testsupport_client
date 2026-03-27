@@ -5,16 +5,27 @@ import de.creditreform.crefoteam.cte.jaxbbasics.jaxbutil.CteJaxbBasics;
 import de.creditreform.crefoteam.cte.monitoringbackend.xmlbinding.RelevanzDecisionMonitoring;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.rest.TesunRestService;
-import de.creditreform.crefoteam.cte.tesun.util.*;
-import org.apache.log4j.Level;
-
-import java.io.*;
+import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
+import de.creditreform.crefoteam.cte.tesun.util.PropertiesException;
+import de.creditreform.crefoteam.cte.tesun.util.TestCrefo;
+import de.creditreform.crefoteam.cte.tesun.util.TestCustomer;
+import de.creditreform.crefoteam.cte.tesun.util.TestResults;
+import de.creditreform.crefoteam.cte.tesun.util.TestScenario;
+import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
+import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import org.apache.log4j.Level;
 
 public class CollectsChecker {
 

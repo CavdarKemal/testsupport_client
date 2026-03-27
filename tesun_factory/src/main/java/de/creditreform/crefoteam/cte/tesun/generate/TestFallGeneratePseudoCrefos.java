@@ -18,10 +18,12 @@ import de.creditreform.crefoteam.cte.tesun.util.replacer.Replacer;
 import de.creditreform.crefoteam.cte.tesun.util.replacer.ReplacerFactory;
 import de.creditreform.crefoteam.cte.tesun.util.replacer.ReplacerParameterException;
 import de.creditreform.crefoteam.cte.tesun.util.replacer.ReplacerUtils;
+import de.creditreform.crefoteam.ctreader.ctreaderutil.vclist.VCListFactory;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import javax.inject.Inject;
 import org.apache.log4j.Level;
+import org.slf4j.LoggerFactory;
 
 public class TestFallGeneratePseudoCrefos extends AbstractTesunClientJob {
 
@@ -210,22 +213,36 @@ public class TestFallGeneratePseudoCrefos extends AbstractTesunClientJob {
         return ++nextCrefo;
     }
 
-    private Long getReplacementForClzRange(Long oldCrefo, Long newCrefo) throws PropertiesException {
+    protected Long getReplacementForClzRange(Long oldCrefo, Long newCrefo) throws PropertiesException {
         Integer targetClz = null;
         String strNewCrefo = "";
-        if (oldCrefo >= 9370000000L) {
-            if (oldCrefo >= 9390000000L) {
+        if(isCrefoForLandKey("AT", oldCrefo)) {
+            targetClz = environmentConfig.getTargetClzForAtPseudoCrefos();
+        }
+        else if(isCrefoForLandKey("LU", oldCrefo)) {
                 targetClz = environmentConfig.getTargetClzForLuPseudoCrefos();
             }
             else {
-                targetClz = environmentConfig.getTargetClzForAtPseudoCrefos();
+            return newCrefo;
             }
             String strDeClz = String.valueOf(environmentConfig.getTargetClzForDePseudoCrefos());
             String strNewClz = String.valueOf(targetClz);
             strNewCrefo = newCrefo.toString().replace(strDeClz, strNewClz);
             return Long.valueOf(strNewCrefo);
         }
-        return newCrefo;
+
+    private boolean isCrefoForLandKey(String landKey, Long oldCrefo) {
+        VCListFactory vcListFactory = new VCListFactory(LoggerFactory.getLogger(TestFallGeneratePseudoCrefos.class));
+        Map<Object,Object> ctx = new HashMap<>();
+        ctx.put(VCListFactory.PARAM_VC_INCLUDES, landKey);
+        List<Integer> vcList = vcListFactory.create(ctx);
+        long oldClz = oldCrefo.longValue() / 10000000;
+        for( Integer clz : vcList ) {
+            if(clz == oldClz) {
+                return true;
+            }
+        };
+        return false;
     }
 
     protected Replacer createReplacerForCrefosMap(Map<String, ReplacementMapping> replacementMappingMap, Map<Long, AB30XMLProperties> ab30CrefoToPropertiesMap) {

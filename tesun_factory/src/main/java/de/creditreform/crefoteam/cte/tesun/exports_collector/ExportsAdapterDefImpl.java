@@ -5,18 +5,35 @@ import de.creditreform.crefoteam.cte.pathabstraction.api.PathElement;
 import de.creditreform.crefoteam.cte.pathabstraction.api.PathElementFilter;
 import de.creditreform.crefoteam.cte.pathabstraction.api.PathElementProcessor;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
-import de.creditreform.crefoteam.cte.tesun.util.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
-
-import javax.naming.InsufficientResourcesException;
-import java.io.*;
+import de.creditreform.crefoteam.cte.tesun.util.PathElementUtils;
+import de.creditreform.crefoteam.cte.tesun.util.TestCrefo;
+import de.creditreform.crefoteam.cte.tesun.util.TestCustomer;
+import de.creditreform.crefoteam.cte.tesun.util.TestResults;
+import de.creditreform.crefoteam.cte.tesun.util.TestScenario;
+import de.creditreform.crefoteam.cte.tesun.util.TesunDateUtils;
+import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.naming.InsufficientResourcesException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Level;
 
 public class ExportsAdapterDefImpl implements ExportsAdapter {
 
@@ -197,8 +214,11 @@ public class ExportsAdapterDefImpl implements ExportsAdapter {
         String infoStr;
         for (String zipEntryName : zipEntryNamesList) {
             // ermittle TestCrefos, die der Crefonummer des ZIP-Entries entsprechen
-            List<TestCrefo> testCrefoListX = testCrefoList.stream().filter(testCrefo -> zipEntryName.contains(testCrefo.getPseudoCrefoNr().toString())).collect(Collectors.toList());
-            if (zipEntryName.startsWith("compan") || zipEntryName.startsWith("stamm") || zipEntryName.startsWith("crefo") || zipEntryName.startsWith("betei")) {
+            List<TestCrefo> testCrefoListX = testCrefoList.stream().filter(testCrefo -> {
+                //System.out.println("Checke TestCrefo '" + testCrefo + "' gegen ZIP-Enty '" + zipEntryName + "'...");
+                return zipEntryName.contains(testCrefo.getPseudoCrefoNr().toString());
+            }).collect(Collectors.toList());
+            if (zipEntryName.startsWith("compan") || zipEntryName.startsWith("stamm") || zipEntryName.startsWith("crefo") || zipEntryName.startsWith("betei") || zipEntryName.startsWith("update")) {
                 // Zip-Entry entsprciht einem Stamm- oder Beteiligtenexport. Suche die passende TestCrefo
                 for (int index = 0; index < testCrefoListX.size(); index++) {
                     TestCrefo testCrefo = testCrefoListX.get(index);

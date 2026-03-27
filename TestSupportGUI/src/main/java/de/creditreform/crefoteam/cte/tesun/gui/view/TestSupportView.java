@@ -61,10 +61,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         this.guiFrame = guiFrame;
         currentEnvironment = guiFrame.getEnvironmentConfig();
         this.viewTestResults = getViewTestResults();
-
-        // Fix: Build the complete list BEFORE calling enableComponentsToOnOff(false).
-        // Previously the last 4 entries were added after the disable call and were
-        // therefore never initially disabled.
         componentsToOnOff = new ArrayList<>();
         componentsToOnOff.add(getComboBoxTestSource());
         componentsToOnOff.add(getCheckBoxUseOnlyTestCLZs());
@@ -455,6 +451,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void checkAndSetTestsSource(String testSetSource) throws Exception {
+        // CTEWE-1984::
         File sourceDir = new File(currentEnvironment.getTestResourcesRoot(), testSetSource);
         if (sourceDir.exists()) {
             currentEnvironment.setTestResourcesDir(sourceDir);
@@ -523,21 +520,24 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                     throw ex;
                 }
             });
+            // Beide Phasen nehmen
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_1, selectedCustomersMapPhase1);
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_2, selectedCustomersMapPhase2);
         } else {
-            Iterator<Map.Entry<String, TestCustomer>> it = selectedCustomersMapPhase2.entrySet().iterator();
-            while (it.hasNext()) {
-                TestCustomer testCustomer = it.next().getValue();
+            // nur Phase 2 checken: mind. ein Kunde muss aktiv sein!
+            Iterator<Map.Entry<String, TestCustomer>> iterator = selectedCustomersMapPhase2.entrySet().iterator();
+            while (iterator.hasNext()) {
+                TestCustomer testCustomer = iterator.next().getValue();
                 if (testCustomer.isActivated()) {
                     break;
                 }
             }
-            if (!it.hasNext()) {
+            if (!iterator.hasNext()) {
                 RuntimeException ex = new RuntimeException("PHASE-2 muss mindestens einen aktiven Kunden haben!");
                 GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Kunden!", ex);
                 throw ex;
             }
+            // nur Phase-2 Kunden mitnehmen
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_2, selectedCustomersMapPhase2);
         }
         return resultMap;
