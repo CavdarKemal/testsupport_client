@@ -112,6 +112,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @Override
     public void tearDown() {
+        // Warten bis der Activiti-Prozess komplett durchgelaufen ist (Demo-Mode: alle UserTasks automatisch erledigt).
+        // Erst dann dispose() aufrufen, damit Surefire die JVM nicht vorzeitig beendet und processThread
+        // alle UserTasks verarbeiten kann.
+        waitForStartButtonEnabled(120_000);
         if (guiFrame != null) {
             guiFrame.setVisible(false);
             guiFrame.dispose();
