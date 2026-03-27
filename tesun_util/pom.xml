@@ -97,6 +97,17 @@
   </dependencies>
 
   <build>
+    <plugins>
+      <!-- Integrations-/Umgebungstests benötigen X-TESTS-Verzeichnisse und Windows-Registry.
+           Diese Tests werden im normalen Build übersprungen und nur lokal manuell ausgeführt. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

@@ -49,6 +49,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     private static EnvironmentConfig ENV_CONFIG;
     private static CteActivitiService activitiService;
+    private static HashMap<String, Object> paramsMap = new HashMap<>();
 
     private TestSupportView testSupportView;
 
@@ -64,7 +65,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             activitiService = new CteActivitiServiceRestImpl(configs.get(0));
             // Verbindung testen — schlägt fehl wenn Container nicht läuft
             // Laufende Prozesse vorab löschen, damit das Deployment gelöscht werden kann (FK-Constraint)
-            for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, new HashMap<>())) {
+            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
+            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
+            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
+            for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, paramsMap)) {
                 activitiService.deleteProcessInstance(p.getId());
             }
             // BPMN vorab deployen — damit alle Tests startProcess() aufrufen können
@@ -190,15 +194,11 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     // -----------------------------------------------------------------------
 
     private CteActivitiProcess startProcessOnActiviti() throws Exception {
-        Map<String, Object> vars = new HashMap<>();
-        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
-        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
-        vars.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
-        return activitiService.startProcess(PROCESS_KEY, vars);
+        return activitiService.startProcess(PROCESS_KEY, paramsMap);
     }
 
     private List<CteActivitiProcess> queryRunningProcesses() throws Exception {
-        return activitiService.queryProcessInstances(PROCESS_KEY, new HashMap<>());
+        return activitiService.queryProcessInstances(PROCESS_KEY, paramsMap);
     }
 
     private void deleteAllRunningProcesses() throws Exception {
@@ -212,8 +212,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         while (System.currentTimeMillis() < deadline) {
             try {
                 boolean[] enabled = {false};
-                SwingUtilities.invokeAndWait(() ->
-                        enabled[0] = testSupportView.getButtonStartProcess().isEnabled());
+                SwingUtilities.invokeAndWait(() -> enabled[0] = testSupportView.getButtonStartProcess().isEnabled());
                 if (enabled[0]) return;
                 Thread.sleep(200);
             } catch (Exception ignored) {}

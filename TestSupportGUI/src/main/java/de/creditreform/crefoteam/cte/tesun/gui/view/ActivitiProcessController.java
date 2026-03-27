@@ -248,10 +248,15 @@ public class ActivitiProcessController {
         return null;
     }
 
-    private void notifyAboutProcessImage() throws Exception {
-        InputStream processImage = cteActivitiServices.getProcessImage(processInstanceID);
-        if (processImage != null) {
-            callback.notifyClientJob(Level.INFO, processImage);
+    private void notifyAboutProcessImage() {
+        try {
+            InputStream processImage = cteActivitiServices.getProcessImage(processInstanceID);
+            if (processImage != null) {
+                callback.notifyClientJob(Level.INFO, processImage);
+            }
+        } catch (Exception e) {
+            // Prozessbild nicht verfügbar (z.B. HTTP 404 bei sub-process) — kein kritischer Fehler
+            TimelineLogger.debug(ActivitiProcessController.class, "notifyAboutProcessImage: Bild nicht verfügbar für ProcessInstanceID {}", processInstanceID);
         }
     }
 
