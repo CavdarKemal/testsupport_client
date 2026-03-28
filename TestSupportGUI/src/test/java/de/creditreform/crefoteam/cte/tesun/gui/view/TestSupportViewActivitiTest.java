@@ -106,7 +106,13 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         } catch (Exception e) {
             Assume.assumeNoException("Activiti-Verbindung fehlgeschlagen — Test übersprungen", e);
         }
-        guiFrame = new TestSupportGUI(ENV_CONFIG); // frisches Frame pro Test — kein Zustand aus Vortests
+        try {
+            guiFrame = new TestSupportGUI(ENV_CONFIG); // frisches Frame pro Test — kein Zustand aus Vortests
+        } catch (RuntimeException e) {
+            Assume.assumeNoException(
+                    "TestSupportGUI konnte nicht gestartet werden (Umgebung gesperrt oder andere externe Instanz läuft) — Test übersprungen",
+                    e);
+        }
         guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // verhindert System.exit() beim dispose() im Test
         super.setUp(); // setzt frameOperator
         testSupportView = extractTestSupportView();
@@ -118,7 +124,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         // Warten bis der Activiti-Prozess komplett durchgelaufen ist (Demo-Mode: alle UserTasks automatisch erledigt).
         // Erst dann dispose() aufrufen, damit Surefire die JVM nicht vorzeitig beendet und processThread
         // alle UserTasks verarbeiten kann.
-        waitForStartButtonEnabled(120_000);
+        if (testSupportView != null) {
+            waitForStartButtonEnabled(120_000);
+        }
         if (guiFrame != null) {
             guiFrame.setVisible(false);
             guiFrame.dispose();
@@ -143,12 +151,13 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     // -----------------------------------------------------------------------
-    // Test 2: Prozess unterbrechen und fortsetzen
+    // Test 2: Prozess unterbrechen und fortsetzen (in derselben GUI-Session)
     //         Phase 1: Prozess auf Activiti starten, auf Phase-1-UserTask warten,
     //                  GUI fortsetzen — prüfen ob GUI genau bei diesem Task beginnt.
-    //         Phase 2: GUI verarbeitet Phase 1, auf Phase-2-UserTask warten,
-    //                  GUI-Loop stoppen (ohne Activiti abzubrechen), neues Frame,
-    //                  fortsetzen — prüfen ob GUI beim Phase-2-Task beginnt.
+    //         Phase 2: GUI verarbeitet Phase 1 durch, auf Phase-2-UserTask warten,
+    //                  GUI-Loop per Reflection unterbrechen (simuliert unerwartetes Ende,
+    //                  kein Cancel-Signal → Activiti-Prozess bleibt erhalten),
+    //                  im selben Frame fortsetzen — prüfen ob GUI beim Phase-2-Task beginnt.
     // -----------------------------------------------------------------------
 
     @Test
@@ -170,7 +179,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen",
                 waitForTaskNameInConsole(taskPhase1.getName(), 60_000, 0));
 
-        // --- Phase 2: GUI läuft weiter, auf Phase-2-Task warten ---
+        // --- Phase 2: GUI läuft weiter (verarbeitet Phase 1), auf Phase-2-Task warten ---
         CteActivitiTask taskPhase2 = waitForTaskInPhase(TEST_PHASE.PHASE_2, 120_000);
         Assume.assumeNotNull(
                 "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen",
@@ -179,16 +188,18 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         // Konsolenposition merken, damit Phase-2-Check nur neuen Text prüft
         int consoleLengthBeforePhase2Resume = getConsoleLength();
 
-        // Stop-Button klicken — setzt running=false im GUI-Loop.
-        // Das Cancel-Signal schlägt auf Activiti fehl (ungültiger Signalname),
-        // daher bleibt der Activiti-Prozess am Phase-2-Task erhalten.
-        clickStopButton();
+        // GUI-Loop per Reflection unterbrechen: nur running=false, kein Cancel-Signal.
+        // Simuliert ein unerwartetes Ende der GUI (z.B. Absturz) — der Activiti-Prozess
+        // bleibt am Phase-2-Task erhalten und kann fortgesetzt werden.
+        // (Zum Vergleich: clickStopButton() würde ENEcancelProcessSignal senden
+        //  und den Activiti-Prozess abbrechen — das wäre kein "Fortsetzen"-Szenario.)
+        stopActivitiControllerLoop();
         waitForStartButtonEnabled(30_000);
 
-        // Prüfen ob Phase-2-Task nach dem Stop noch auf Activiti vorhanden ist
+        // Prüfen ob Phase-2-Task nach der Unterbrechung noch auf Activiti vorhanden ist
         CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
         Assume.assumeNotNull(
-                "Phase-2-Task nach Stop nicht mehr auf Activiti — Phase-2-Check übersprungen",
+                "Phase-2-Task nach Unterbrechung nicht mehr auf Activiti — Phase-2-Check übersprungen",
                 taskPhase2ForResume);
 
         // Im selben GUI-Frame fortsetzen: "Prozess starten" → "Ja"
@@ -294,11 +305,25 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     /**
+     * Unterbricht den GUI-Loop per Reflection (setzt running=false), ohne das
+     * Activiti-Cancel-Signal zu senden. Simuliert ein unerwartetes Ende der GUI
+     * (z.B. Absturz) — der Activiti-Prozess bleibt am aktuellen Task erhalten.
+     */
+    private void stopActivitiControllerLoop() throws Exception {
+        Field controllerField = TestSupportView.class.getDeclaredField("activitiController");
+        controllerField.setAccessible(true);
+        ActivitiProcessController controller = (ActivitiProcessController) controllerField.get(testSupportView);
+
+        Field runningField = ActivitiProcessController.class.getDeclaredField("running");
+        runningField.setAccessible(true);
+        runningField.set(controller, false);
+    }
+
+    /**
      * Klickt den Stop-Button der GUI auf dem EDT.
-     * ActivitiProcessController.stop() setzt running=false und versucht ein Cancel-Signal
-     * zu senden — das Signal schlägt auf Activiti fehl (ungültiger Name, da "ENV" nicht
-     * in der taskVariablesMap ist), wird aber still gefangen. Der Activiti-Prozess
-     * läuft daher weiter und steht für eine Fortsetzung bereit.
+     * Ruft ActivitiProcessController.stop() auf: setzt running=false UND sendet
+     * ENEcancelProcessSignal an Activiti → der Activiti-Prozess wird abgebrochen.
+     * Nur für Tests geeignet, die das bewusste Abbrechen testen (nicht für Fortsetzen).
      */
     private void clickStopButton() throws Exception {
         SwingUtilities.invokeAndWait(() ->
