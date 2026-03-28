@@ -1,7 +1,6 @@
 package de.creditreform.crefoteam.cte.tesun.gui.view;
 
 import de.creditreform.crefoteam.activiti.CteActivitiTask;
-import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.activiti.handlers.UserTaskRunnable;
 import de.creditreform.crefoteam.cte.tesun.gui.design.TestSupportPanel;
@@ -21,19 +20,13 @@ import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
 import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +37,7 @@ import org.apache.http.impl.execchain.RequestAbortedException;
 import org.apache.log4j.Level;
 
 public class TestSupportView extends TestSupportPanel implements TesunClientJobListener, CommandExecutorListener {
+
     private static final String APP_TITLE = "CTE-Testautomatisierung";
 
     private ActivitiProcessController activitiController;
@@ -61,41 +55,32 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         this.guiFrame = guiFrame;
         currentEnvironment = guiFrame.getEnvironmentConfig();
         this.viewTestResults = getViewTestResults();
-        componentsToOnOff = new ArrayList<>();
-        componentsToOnOff.add(getComboBoxTestSource());
-        componentsToOnOff.add(getCheckBoxUseOnlyTestCLZs());
-        componentsToOnOff.add(getComboBoxITSQRevision());
-        componentsToOnOff.add(getComboBoxActivitiHost());
-        componentsToOnOff.add(getComboBoxRestServicesHost());
-        componentsToOnOff.add(getComboBoxBatchGUIHost());
-        componentsToOnOff.add(getComboBoxImpCycleHost());
-        componentsToOnOff.add(getComboBoxInsoHost());
-        componentsToOnOff.add(getComboBoxInsoBackEndHost());
-        componentsToOnOff.add(getComboBoxTestPhase());
-        componentsToOnOff.add(getButtonManageJVMs());
-        componentsToOnOff.add(getButtonStopUserTasksThread());
-        componentsToOnOff.add(getButtonStartTestJob());
-        componentsToOnOff.add(getButtonStartProcess());
-        componentsToOnOff.add(getComboBoxTestJobs());
-        componentsToOnOff.add(getTextFieldJobParams());
-        componentsToOnOff.add(getComboBoxTestType());
-        componentsToOnOff.add(getComboBoxEnvironment());       // Fix: was added after disable
-        componentsToOnOff.add(getButtonRefreshEnvironment());  // Fix: was added after disable
-        componentsToOnOff.add(getCheckBoxDemoMode());          // Fix: was added after disable
-        componentsToOnOff.add(getCheckBoxUploadSynthetics());  // Fix: was added after disable
-        enableComponentsToOnOff(false);
 
-        getLabelFachwertConfig().setVisible(false);
-        getRadioButtonFWConfigNewest().setVisible(false);
-        getRadioButtonFWConfigLikePRE().setVisible(false);
-        getLabelExportFormat().setVisible(false);
-        getRadioButtonExportFormatNewest().setVisible(false);
-        getRadioButtonExportFormatLikePRE().setVisible(false);
+        getViewTestSupportMainControls().init(
+                this,
+                this::doChangeComboBoxesHost,
+                this::initForEnvironment,
+                this::doManageJVMs,
+                this::doChangeEnvironment);
+
+        getViewTestSupportMainProcess().init(
+                this::startActivitiProcess,
+                this::stopActivitiProcess,
+                this::startSelectedTestJob,
+                this::doChangeTestResources,
+                this::doChangeITSQRevision,
+                this::doChangeTestType,
+                () -> currentEnvironment.setLastUseOnlyTestClz(getViewTestSupportMainProcess().isUseOnlyTestCLZs()),
+                currentEnvironment);
+
+        componentsToOnOff = new ArrayList<>();
+        componentsToOnOff.addAll(getViewTestSupportMainControls().getComponentsToOnOff());
+        componentsToOnOff.addAll(getViewTestSupportMainProcess().getComponentsToOnOff());
+
+        enableComponentsToOnOff(false);
 
         getSplitPaneMain().setDividerLocation(500);
         getCheckBoxScrollToEnd().setSelected(true);
-        getCheckBoxDemoMode().setSelected(true); // CLAUDE_MODE
-        getCheckBoxDemoMode().setEnabled(false); // CLAUDE_MODE
 
         initEnvironmentsComboBox();
         initITSQRevisionsComboBox();
@@ -106,9 +91,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         initTestPhasesComboBox();
 
         initForEnvironment();
-
-        getCheckBoxUseOnlyTestCLZs().setSelected(currentEnvironment.isLastUseOnlyTestClz());
-        getCheckBoxUploadSynthetics().setSelected(currentEnvironment.isLastUploadSynthetics());
 
         initListeners();
         activitiController = new ActivitiProcessController(this, this::initCustomers);
@@ -122,38 +104,23 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 doResize();
             }
         });
-        getCheckBoxUseOnlyTestCLZs().addActionListener(e -> currentEnvironment.setLastUseOnlyTestClz(getCheckBoxUseOnlyTestCLZs().isSelected()));
-        getCheckBoxUploadSynthetics().addActionListener(e -> currentEnvironment.setLastUploadSynthetics(getCheckBoxUploadSynthetics().isSelected()));
-        getComboBoxEnvironment().addActionListener(e -> doChangeEnvironment());
-        getComboBoxActivitiHost().addActionListener(e -> doChangeComboBoxesHost());
-        getComboBoxImpCycleHost().addActionListener(e -> doChangeComboBoxesHost());
-        getComboBoxRestServicesHost().addActionListener(e -> doChangeComboBoxesHost());
-        getComboBoxTestSource().addActionListener(e -> doChangeTestResources());
-        getComboBoxITSQRevision().addActionListener(e -> doChangeITSQRevision());
-        getComboBoxTestType().addActionListener(e -> doChangeTestType());
-        getComboBoxTestJobs().addActionListener(e -> doChangeTestJob());
-        getButtonRefreshEnvironment().addActionListener(e -> initForEnvironment());
-        getButtonManageJVMs().addActionListener(e -> doManageJVMs());
-        getButtonStartProcess().addActionListener(e -> startActivitiProcess());
-        getButtonStopUserTasksThread().addActionListener(e -> stopActivitiProcess());
-        getButtonStartTestJob().addActionListener(e -> {
-            TestJobsComboBoxItem testJobsComboBoxItem = (TestJobsComboBoxItem) getComboBoxTestJobs().getSelectedItem();
-            startUserTaskRunnable(testJobsComboBoxItem);
-        });
-        getButtonClearLOGPanel().addActionListener(e -> getTextAreaTaskListenerInfo().setText(""));
     }
 
     private void stopActivitiProcess() {
         activitiController.stop();
-        getButtonStopUserTasksThread().setEnabled(false);
+        getViewTestSupportMainProcess().setStopButtonEnabled(false);
+    }
+
+    private void startSelectedTestJob() {
+        startUserTaskRunnable(getViewTestSupportMainProcess().getSelectedTestJob());
     }
 
     protected void startActivitiProcess() {
-        // Reset test customer results
-        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewcustomersSelection().getActiveTestCustomersMapMap();
-        activeTestCustomersMapMap.keySet().forEach(testPhase -> activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap =
+                getViewCustomersSelection().getActiveTestCustomersMapMap();
+        activeTestCustomersMapMap.keySet().forEach(testPhase ->
+                activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
 
-        // Sync part on EDT: check Activiti status, deploy or ask to continue
         CteActivitiTask cteActivitiTask;
         enableComponentsToOnOff(false);
         GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
@@ -166,24 +133,20 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             return;
         } finally {
             GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
-            // Fix: enableComponentsToOnOff no longer throws — safe to call in finally.
             enableComponentsToOnOff(true);
         }
 
         // Capture GUI state on EDT before handing off to worker thread.
-        // Fix: previously setTaskVariablesMap() was called from the worker thread,
-        // reading Swing component state from a non-EDT thread.
-        final boolean isDemoMode = getCheckBoxDemoMode().isSelected();
+        final boolean isDemoMode = getViewTestSupportMainProcess().isDemoMode();
         final Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers =
-                getViewcustomersSelection().getActiveTestCustomersMapMap();
+                getViewCustomersSelection().getActiveTestCustomersMapMap();
         final CteActivitiTask finalTask = cteActivitiTask;
 
         new Thread(() -> {
-            // Fix: all Swing calls dispatched to EDT.
             SwingUtilities.invokeLater(() -> {
                 GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
                 enableComponentsToOnOff(false);
-                getButtonStopUserTasksThread().setEnabled(true);
+                getViewTestSupportMainProcess().setStopButtonEnabled(true);
             });
             try {
                 Map<String, Object> taskVariablesMap = setTaskVariablesMap(isDemoMode, activeCustomers);
@@ -218,84 +181,25 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void initTestTypesComboBox() {
         try {
-            List<TestSupportClientKonstanten.TEST_TYPES> testTypesList = currentEnvironment.getTestTypes();
-            DefaultComboBoxModel testTypesModel = new DefaultComboBoxModel();
-            for (TestSupportClientKonstanten.TEST_TYPES testType : testTypesList) {
-                testTypesModel.addElement(testType);
-            }
-            getComboBoxTestType().setModel(testTypesModel);
-            getComboBoxTestType().setSelectedItem(currentEnvironment.getLastTestType());
-            getViewcustomersSelection().setTestCustomersTableModelMap(new HashMap<>());
-        } catch (PropertiesException ex) {
+            getViewTestSupportMainProcess().initTestTypesComboBox(currentEnvironment);
+            getViewCustomersSelection().setTestCustomersTableModelMap(new HashMap<>());
+        } catch (Exception ex) {
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Test-Typen!", ex);
             throw new RuntimeException(ex.getMessage());
         }
     }
 
     private void initTestPhasesComboBox() {
-        getComboBoxTestPhase().setModel(new DefaultComboBoxModel());
-        getComboBoxTestPhase().addItem(TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
-        getComboBoxTestPhase().addItem(TestSupportClientKonstanten.TEST_PHASE.PHASE_2);
-        getComboBoxTestPhase().setSelectedItem(TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
+        getViewTestSupportMainProcess().initTestPhasesComboBox();
     }
 
     private void initTestJobsCombo() {
-        List<TestJobsComboBoxItem> testJobsList = new ArrayList<>();
-        // testJobsList.add(new TestJobsComboBoxItem("1:Extend Pseudo-Crefos", Collections.singletonList("UserTaskExtendsArchivBestandCrefos")));
-        testJobsList.add(new TestJobsComboBoxItem("2:Generate Pseudo-Crefos", Collections.singletonList("UserTaskGeneratePseudoCrefos")));
-        testJobsList.add(new TestJobsComboBoxItem("3:Systemeinstellungen setzen", Collections.singletonList("UserTaskPrepareTestSystem")));
-        testJobsList.add(new TestJobsComboBoxItem("4:Upload nach STAGING", Collections.singletonList("UserTaskStartUploads")));
-
-        testJobsList.add(new TestJobsComboBoxItem("6:Beteiligten-Import starten", Arrays.asList("UserTaskStartBeteiligtenImport", "UserTaskWaitForBeteiligtenImport")));
-        testJobsList.add(new TestJobsComboBoxItem("8:ENTG-Berechnung starten", Arrays.asList("UserTaskStartEntgBerechnung", "UserTaskWaitForEntgBerechnung")));
-        testJobsList.add(new TestJobsComboBoxItem("10:BTLG-Aktualisierung starten", Arrays.asList("UserTaskStartBtlgAktualisierung", "UserTaskWaitForBtlgAktualisierung")));
-        testJobsList.add(new TestJobsComboBoxItem("12:CT-Import starten", Arrays.asList("UserTaskStartCtImport", "UserTaskWaitForCtImport")));
-        testJobsList.add(new TestJobsComboBoxItem("13:Import-Cycle starten", Arrays.asList("UserTaskStartImports", "UserTaskWaitForCtImport")));
-
-        testJobsList.add(new TestJobsComboBoxItem("14:Exports starten", Collections.singletonList("UserTaskStartExports")));
-
-        testJobsList.add(new TestJobsComboBoxItem("16:Collect starten", Collections.singletonList("UserTaskStartCollect"), TestSupportClientKonstanten.LAST_COMPLETITION_TIME));
-        testJobsList.add(new TestJobsComboBoxItem("17:Collects überprüfen", Collections.singletonList("UserTaskCheckCollects")));
-
-        testJobsList.add(new TestJobsComboBoxItem("18:SFTP-Uploads starten", Collections.singletonList("UserTaskStartSftpUploads")));
-        testJobsList.add(new TestJobsComboBoxItem("19:SFTP-Uploads prüfen", Collections.singletonList("UserTaskCheckSftpUploads"), TestSupportClientKonstanten.LAST_COMPLETITION_TIME));
-
-        testJobsList.add(new TestJobsComboBoxItem("20:Restore Collects(Exports)", Collections.singletonList("UserTaskStartRestore")));
-        testJobsList.add(new TestJobsComboBoxItem("21:REF/COLLECT-Checks astarten", Collections.singletonList("UserTaskCheckRefExports")));
-        testJobsList.add(new TestJobsComboBoxItem("22:Export-Protokoll-Checks starten", Collections.singletonList("UserTaskCheckExportProtokoll"), TestSupportClientKonstanten.LAST_COMPLETITION_TIME));
-
-        testJobsList.add(new TestJobsComboBoxItem("25:System-Einstellungen Restaurieren", Collections.singletonList("UserTaskRestoreTestSystem")));
-
-        testJobsList.add(new TestJobsComboBoxItem("30:BIC Jobs testen", Collections.singletonList("UserTaskBicJobs"), TestSupportClientKonstanten.UPLOAD_EMPTY_PAYLOAD));
-
-        testJobsList.add(new TestJobsComboBoxItem("40:CrefoAnalyseErgebnisse sammeln", Collections.singletonList("UserTaskCrefoAnalyseErgebnisse")));
-        testJobsList.add(new TestJobsComboBoxItem("41:Fachwertkonfig sammeln", Collections.singletonList("UserTaskCollectFWConfigs")));
-        testJobsList.add(new TestJobsComboBoxItem("42:Erneute Lieferung beantragen", Collections.singletonList("UserTaskErneuteLieferungBeantragen")));
-        testJobsList.sort(Comparator.naturalOrder());
-        DefaultComboBoxModel<TestJobsComboBoxItem> testJobsModel = new DefaultComboBoxModel(testJobsList.toArray());
-        getComboBoxTestJobs().setModel(testJobsModel);
-        doChangeTestJob();
+        getViewTestSupportMainProcess().initTestJobsCombo();
     }
 
     private void initHostsFields() {
         try {
-            getComboBoxActivitiHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForActiviti().forEach(restInvokerConfig -> getComboBoxActivitiHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
-
-            getComboBoxRestServicesHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForMasterkonsole().forEach(restInvokerConfig -> getComboBoxRestServicesHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
-
-            getComboBoxBatchGUIHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForBatchGUI().forEach(restInvokerConfig -> getComboBoxBatchGUIHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
-
-            getComboBoxImpCycleHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForJvmImpCycle().forEach(restInvokerConfig -> getComboBoxImpCycleHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
-
-            getComboBoxInsoHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForJvmInso().forEach(restInvokerConfig -> getComboBoxInsoHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
-
-            getComboBoxInsoBackEndHost().setModel(new DefaultComboBoxModel());
-            currentEnvironment.getRestServiceConfigsForJvmInsoBackend().forEach(restInvokerConfig -> getComboBoxInsoBackEndHost().addItem(new RestInvokerConfigCbItem(restInvokerConfig.getServiceURL(), restInvokerConfig)));
+            getViewTestSupportMainControls().initHostsFields(currentEnvironment);
         } catch (Exception ex) {
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Hosts!", ex);
             throw new RuntimeException(ex.getMessage());
@@ -304,14 +208,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void initTestSourcesComboBox() {
         try {
-            ActionListener[] actionListeners = disableCbListeners(getComboBoxTestSource());
-            getComboBoxTestSource().setModel(new DefaultComboBoxModel());
-            List<String> testSetSources = currentEnvironment.getTestSetSources();
-            testSetSources.forEach(testSetSource -> {
-                getComboBoxTestSource().addItem(testSetSource);
-            });
-            getComboBoxTestSource().setSelectedItem(currentEnvironment.getLastTestSource());
-            enableCbListeners(getComboBoxTestSource(), actionListeners);
+            getViewTestSupportMainProcess().initTestSourcesComboBox(currentEnvironment);
         } catch (Exception ex) {
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Test-Sourcen!", ex);
             throw new RuntimeException(ex.getMessage());
@@ -320,18 +217,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void initITSQRevisionsComboBox() {
         try {
-            ActionListener[] actionListeners = disableCbListeners(getComboBoxITSQRevision());
-            List<String> itsqRevisionsList = currentEnvironment.getItsqRevisions();
-            getComboBoxITSQRevision().setModel(new DefaultComboBoxModel());
-            itsqRevisionsList.forEach(itsqRevision -> {
-                getComboBoxITSQRevision().addItem(itsqRevision);
-            });
-            String lastItsqRevision = currentEnvironment.getLastItsqRevision();
-            if (!itsqRevisionsList.contains(lastItsqRevision)) {
-                getComboBoxITSQRevision().addItem(lastItsqRevision);
-            }
-            getComboBoxITSQRevision().setSelectedItem(lastItsqRevision);
-            enableCbListeners(getComboBoxITSQRevision(), actionListeners);
+            getViewTestSupportMainProcess().initITSQRevisionsComboBox(currentEnvironment);
         } catch (Exception ex) {
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der ITSQ-Revisions!", ex);
             throw new RuntimeException(ex.getMessage());
@@ -339,48 +225,39 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void initEnvironmentsComboBox() {
-        DefaultComboBoxModel environmentsModel = new DefaultComboBoxModel();
         Map<String, File> environmentsMap = currentEnvironment.getEnvironmentsMap();
         if ((environmentsMap == null) || (environmentsMap.isEmpty())) {
             String exceptionErr = "Es konnten im aktuellen Verzeichnis '" + System.getProperty("user.dir") + "'\nkeine Konfigurationsdateien '{ENE|GEE|ABE}-config.properties' gefunden werden!";
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(this, "Konfiguration laden", new RuntimeException(exceptionErr)));
             System.exit(-1);
         }
-        Iterator<String> envNamesIterator = environmentsMap.keySet().iterator();
-        while (envNamesIterator.hasNext()) {
-            String envName = envNamesIterator.next();
-            environmentsModel.addElement(envName);
-        }
-        getComboBoxEnvironment().setModel(environmentsModel);
-        getComboBoxEnvironment().setSelectedItem(currentEnvironment.getCurrentEnvName());
+        getViewTestSupportMainControls().initEnvironmentsComboBox(currentEnvironment);
     }
 
     private void doChangeEnvironment() {
-        String newEnv = getComboBoxEnvironment().getSelectedItem().toString();
+        String newEnv = getViewTestSupportMainControls().getSelectedEnvironmentName();
         try {
             EnvironmentConfig environmentConfig = new EnvironmentConfig(newEnv);
             checkEnvionmentLock(environmentConfig, newEnv);
-            TestSupportClientKonstanten.TEST_TYPES selectedTestType = (TestSupportClientKonstanten.TEST_TYPES) getComboBoxTestType().getSelectedItem();
-            if (!TimelineLogger.configure(environmentConfig.getLogOutputsRootForEnv(getComboBoxEnvironment().getSelectedItem().toString()), (selectedTestType + ".log"), "TimeLine.log")) {
+            TestSupportClientKonstanten.TEST_TYPES selectedTestType = getViewTestSupportMainProcess().getSelectedTestType();
+            if (!TimelineLogger.configure(
+                    currentEnvironment.getLogOutputsRootForEnv(getViewTestSupportMainControls().getSelectedEnvironmentName()),
+                    (selectedTestType + ".log"), "TimeLine.log")) {
                 notifyClientJob(Level.ERROR, "Exception beim Konfigurieren der LOG-Dateien!\n");
             }
-            String testSetSource = getComboBoxTestSource().getSelectedItem().toString();
+            String testSetSource = getViewTestSupportMainProcess().getSelectedTestSource();
             environmentConfig.setLastTestSource(testSetSource);
-
-            environmentConfig.setLastItsqRevision(getComboBoxITSQRevision().getSelectedItem().toString());
-            environmentConfig.setLastTestType((TestSupportClientKonstanten.TEST_TYPES) getComboBoxTestType().getSelectedItem());
-            environmentConfig.setLastUseOnlyTestClz(getCheckBoxUseOnlyTestCLZs().isSelected());
-            environmentConfig.setLastUploadSynthetics(getCheckBoxUploadSynthetics().isSelected());
-
+            environmentConfig.setLastItsqRevision(getViewTestSupportMainProcess().getSelectedITSQRevision());
+            environmentConfig.setLastTestType(selectedTestType);
+            environmentConfig.setLastUseOnlyTestClz(getViewTestSupportMainProcess().isUseOnlyTestCLZs());
+            environmentConfig.setLastUploadSynthetics(getViewTestSupportMainProcess().isUploadSynthetics());
             guiFrame.setEnvironmentConfig(environmentConfig);
             currentEnvironment = guiFrame.getEnvironmentConfig();
             initForEnvironment();
         } catch (Exception ex) {
             RuntimeException runtimeException = new RuntimeException(("Exception beim Initialisieren der Umgebung " + newEnv + "!"), ex);
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(this, "Initialisierung", runtimeException));
-            ActionListener[] actionListeners = disableCbListeners(getComboBoxEnvironment());
-            getComboBoxEnvironment().setSelectedItem(currentEnvironment.getCurrentEnvName());
-            enableCbListeners(getComboBoxEnvironment(), actionListeners);
+            getViewTestSupportMainControls().setSelectedEnvironment(currentEnvironment.getCurrentEnvName());
         }
     }
 
@@ -399,13 +276,13 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         enableComponentsToOnOff(false);
         GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
         viewTestResults.setEnvironmentConfig(currentEnvironment);
-        TestSupportClientKonstanten.TEST_TYPES selectedTestType = (TestSupportClientKonstanten.TEST_TYPES) getComboBoxTestType().getSelectedItem();
         notifyClientJob(Level.INFO, String.format("\nInitialisiere für die Umgebung %s...", currentEnvironment.getCurrentEnvName()));
         getTextAreaTaskListenerInfo().setText("");
         initHostsFields();
         new Thread(() -> {
             try {
-                notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...", getComboBoxEnvironment().getSelectedItem()));
+                notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...",
+                        getViewTestSupportMainControls().getSelectedEnvironmentName()));
                 testSupportHelper = getTestSupportHelper();
 /* CLAUDE_MODE
                 TesunSystemInfo tesunSystemInfo = testSupportHelper.getTesunRestServiceWLS().getTesunSystemInfo();
@@ -424,9 +301,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private TestSupportHelper getTestSupportHelper() throws Exception {
         return new TestSupportHelper(currentEnvironment,
-                ((RestInvokerConfigCbItem) getComboBoxActivitiHost().getSelectedItem()).getRestInvokerConfig(),
-                ((RestInvokerConfigCbItem) getComboBoxRestServicesHost().getSelectedItem()).getRestInvokerConfig(),
-                ((RestInvokerConfigCbItem) getComboBoxImpCycleHost().getSelectedItem()).getRestInvokerConfig(),
+                getViewTestSupportMainControls().getSelectedActivitiConfig(),
+                getViewTestSupportMainControls().getSelectedRestServicesConfig(),
+                getViewTestSupportMainControls().getSelectedImpCycleConfig(),
                 TestSupportView.this);
     }
 
@@ -435,10 +312,10 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             SwingUtilities.invokeLater(() -> {
                 GUIStaticUtils.setWaitCursor(this, true);
                 enableComponentsToOnOff(false);
-                getTextFieldTestCasesPath().setText("");
-                getViewcustomersSelection().setTestCustomersTableModelMap(new HashMap<>());
+                getViewTestSupportMainProcess().setTestCasesPath("");
+                getViewCustomersSelection().setTestCustomersTableModelMap(new HashMap<>());
             });
-            checkAndSetTestsSource(getComboBoxTestSource().getSelectedItem().toString());
+            checkAndSetTestsSource(getViewTestSupportMainProcess().getSelectedTestSource());
             initTestCasesForCustomers();
         } catch (Exception ex) {
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Quelle für ITSQ-Revision ändern", ex));
@@ -451,13 +328,13 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void checkAndSetTestsSource(String testSetSource) throws Exception {
-        // CTEWE-1984::
+        if (testSetSource == null) return;
         File sourceDir = new File(currentEnvironment.getTestResourcesRoot(), testSetSource);
         if (sourceDir.exists()) {
             currentEnvironment.setTestResourcesDir(sourceDir);
             String testCasesPath = currentEnvironment.getItsqRefExportsRoot().getAbsolutePath();
             currentEnvironment.setLastTestSource(testSetSource);
-            SwingUtilities.invokeLater(() -> getTextFieldTestCasesPath().setText(testCasesPath));
+            SwingUtilities.invokeLater(() -> getViewTestSupportMainProcess().setTestCasesPath(testCasesPath));
         } else {
             GUIStaticUtils.showExceptionMessage(this, "", new RuntimeException("\nDie selektierte Quelle " + sourceDir + " existiert nicht!\nBitte andere Quelle wählen."));
         }
@@ -490,7 +367,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             });
             TesunUtilites.dumpCustomers(currentEnvironment.getLogOutputsRoot(), "INIT-" + testPhase.name(), testCustomerMap);
         }
-        SwingUtilities.invokeLater(() -> getViewcustomersSelection().setTestCustomersTableModelMap(customerTestInfoMapMap));
+        SwingUtilities.invokeLater(() -> getViewCustomersSelection().setTestCustomersTableModelMap(customerTestInfoMapMap));
     }
 
     private void doManageJVMs() {
@@ -503,7 +380,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> getAndCheckActiveCustomers() {
         Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> resultMap = new HashMap<>();
-        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewcustomersSelection().getActiveTestCustomersMapMap();
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap =
+                getViewCustomersSelection().getActiveTestCustomersMapMap();
         if (activeTestCustomersMapMap.isEmpty()) {
             RuntimeException ex = new RuntimeException("Es sind keine Kunden aktiviert!\nBitte zuerst mindestens einen Kunden mit mindestens einen Terst-Scenario aktivieren.");
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Kunden!", ex);
@@ -511,7 +389,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         }
         Map<String, TestCustomer> selectedCustomersMapPhase1 = activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
         Map<String, TestCustomer> selectedCustomersMapPhase2 = activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_2);
-        if (getComboBoxTestType().getSelectedItem().equals(TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2)) {
+        if (getViewTestSupportMainProcess().getSelectedTestType().equals(TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2)) {
             selectedCustomersMapPhase1.keySet().forEach(customerKey -> {
                 TestCustomer testCustomer = selectedCustomersMapPhase2.get(customerKey);
                 if (testCustomer == null || !testCustomer.isActivated()) {
@@ -520,24 +398,21 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                     throw ex;
                 }
             });
-            // Beide Phasen nehmen
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_1, selectedCustomersMapPhase1);
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_2, selectedCustomersMapPhase2);
         } else {
-            // nur Phase 2 checken: mind. ein Kunde muss aktiv sein!
-            Iterator<Map.Entry<String, TestCustomer>> iterator = selectedCustomersMapPhase2.entrySet().iterator();
-            while (iterator.hasNext()) {
-                TestCustomer testCustomer = iterator.next().getValue();
+            Iterator<Map.Entry<String, TestCustomer>> it = selectedCustomersMapPhase2.entrySet().iterator();
+            while (it.hasNext()) {
+                TestCustomer testCustomer = it.next().getValue();
                 if (testCustomer.isActivated()) {
                     break;
                 }
             }
-            if (!iterator.hasNext()) {
+            if (!it.hasNext()) {
                 RuntimeException ex = new RuntimeException("PHASE-2 muss mindestens einen aktiven Kunden haben!");
                 GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Kunden!", ex);
                 throw ex;
             }
-            // nur Phase-2 Kunden mitnehmen
             resultMap.put(TestSupportClientKonstanten.TEST_PHASE.PHASE_2, selectedCustomersMapPhase2);
         }
         return resultMap;
@@ -547,7 +422,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         try {
             GUIStaticUtils.setWaitCursor(this, true);
             enableComponentsToOnOff(false);
-            final boolean isDemoMode = getCheckBoxDemoMode().isSelected();
+            final boolean isDemoMode = getViewTestSupportMainProcess().isDemoMode();
             new Thread(() -> {
                 try {
                     Map<String, Object> lastUserTaskVariablesMap = new HashMap<>();
@@ -556,14 +431,15 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                         Class<UserTaskRunnable> userTaskRunnableClass = (Class<UserTaskRunnable>) Class.forName(className);
                         Constructor<UserTaskRunnable> constructor = userTaskRunnableClass.getConstructor(EnvironmentConfig.class, TesunClientJobListener.class);
                         final UserTaskRunnable userTaskRunnable = constructor.newInstance(currentEnvironment, TestSupportView.this);
-                        Map<String, Object> taskVariablesMap = setTaskVariablesMap(isDemoMode, getViewcustomersSelection().getActiveTestCustomersMapMap());
+                        Map<String, Object> taskVariablesMap = setTaskVariablesMap(isDemoMode, getViewCustomersSelection().getActiveTestCustomersMapMap());
                         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MANUEL_USER_TASK, Boolean.TRUE);
                         taskVariablesMap.putAll(lastUserTaskVariablesMap);
                         taskVariablesMap.putAll(testJobsComboBoxItem.getTaskVariablesMap());
                         lastUserTaskVariablesMap = userTaskRunnable.runTask(taskVariablesMap);
                     }
                 } catch (Exception ex) {
-                    notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, String.format("\nFehler beim Start des User-Tasks %s!", testJobsComboBoxItem.getTestJobNamesList()), ex));
+                    notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this,
+                            String.format("\nFehler beim Start des User-Tasks %s!", testJobsComboBoxItem.getTestJobNamesList()), ex));
                 } finally {
                     SwingUtilities.invokeLater(() -> {
                         GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
@@ -595,10 +471,10 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_SUCCESS_EMAIL_TO, currentEnvironment.getActivitiSuccessEmailTo());
         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_FAILURE_EMAIL_TO, currentEnvironment.getActivitiFailureEmailTo());
         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVE_CUSTOMERS, activeCustomers);
-        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE, getComboBoxTestType().getSelectedItem());
-        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, getComboBoxTestPhase().getSelectedItem());
-        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_USE_ONLY_TEST_CLZ, getCheckBoxUseOnlyTestCLZs().isSelected());
-        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_UPLOAD_SYNTH_TEST_CREFOS, Boolean.valueOf(getCheckBoxUploadSynthetics().isSelected()));
+        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE, getViewTestSupportMainProcess().getSelectedTestType());
+        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, getViewTestSupportMainProcess().getSelectedTestPhase());
+        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_USE_ONLY_TEST_CLZ, getViewTestSupportMainProcess().isUseOnlyTestCLZs());
+        taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_UPLOAD_SYNTH_TEST_CREFOS, getViewTestSupportMainProcess().isUploadSynthetics());
         return taskVariablesMap;
     }
 
@@ -621,7 +497,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, true));
             try {
                 initCustomers();
-                String testSetSource = getComboBoxTestSource().getSelectedItem().toString();
+                String testSetSource = getViewTestSupportMainProcess().getSelectedTestSource();
                 currentEnvironment.setLastTestSource(testSetSource);
             } catch (Exception ex) {
                 notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Quelle für Test-Resourcen ändern", ex));
@@ -648,54 +524,18 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     protected void doChangeTestType() {
         try {
-            TestSupportClientKonstanten.TEST_TYPES selectedTestType = (TestSupportClientKonstanten.TEST_TYPES) getComboBoxTestType().getSelectedItem();
-            if (!TimelineLogger.configure(currentEnvironment.getLogOutputsRootForEnv(getComboBoxEnvironment().getSelectedItem().toString()), (selectedTestType + ".log"), "TimeLine.log")) {
+            TestSupportClientKonstanten.TEST_TYPES selectedTestType = getViewTestSupportMainProcess().getSelectedTestType();
+            if (!TimelineLogger.configure(
+                    currentEnvironment.getLogOutputsRootForEnv(getViewTestSupportMainControls().getSelectedEnvironmentName()),
+                    (selectedTestType + ".log"), "TimeLine.log")) {
                 notifyClientJob(Level.ERROR, "Exception beim Konfigurieren der LOG-Dateien!\n");
             }
             notifyClientJob(Level.INFO, String.format("\nInitialisiere für den Test-Typ %s...", selectedTestType.getDescription()));
-            initTestJobsCombo();
+            getViewTestSupportMainProcess().initTestJobsCombo();
         } catch (Exception ex) {
             RuntimeException runtimeException = new RuntimeException("Exception beim Wechseln des Test-Typs!", ex);
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(this, "Initialisierung", runtimeException));
         }
-    }
-
-    private void doChangeTestJob() {
-        final TestJobsComboBoxItem testJobsComboBoxItem = (TestJobsComboBoxItem) getComboBoxTestJobs().getSelectedItem();
-        final Map<String, Object> taskVariablesMap = testJobsComboBoxItem.getTaskVariablesMap();
-        final boolean isempty = taskVariablesMap.isEmpty();
-        getLabelJobParams().setVisible(!isempty);
-        getTextFieldJobParams().setVisible(!isempty);
-        getTextFieldJobParams().setEditable(!isempty);
-        if (!isempty) {
-            String fieldText = testJobsComboBoxItem.getTaskVariablesMapAsFieldText();
-            getTextFieldJobParams().setText(fieldText);
-            getTextFieldJobParams().addActionListener(e -> testJobsComboBoxItem.setTaskVariables(getTextFieldJobParams().getText()));
-            getTextFieldJobParams().addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    testJobsComboBoxItem.setTaskVariables(getTextFieldJobParams().getText());
-                }
-            });
-        }
-    }
-
-    private void enableCbListeners(JComboBox comboBox, ActionListener[] actionListeners) {
-        for (ActionListener actionListener : actionListeners) {
-            comboBox.addActionListener(actionListener);
-        }
-    }
-
-    private ActionListener[] disableCbListeners(JComboBox comboBox) {
-        ActionListener[] actionListeners = comboBox.getActionListeners();
-        for (ActionListener actionListener : actionListeners) {
-            comboBox.removeActionListener(actionListener);
-        }
-        return actionListeners;
     }
 
     /**
@@ -712,9 +552,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             }
             if (enable) {
                 try {
-                    getButtonManageJVMs().setEnabled(currentEnvironment.îsAdminFuncsEnabled());
-                    Object selected = getComboBoxTestSource().getSelectedItem();
-                    getComboBoxITSQRevision().setEnabled(selected != null && selected.equals("ITSQ"));
+                    getViewTestSupportMainControls().updateAdminButtonState(currentEnvironment);
+                    getViewTestSupportMainProcess().updateITSQRevisionEnabled();
                 } catch (Exception ex) {
                     TimelineLogger.error(getClass(), "Fehler beim Aktivieren der GUI-Elemente", ex);
                 }
@@ -736,9 +575,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         return strErrBuilder.toString();
     }
 
-    /**
-     * Appends a message to the log console (EDT-safe) and writes it to the file log.
-     */
     private void appendToConsole(String message) {
         if (message == null) return;
         final String forFile = message.startsWith("\n") ? message.substring(1) : message;
@@ -751,7 +587,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         });
     }
 
-/***********************************************************************************************************/
+    /***********************************************************************************************************/
     /***************************************** TesunClientJobListener ******************************************/
 
     /**
@@ -788,7 +624,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             }
 
         } else if (notifyObject == null) {
-            // Activiti process has ended
             TimelineLogger.info(this.getClass(), "===========    Activiti-Process beendet.    ===========");
             String msg = "\n***********    UserTasks-Thread beendet.    ***********\n===========    Activiti-Process beendet.    ===========\nTest-Results sind im Output-Ordner gespeichert";
             activitiController.stop();
@@ -797,7 +632,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             viewTestResults.refreshTestResultsForMap(activeTestCustomersMapMap, true);
 */
             TimelineLogger.info(TestSupportView.class, msg);
-            // Fix: dispatch all GUI operations to EDT
             final String finalMsg = msg;
             SwingUtilities.invokeLater(() -> {
                 getTextAreaTaskListenerInfo().append(finalMsg.replaceAll("\t", "  "));
@@ -826,17 +660,17 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CTE_VERSION)) {
                 return Integer.valueOf(currentEnvironment.getCteVersion());
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_TEST_TYPE)) {
-                return getComboBoxTestType().getSelectedItem();
+                return getViewTestSupportMainProcess().getSelectedTestType();
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_USE_ITSQ_TEST_RESOURCES)) {
-                return getComboBoxTestSource().getSelectedItem();
+                return getViewTestSupportMainProcess().getSelectedTestSource();
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_REF_EXPORTS_PATH)) {
-                File tmpFile = new File(getTextFieldTestCasesPath().getText());
+                File tmpFile = new File(getViewTestSupportMainProcess().getTestCasesPath());
                 tmpFile = new File(tmpFile.getParentFile(), TestSupportClientKonstanten.REF_EXPORTS);
                 return tmpFile.getAbsolutePath();
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_TEST_CASES_PATH)) {
                 return GUIStaticUtils.chooseDirectory(this, currentEnvironment.getItsqRefExportsRoot().getAbsolutePath(), "Verzeichnis für die Testfälle angeben");
             } else if (askFor.equals(ASK_FOR.ASK_NEW_TEST_CASES_PATH)) {
-                return getTextFieldTestCasesPath().getText();
+                return getViewTestSupportMainProcess().getTestCasesPath();
             } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CHECK_DOWNLOADS)) {
                 String strErr = createErrorFilesInfo((List<File>) userObject);
                 return (JOptionPane.showConfirmDialog(this, ("Fehler bei Download!\n" + strErr), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
@@ -885,28 +719,4 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         notifyClientJob(Level.INFO, strInfo);
     }
     /***************************************** CommandExecutorListener *****************************************/
-
-
-    private class RestInvokerConfigCbItem {
-        private final String serviceURL;
-        private final RestInvokerConfig restInvokerConfig;
-
-        private RestInvokerConfigCbItem(String serviceURL, RestInvokerConfig restInvokerConfig) {
-            this.serviceURL = serviceURL;
-            this.restInvokerConfig = restInvokerConfig;
-        }
-
-        public String getServiceURL() {
-            return serviceURL;
-        }
-
-        public RestInvokerConfig getRestInvokerConfig() {
-            return restInvokerConfig;
-        }
-
-        @Override
-        public String toString() {
-            return serviceURL;
-        }
-    }
 }
