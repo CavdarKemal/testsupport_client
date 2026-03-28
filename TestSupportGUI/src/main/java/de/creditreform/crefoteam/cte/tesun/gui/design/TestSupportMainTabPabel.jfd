@@ -7,15 +7,76 @@ new FormModel {
 	"i18n.keyPrefix": "TestSupportMainTabPabel"
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-			"$columnSpecs": "0, 0"
-			"$rowSpecs": "0, 0, 0"
-			"$hGap": 5
-			"$vGap": 5
-			"$alignLeft": true
-			"$alignTop": true
-		} ) {
+		add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
 			name: "this"
+			auxiliary() {
+				"JavaCodeGenerator.variableGetter": true
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0:1.0"
+				"$rowSpecs": "0:1.0, 0"
+				"$alignTop": true
+				"$alignLeft": true
+			} ) {
+				name: "panelLogs"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPaneTaskListenerInfo"
+					add( new FormComponent( "javax.swing.JTextArea" ) {
+						name: "textAreaTaskListenerInfo"
+						"tabSize": 4
+						"lineWrap": true
+						"editable": false
+						"background": sfield java.awt.Color white
+						"font": new java.awt.Font( "Verdana", 0, 12 )
+						"minimumSize": new java.awt.Dimension( 455, 16 )
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridwidth": 2
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "checkBoxScrollToEnd"
+					"text": new FormMessage( null, "TestSupportMainTabPabel.checkBoxScrollToEnd.text" )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonClearLOGPanel"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/table_replace.png" )
+					"actionCommand": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.actionCommand" )
+					"toolTipText": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.toolTipText" )
+					"text": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.text" )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"gridx": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+					"hAlign": 4
+				} )
+			}, new FormLayoutConstraints( null ) {
+				"title": new FormMessage( null, "TestSupportMainTabPabel.panelLogs.tab.title" )
+			} )
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "scrollPanelProcessImage"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelProcessImage"
+				} )
+			}, new FormLayoutConstraints( null ) {
+				"title": new FormMessage( null, "TestSupportMainTabPabel.scrollPanelProcessImage.tab.title" )
+			} )
+			add( new FormComponent( "de.creditreform.crefoteam.cte.tesun.gui.view.TestResultsView" ) {
+				name: "viewTestResults"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+			}, new FormLayoutConstraints( null ) {
+				"title": new FormMessage( null, "TestSupportMainTabPabel.viewTestResults.tab.title" )
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 400, 300 )

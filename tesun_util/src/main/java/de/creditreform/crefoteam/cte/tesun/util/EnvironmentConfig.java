@@ -455,7 +455,7 @@ public class EnvironmentConfig {
 
     public File getTestResourcesDir() {
         if (testResourcesDir == null) {
-            throw new IllegalStateException("setTestRepoPath() wurde nicht aufgerufen!");
+            throw new IllegalStateException("setTestResourcesDir() wurde nicht aufgerufen!");
         }
         return testResourcesDir;
     }

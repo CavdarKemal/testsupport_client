@@ -134,8 +134,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         waitForStopButtonEnabled(120_000);
 
         boolean[] enabled = {false};
+/* Auslagern nach TestSupportMainProcessView
         SwingUtilities.invokeAndWait(() ->
                 enabled[0] = testSupportView.getButtonStopUserTasksThread().isEnabled());
+*/
         assertTrue("Stop-Button muss nach Prozessstart aktiviert sein", enabled[0]);
     }
 
@@ -214,7 +216,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         while (System.currentTimeMillis() < deadline) {
             try {
                 boolean[] enabled = {false};
+/* Auslagern nach TestSupportMainProcessView
                 SwingUtilities.invokeAndWait(() -> enabled[0] = testSupportView.getButtonStartProcess().isEnabled());
+*/
                 if (enabled[0]) return;
                 Thread.sleep(200);
             } catch (Exception ignored) {}
@@ -226,8 +230,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             boolean[] enabled = {false};
+/* Auslagern nach TestSupportMainProcessView
             SwingUtilities.invokeAndWait(() ->
                     enabled[0] = testSupportView.getButtonStopUserTasksThread().isEnabled());
+*/
             if (enabled[0]) return;
             Thread.sleep(100);
         }

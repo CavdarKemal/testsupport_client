@@ -52,6 +52,14 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         currentEnvironment = guiFrame.getEnvironmentConfig();
         this.viewTestResults = getTabbedPaneMonitor().getViewTestResults();
 
+        initEnvironmentsComboBox();
+        initITSQRevisionsComboBox();
+        initTestSourcesComboBox();
+        initTestTypesComboBox();
+        initTestJobsCombo();
+        initHostsFields();
+        initTestPhasesComboBox();
+
         getViewTestSupportMainControls().init(
                 this,
                 this::doChangeComboBoxesHost,
@@ -80,16 +88,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         getSplitPaneMain().setDividerLocation(500);
         getTabbedPaneMonitor().getCheckBoxScrollToEnd().setSelected(true);
 
-        initEnvironmentsComboBox();
-        initITSQRevisionsComboBox();
-        initTestSourcesComboBox();
-        initTestTypesComboBox();
-        initTestJobsCombo();
-        initHostsFields();
-        initTestPhasesComboBox();
-
         initForEnvironment();
-
         initListeners();
         activitiController = new ActivitiProcessController(this, this::initCustomers);
     }
@@ -322,7 +321,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void checkAndSetTestsSource(String testSetSource) throws Exception {
-        if (testSetSource == null) return;
         File sourceDir = new File(currentEnvironment.getTestResourcesRoot(), testSetSource);
         if (sourceDir.exists()) {
             currentEnvironment.setTestResourcesDir(sourceDir);
