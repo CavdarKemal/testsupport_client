@@ -55,7 +55,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         super();
         this.guiFrame = guiFrame;
         currentEnvironment = guiFrame.getEnvironmentConfig();
-        this.viewTestResults = getViewTestResults();
+        this.viewTestResults = getTabbedPaneMonitor().getViewTestResults();
 
         getViewTestSupportMainControls().init(
                 this,
@@ -81,7 +81,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         enableComponentsToOnOff(false);
 
         getSplitPaneMain().setDividerLocation(500);
-        getCheckBoxScrollToEnd().setSelected(true);
+        getTabbedPaneMonitor().getCheckBoxScrollToEnd().setSelected(true);
 
         initEnvironmentsComboBox();
         initITSQRevisionsComboBox();
@@ -99,7 +99,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void initListeners() {
         getTabbedPaneMonitor().addChangeListener(this::doTabChangeEvent);
-        getScrollPanelProcessImage().addComponentListener(new ComponentAdapter() {
+        getTabbedPaneMonitor().getScrollPanelProcessImage().addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 doResize();
@@ -278,7 +278,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
         viewTestResults.setEnvironmentConfig(currentEnvironment);
         notifyClientJob(Level.INFO, String.format("\nInitialisiere für die Umgebung %s...", currentEnvironment.getCurrentEnvName()));
-        getTextAreaTaskListenerInfo().setText("");
+        getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setText("");
         initHostsFields();
         new Thread(() -> {
             try {
@@ -482,7 +482,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void doResize() {
-        JLabel jLabel = (JLabel) getScrollPanelProcessImage().getViewport().getComponent(0);
+        JLabel jLabel = (JLabel) getTabbedPaneMonitor().getScrollPanelProcessImage().getViewport().getComponent(0);
         if (resizeProcessImage && (lastProcessImage != null)) {
             try {
                 Dimension scaledDimension = testSupportHelper.getScaledDimension(jLabel, lastProcessImage);
@@ -583,9 +583,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         final String forFile = message.startsWith("\n") ? message.substring(1) : message;
         TimelineLogger.info(this.getClass(), forFile);
         SwingUtilities.invokeLater(() -> {
-            getTextAreaTaskListenerInfo().append(message.replaceAll("\t", "  "));
-            if (getCheckBoxScrollToEnd().isSelected()) {
-                getTextAreaTaskListenerInfo().setCaretPosition(getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
+            getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(message.replaceAll("\t", "  "));
+            if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
+                getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
             }
         });
     }
@@ -613,7 +613,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             final InputStream inputStream = (InputStream) notifyObject;
             SwingUtilities.invokeLater(() -> {
                 try {
-                    JLabel jLabel = (JLabel) getScrollPanelProcessImage().getViewport().getComponent(0);
+                    JLabel jLabel = (JLabel) getTabbedPaneMonitor().getScrollPanelProcessImage().getViewport().getComponent(0);
                     lastProcessImage = testSupportHelper.refreshProcessImage(inputStream, jLabel, resizeProcessImage);
                 } catch (Exception ex) {
                     GUIStaticUtils.showExceptionMessage(this, "Fehler beim Erzeugen des Bitmaps!", ex);
@@ -637,9 +637,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             TimelineLogger.info(TestSupportView.class, msg);
             final String finalMsg = msg;
             SwingUtilities.invokeLater(() -> {
-                getTextAreaTaskListenerInfo().append(finalMsg.replaceAll("\t", "  "));
-                if (getCheckBoxScrollToEnd().isSelected()) {
-                    getTextAreaTaskListenerInfo().setCaretPosition(getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
+                getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(finalMsg.replaceAll("\t", "  "));
+                if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
+                    getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
                 }
                 enableComponentsToOnOff(true);
                 GUIStaticUtils.setWaitCursor(this, false);
@@ -699,9 +699,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 String strLog = "\n!!!\n\t" + s + "\n!!!\n";
                 TimelineLogger.error(this.getClass(), strLog);
                 SwingUtilities.invokeLater(() -> {
-                    getTextAreaTaskListenerInfo().append(strLog.replaceAll("\t", "  "));
-                    if (getCheckBoxScrollToEnd().isSelected()) {
-                        getTextAreaTaskListenerInfo().setCaretPosition(getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
+                    getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(strLog.replaceAll("\t", "  "));
+                    if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
+                        getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
                     }
                 });
                 return Boolean.TRUE;
