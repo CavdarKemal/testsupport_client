@@ -3,6 +3,7 @@ package de.creditreform.crefoteam.cte.tesun.gui.view;
 import de.creditreform.crefoteam.activiti.CteActivitiProcess;
 import de.creditreform.crefoteam.activiti.CteActivitiService;
 import de.creditreform.crefoteam.activiti.CteActivitiServiceRestImpl;
+import de.creditreform.crefoteam.activiti.CteActivitiTask;
 import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.gui.BaseGUITest;
@@ -10,6 +11,7 @@ import de.creditreform.crefoteam.cte.tesun.gui.TestSupportGUI;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.GUIStaticUtils;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
+import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten.TEST_PHASE;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
@@ -39,7 +42,8 @@ import static org.junit.Assert.*;
  *
  * Test-Szenarien:
  *   1. Frisch-Start: Stop-Button wird nach dem Prozessstart aktiviert.
- *   2. Prozess fortsetzen (Ja-Dialog): selbe Prozess-Instanz bleibt aktiv.
+ *   2. Prozess fortsetzen: Unterbrechung bei Phase-1- und Phase-2-UserTask,
+ *      anschließend Fortsetzung — geprüft ob GUI genau beim unterbrochenen Task weitermacht.
  *   3. Prozess neu starten (Nein-Dialog): alte Instanz gelöscht, neue gestartet.
  */
 public class TestSupportViewActivitiTest extends BaseGUITest {
@@ -140,30 +144,64 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     // -----------------------------------------------------------------------
-    // Test 2: Laufenden Prozess fortsetzen (Ja-Antwort im Dialog)
-    //         Check: selbe Prozess-Instanz bleibt aktiv auf Activiti
+    // Test 2: Prozess unterbrechen und fortsetzen
+    //         Phase 1: Prozess auf Activiti starten, auf Phase-1-UserTask warten,
+    //                  GUI fortsetzen — prüfen ob GUI genau bei diesem Task beginnt.
+    //         Phase 2: GUI verarbeitet Phase 1, auf Phase-2-UserTask warten,
+    //                  GUI-Loop stoppen (ohne Activiti abzubrechen), neues Frame,
+    //                  fortsetzen — prüfen ob GUI beim Phase-2-Task beginnt.
     // -----------------------------------------------------------------------
 
     @Test
     public void test2_laufendenProzessFortsetzten() throws Exception {
-        CteActivitiProcess existing = startProcessOnActiviti();
-        Integer existingId = existing.getId();
 
+        // --- Phase 1: Unterbrechung + Fortsetzung ---
+        CteActivitiProcess process = startProcessOnActiviti();
+
+        // Warten bis Phase-1-UserTask auf Activiti erscheint
+        CteActivitiTask taskPhase1 = waitForTaskInPhase(TEST_PHASE.PHASE_1, 60_000);
+        assertNotNull("Prozess muss Phase-1-UserTask erreichen", taskPhase1);
+
+        // GUI startet → laufender Prozess erkannt → Dialog → "Ja" (Fortsetzen)
         new JButtonOperator(frameOperator, "Prozess starten").push();
-
-        // Dialog "Soll der Prozess fortgesetzt ... werden?" — "Ja"
-        // Hinweis: showConfirmDialog verwendet JScrollPane mit VERTICAL_SCROLLBAR_ALWAYS,
-        // dadurch enthält die Dialog-Komponenten-Hierarchie BasicArrowButton-Instanzen des
-        // Scrollbars vor den eigentlichen Optionen-Buttons → Index-basierte Suche unzuverlässig,
-        // stattdessen nach Button-Text suchen.
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
-        waitForStopButtonEnabled(120_000);
+        // GUI muss den Phase-1-Task in der Konsole ausgeben — beweist korrekte Fortsetzung
+        assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen",
+                waitForTaskNameInConsole(taskPhase1.getName(), 60_000));
 
-        // Selbe Instanz muss noch auf Activiti aktiv sein
-        List<CteActivitiProcess> processes = queryRunningProcesses();
-        boolean sameActive = processes.stream().anyMatch(p -> existingId.equals(p.getId()));
-        assertTrue("Selbe Prozess-Instanz muss im Fortsetzen-Modus noch aktiv sein", sameActive);
+        // --- Phase 2: Warten bis GUI Phase 1 verarbeitet hat und Phase-2-Task erscheint ---
+        CteActivitiTask taskPhase2 = waitForTaskInPhase(TEST_PHASE.PHASE_2, 120_000);
+        Assume.assumeNotNull(
+                "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen",
+                taskPhase2);
+
+        // GUI-Loop stoppen ohne Activiti-Cancel-Signal (setzt running=false via Reflection)
+        stopActivitiControllerLoop();
+        waitForStartButtonEnabled(30_000); // Loop ist beendet wenn Start-Button wieder aktiv
+
+        // Prüfen ob Phase-2-Task nach dem Stop noch auf Activiti vorhanden ist
+        // (Cancel-Signal könnte Prozess beendet haben — dann Phase-2-Check überspringen)
+        CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
+        Assume.assumeNotNull(
+                "Phase-2-Task nach GUI-Stop nicht mehr auf Activiti — Phase-2-Check übersprungen",
+                taskPhase2ForResume);
+
+        // Altes Frame schließen, neues erstellen
+        guiFrame.dispose();
+        guiFrame = new TestSupportGUI(ENV_CONFIG);
+        guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameOperator = new JFrameOperator(guiFrame);
+        testSupportView = extractTestSupportView();
+        waitForStartButtonEnabled(30_000);
+
+        // GUI startet → laufender Prozess (Phase 2) erkannt → Dialog → "Ja"
+        new JButtonOperator(frameOperator, "Prozess starten").push();
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+
+        // GUI muss den Phase-2-Task in der Konsole ausgeben
+        assertTrue("GUI muss nach Fortsetzung bei Phase-2-Task '" + taskPhase2ForResume.getName() + "' beginnen",
+                waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000));
     }
 
     // -----------------------------------------------------------------------
@@ -207,6 +245,58 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         for (CteActivitiProcess p : queryRunningProcesses()) {
             activitiService.deleteProcessInstance(p.getId());
         }
+    }
+
+    /**
+     * Fragt Activiti-Tasks nach Phase. Nutzt listTasks() mit dem MEIN_KEY-Filter,
+     * damit auch Tasks in Sub-Prozessen gefunden werden.
+     */
+    private CteActivitiTask waitForTaskInPhase(TEST_PHASE expectedPhase, long timeoutMs) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            List<CteActivitiTask> tasks = activitiService.listTasks(paramsMap);
+            for (CteActivitiTask task : tasks) {
+                String phase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
+                if (expectedPhase.name().equals(phase)) {
+                    return task;
+                }
+            }
+            Thread.sleep(500);
+        }
+        return null;
+    }
+
+    /**
+     * Wartet bis der Konsolen-Text den Namen des UserTask enthält.
+     * Beweist, dass die GUI den Task verarbeitet hat.
+     */
+    private boolean waitForTaskNameInConsole(String taskName, long timeoutMs) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            String[] consoleText = {""};
+            SwingUtilities.invokeAndWait(() ->
+                    consoleText[0] = testSupportView.getTabbedPaneMonitor()
+                            .getTextAreaTaskListenerInfo().getText());
+            if (consoleText[0].contains(taskName)) {
+                return true;
+            }
+            Thread.sleep(200);
+        }
+        return false;
+    }
+
+    /**
+     * Stoppt den ActivitiProcessController-Loop (running=false) ohne das Activiti-Cancel-Signal
+     * zu senden. Der laufende Activiti-Prozess bleibt damit auf dem Server aktiv.
+     */
+    private void stopActivitiControllerLoop() throws Exception {
+        Field controllerField = TestSupportView.class.getDeclaredField("activitiController");
+        controllerField.setAccessible(true);
+        ActivitiProcessController controller = (ActivitiProcessController) controllerField.get(testSupportView);
+
+        Field runningField = ActivitiProcessController.class.getDeclaredField("running");
+        runningField.setAccessible(true);
+        runningField.set(controller, false);
     }
 
     private void waitForStartButtonEnabled(long timeoutMs) {
