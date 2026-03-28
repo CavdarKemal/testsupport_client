@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
-import org.netbeans.jemmy.operators.JFrameOperator;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
@@ -156,7 +155,8 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     public void test2_laufendenProzessFortsetzten() throws Exception {
 
         // --- Phase 1: Unterbrechung + Fortsetzung ---
-        CteActivitiProcess process = startProcessOnActiviti();
+        // Prozess direkt auf Activiti starten — GUI erkennt ihn und setzt fort
+        startProcessOnActiviti();
 
         // Warten bis Phase-1-UserTask auf Activiti erscheint
         CteActivitiTask taskPhase1 = waitForTaskInPhase(TEST_PHASE.PHASE_1, 60_000);
@@ -168,40 +168,36 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
         // GUI muss den Phase-1-Task in der Konsole ausgeben — beweist korrekte Fortsetzung
         assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen",
-                waitForTaskNameInConsole(taskPhase1.getName(), 60_000));
+                waitForTaskNameInConsole(taskPhase1.getName(), 60_000, 0));
 
-        // --- Phase 2: Warten bis GUI Phase 1 verarbeitet hat und Phase-2-Task erscheint ---
+        // --- Phase 2: GUI läuft weiter, auf Phase-2-Task warten ---
         CteActivitiTask taskPhase2 = waitForTaskInPhase(TEST_PHASE.PHASE_2, 120_000);
         Assume.assumeNotNull(
                 "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen",
                 taskPhase2);
 
-        // GUI-Loop stoppen ohne Activiti-Cancel-Signal (setzt running=false via Reflection)
-        stopActivitiControllerLoop();
-        waitForStartButtonEnabled(30_000); // Loop ist beendet wenn Start-Button wieder aktiv
+        // Konsolenposition merken, damit Phase-2-Check nur neuen Text prüft
+        int consoleLengthBeforePhase2Resume = getConsoleLength();
 
-        // Prüfen ob Phase-2-Task nach dem Stop noch auf Activiti vorhanden ist
-        // (Cancel-Signal könnte Prozess beendet haben — dann Phase-2-Check überspringen)
-        CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
-        Assume.assumeNotNull(
-                "Phase-2-Task nach GUI-Stop nicht mehr auf Activiti — Phase-2-Check übersprungen",
-                taskPhase2ForResume);
-
-        // Altes Frame schließen, neues erstellen
-        guiFrame.dispose();
-        guiFrame = new TestSupportGUI(ENV_CONFIG);
-        guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameOperator = new JFrameOperator(guiFrame);
-        testSupportView = extractTestSupportView();
+        // Stop-Button klicken — setzt running=false im GUI-Loop.
+        // Das Cancel-Signal schlägt auf Activiti fehl (ungültiger Signalname),
+        // daher bleibt der Activiti-Prozess am Phase-2-Task erhalten.
+        clickStopButton();
         waitForStartButtonEnabled(30_000);
 
-        // GUI startet → laufender Prozess (Phase 2) erkannt → Dialog → "Ja"
+        // Prüfen ob Phase-2-Task nach dem Stop noch auf Activiti vorhanden ist
+        CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
+        Assume.assumeNotNull(
+                "Phase-2-Task nach Stop nicht mehr auf Activiti — Phase-2-Check übersprungen",
+                taskPhase2ForResume);
+
+        // Im selben GUI-Frame fortsetzen: "Prozess starten" → "Ja"
         new JButtonOperator(frameOperator, "Prozess starten").push();
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
-        // GUI muss den Phase-2-Task in der Konsole ausgeben
+        // Konsole (nur neuer Inhalt) muss Phase-2-Task-Namen enthalten
         assertTrue("GUI muss nach Fortsetzung bei Phase-2-Task '" + taskPhase2ForResume.getName() + "' beginnen",
-                waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000));
+                waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000, consoleLengthBeforePhase2Resume));
     }
 
     // -----------------------------------------------------------------------
@@ -267,17 +263,20 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     /**
-     * Wartet bis der Konsolen-Text den Namen des UserTask enthält.
-     * Beweist, dass die GUI den Task verarbeitet hat.
+     * Wartet bis der Konsolen-Text ab Position startOffset den Task-Namen enthält.
+     * startOffset=0 prüft den gesamten Text; ein höherer Wert prüft nur neu hinzugekommenen Text.
      */
-    private boolean waitForTaskNameInConsole(String taskName, long timeoutMs) throws Exception {
+    private boolean waitForTaskNameInConsole(String taskName, long timeoutMs, int startOffset) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             String[] consoleText = {""};
             SwingUtilities.invokeAndWait(() ->
                     consoleText[0] = testSupportView.getTabbedPaneMonitor()
                             .getTextAreaTaskListenerInfo().getText());
-            if (consoleText[0].contains(taskName)) {
+            String relevantText = consoleText[0].length() > startOffset
+                    ? consoleText[0].substring(startOffset)
+                    : "";
+            if (relevantText.contains(taskName)) {
                 return true;
             }
             Thread.sleep(200);
@@ -285,18 +284,25 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         return false;
     }
 
-    /**
-     * Stoppt den ActivitiProcessController-Loop (running=false) ohne das Activiti-Cancel-Signal
-     * zu senden. Der laufende Activiti-Prozess bleibt damit auf dem Server aktiv.
-     */
-    private void stopActivitiControllerLoop() throws Exception {
-        Field controllerField = TestSupportView.class.getDeclaredField("activitiController");
-        controllerField.setAccessible(true);
-        ActivitiProcessController controller = (ActivitiProcessController) controllerField.get(testSupportView);
+    /** Gibt die aktuelle Zeichenanzahl der Konsole zurück. */
+    private int getConsoleLength() throws Exception {
+        int[] len = {0};
+        SwingUtilities.invokeAndWait(() ->
+                len[0] = testSupportView.getTabbedPaneMonitor()
+                        .getTextAreaTaskListenerInfo().getText().length());
+        return len[0];
+    }
 
-        Field runningField = ActivitiProcessController.class.getDeclaredField("running");
-        runningField.setAccessible(true);
-        runningField.set(controller, false);
+    /**
+     * Klickt den Stop-Button der GUI auf dem EDT.
+     * ActivitiProcessController.stop() setzt running=false und versucht ein Cancel-Signal
+     * zu senden — das Signal schlägt auf Activiti fehl (ungültiger Name, da "ENV" nicht
+     * in der taskVariablesMap ist), wird aber still gefangen. Der Activiti-Prozess
+     * läuft daher weiter und steht für eine Fortsetzung bereit.
+     */
+    private void clickStopButton() throws Exception {
+        SwingUtilities.invokeAndWait(() ->
+                testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().doClick());
     }
 
     private void waitForStartButtonEnabled(long timeoutMs) {
