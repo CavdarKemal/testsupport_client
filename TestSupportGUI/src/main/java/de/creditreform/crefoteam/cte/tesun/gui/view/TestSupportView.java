@@ -21,9 +21,6 @@ import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
 import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -42,8 +39,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     private static final String APP_TITLE = "CTE-Testautomatisierung";
 
     private ActivitiProcessController activitiController;
-    private BufferedImage lastProcessImage;
-    private final boolean resizeProcessImage = false;
     List<JComponent> componentsToOnOff;
 
     private final GUIFrame guiFrame;
@@ -74,6 +69,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 () -> currentEnvironment.setLastUseOnlyTestClz(getViewTestSupportMainProcess().isUseOnlyTestCLZs()),
                 currentEnvironment);
 
+        getTabbedPaneMonitor().init(() -> testSupportHelper);
+
         componentsToOnOff = new ArrayList<>();
         componentsToOnOff.addAll(getViewTestSupportMainControls().getComponentsToOnOff());
         componentsToOnOff.addAll(getViewTestSupportMainProcess().getComponentsToOnOff());
@@ -99,12 +96,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void initListeners() {
         getTabbedPaneMonitor().addChangeListener(this::doTabChangeEvent);
-        getTabbedPaneMonitor().getScrollPanelProcessImage().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                doResize();
-            }
-        });
     }
 
     private void stopActivitiProcess() {
@@ -481,19 +472,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         return taskVariablesMap;
     }
 
-    private void doResize() {
-        JLabel jLabel = (JLabel) getTabbedPaneMonitor().getScrollPanelProcessImage().getViewport().getComponent(0);
-        if (resizeProcessImage && (lastProcessImage != null)) {
-            try {
-                Dimension scaledDimension = testSupportHelper.getScaledDimension(jLabel, lastProcessImage);
-                Image resizedImage = lastProcessImage.getScaledInstance((int) scaledDimension.getWidth(), (int) scaledDimension.getHeight(), Image.SCALE_DEFAULT);
-                jLabel.setIcon(new ImageIcon(resizedImage));
-            } catch (Exception ex) {
-                notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler!", ex));
-            }
-        }
-    }
-
     private void doChangeTestResources() {
         new Thread(() -> {
             enableComponentsToOnOff(false);
@@ -579,15 +557,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void appendToConsole(String message) {
-        if (message == null) return;
-        final String forFile = message.startsWith("\n") ? message.substring(1) : message;
-        TimelineLogger.info(this.getClass(), forFile);
-        SwingUtilities.invokeLater(() -> {
-            getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(message.replaceAll("\t", "  "));
-            if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
-                getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
-            }
-        });
+        getTabbedPaneMonitor().appendToConsole(message);
     }
 
     /***********************************************************************************************************/
@@ -610,15 +580,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             appendToConsole(msg);
 
         } else if (notifyObject instanceof InputStream) {
-            final InputStream inputStream = (InputStream) notifyObject;
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    JLabel jLabel = (JLabel) getTabbedPaneMonitor().getScrollPanelProcessImage().getViewport().getComponent(0);
-                    lastProcessImage = testSupportHelper.refreshProcessImage(inputStream, jLabel, resizeProcessImage);
-                } catch (Exception ex) {
-                    GUIStaticUtils.showExceptionMessage(this, "Fehler beim Erzeugen des Bitmaps!", ex);
-                }
-            });
+            getTabbedPaneMonitor().setProcessImage((InputStream) notifyObject);
 
         } else if (notifyObject instanceof String) {
             String msg = (String) notifyObject;
@@ -635,12 +597,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             viewTestResults.refreshTestResultsForMap(activeTestCustomersMapMap, true);
 */
             TimelineLogger.info(TestSupportView.class, msg);
-            final String finalMsg = msg;
+            getTabbedPaneMonitor().appendToConsole(msg);
             SwingUtilities.invokeLater(() -> {
-                getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(finalMsg.replaceAll("\t", "  "));
-                if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
-                    getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
-                }
                 enableComponentsToOnOff(true);
                 GUIStaticUtils.setWaitCursor(this, false);
             });
@@ -698,12 +656,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 String s = errMsg != null ? errMsg.replaceAll("\\n", "") : throwable.getClass().getName();
                 String strLog = "\n!!!\n\t" + s + "\n!!!\n";
                 TimelineLogger.error(this.getClass(), strLog);
-                SwingUtilities.invokeLater(() -> {
-                    getTabbedPaneMonitor().getTextAreaTaskListenerInfo().append(strLog.replaceAll("\t", "  "));
-                    if (getTabbedPaneMonitor().getCheckBoxScrollToEnd().isSelected()) {
-                        getTabbedPaneMonitor().getTextAreaTaskListenerInfo().setCaretPosition(getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getDocument().getLength() - 1);
-                    }
-                });
+                getTabbedPaneMonitor().appendToConsole(strLog);
                 return Boolean.TRUE;
             } else {
                 throw new PropertiesException("Unbekannte Rückfrage: " + askFor + "!");
