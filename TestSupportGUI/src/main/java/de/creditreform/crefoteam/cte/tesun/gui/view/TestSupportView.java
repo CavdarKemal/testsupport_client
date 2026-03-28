@@ -1,6 +1,7 @@
 package de.creditreform.crefoteam.cte.tesun.gui.view;
 
 import de.creditreform.crefoteam.activiti.CteActivitiTask;
+import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.activiti.handlers.UserTaskRunnable;
 import de.creditreform.crefoteam.cte.tesun.gui.design.TestSupportPanel;
@@ -300,11 +301,13 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private TestSupportHelper getTestSupportHelper() throws Exception {
-        return new TestSupportHelper(currentEnvironment,
-                getViewTestSupportMainControls().getSelectedActivitiConfig(),
-                getViewTestSupportMainControls().getSelectedRestServicesConfig(),
-                getViewTestSupportMainControls().getSelectedImpCycleConfig(),
-                TestSupportView.this);
+        RestInvokerConfig activitiConfig     = getViewTestSupportMainControls().getSelectedActivitiConfig();
+        RestInvokerConfig restServicesConfig = getViewTestSupportMainControls().getSelectedRestServicesConfig();
+        RestInvokerConfig impCycleConfig     = getViewTestSupportMainControls().getSelectedImpCycleConfig();
+        if (activitiConfig == null || restServicesConfig == null || impCycleConfig == null) {
+            return null;
+        }
+        return new TestSupportHelper(currentEnvironment, activitiConfig, restServicesConfig, impCycleConfig, TestSupportView.this);
     }
 
     private void initCustomers() {

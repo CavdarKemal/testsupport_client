@@ -84,15 +84,18 @@ public class TestSupportMainControlsView extends TestSupportMainControlsPanel {
     }
 
     public RestInvokerConfig getSelectedActivitiConfig() {
-        return ((RestInvokerConfigCbItem) getComboBoxActivitiHost().getSelectedItem()).getRestInvokerConfig();
+        RestInvokerConfigCbItem item = (RestInvokerConfigCbItem) getComboBoxActivitiHost().getSelectedItem();
+        return item != null ? item.getRestInvokerConfig() : null;
     }
 
     public RestInvokerConfig getSelectedRestServicesConfig() {
-        return ((RestInvokerConfigCbItem) getComboBoxRestServicesHost().getSelectedItem()).getRestInvokerConfig();
+        RestInvokerConfigCbItem item = (RestInvokerConfigCbItem) getComboBoxRestServicesHost().getSelectedItem();
+        return item != null ? item.getRestInvokerConfig() : null;
     }
 
     public RestInvokerConfig getSelectedImpCycleConfig() {
-        return ((RestInvokerConfigCbItem) getComboBoxImpCycleHost().getSelectedItem()).getRestInvokerConfig();
+        RestInvokerConfigCbItem item = (RestInvokerConfigCbItem) getComboBoxImpCycleHost().getSelectedItem();
+        return item != null ? item.getRestInvokerConfig() : null;
     }
 
     public String getSelectedEnvironmentName() {
