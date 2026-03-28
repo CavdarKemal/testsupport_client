@@ -63,15 +63,15 @@ public class ActivitiProcessController {
     /**
      * Async part: starts the process loop in a new thread. No GUI calls here.
      */
-    public void runProcess(TestSupportHelper helper, EnvironmentConfig env, Map<String, Object> taskVariablesMap, Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap, CteActivitiTask cteActivitiTask) throws Exception {
-        this.environmentConfig = env;
+    public void runProcess(TestSupportHelper helper, EnvironmentConfig environmentConfig, Map<String, Object> taskVariablesMap, Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap, CteActivitiTask cteActivitiTask) throws Exception {
+        this.environmentConfig = environmentConfig;
         this.taskVariablesMap = taskVariablesMap;
         this.cteActivitiServices = helper.getActivitiRestService();
         this.selectedCustomersMapMap = activeTestCustomersMapMap;
         this.activitUserTaskToContinue = cteActivitiTask;
         this.running = true;
 
-        String activitiProcessName = env.getActivitiProcessName();
+        String activitiProcessName = environmentConfig.getActivitiProcessName();
         callback.notifyClientJob(Level.INFO, "\nStarte ACTIVITI-Prozess '" + activitiProcessName + "'...");
         callback.notifyClientJob(Level.INFO, "\n===========   Activiti-Process gestartet.   ===========");
         TimelineLogger.info(ActivitiProcessController.class, "\n===========    Activiti-Process gestartet.    ===========");
@@ -276,7 +276,7 @@ public class ActivitiProcessController {
         if (running) {
             running = false;
             try {
-                cteActivitiServices.signalEventReceived(taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ENVIRONMENT) + "cancelProcessSignal");
+                cteActivitiServices.signalEventReceived(taskVariablesMap.get(environmentConfig.getCurrentEnvName()) + "cancelProcessSignal");
             } catch (Exception ex) {
                 // Activiti schließt die Verbindung wenn der Prozess durch das Signal beendet wird
                 // → ConnectionClosedException ist kein Fehler, running ist bereits false
