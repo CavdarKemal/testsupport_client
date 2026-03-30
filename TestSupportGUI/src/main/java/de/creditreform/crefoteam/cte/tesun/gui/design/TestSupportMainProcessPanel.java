@@ -158,7 +158,7 @@ public class TestSupportMainProcessPanel extends JPanel {
         setLayout(new GridBagLayout());
         ((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         ((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
-        ((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
+        ((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
         ((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
         //---- labelTestType3 ----
@@ -175,23 +175,23 @@ public class TestSupportMainProcessPanel extends JPanel {
         add(labelTestTestSource, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
-        add(comboBoxTestSource, new GridBagConstraints(4, 0, 2, 1, 0.0, 0.0,
+        add(comboBoxTestSource, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
 
         //---- labelITSQRevision ----
         labelITSQRevision.setText("Branch:");
-        add(labelITSQRevision, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+        add(labelITSQRevision, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
-        add(comboBoxITSQRevision, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0,
+        add(comboBoxITSQRevision, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
 
         //---- checkBoxDemoMode ----
-        checkBoxDemoMode.setText("Demo");
+        checkBoxDemoMode.setText("Demo Mode");
         add(checkBoxDemoMode, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
-           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
            new Insets(0, 0, 5, 5), 0, 0));
 
         //---- buttonStartProcess ----
@@ -213,10 +213,10 @@ public class TestSupportMainProcessPanel extends JPanel {
         buttonStopUserTasksThread.setPreferredSize(new Dimension(24, 24));
         add(buttonStopUserTasksThread, new GridBagConstraints(10, 0, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-           new Insets(2, 1, 6, 1), 0, 0));
+           new Insets(2, 1, 6, 3), 0, 0));
 
         //---- labelTestCasesPath ----
-        labelTestCasesPath.setText("Testf\ufffdlle:");
+        labelTestCasesPath.setText("Testf\u00e4lle:");
         add(labelTestCasesPath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 6, 6), 0, 0));
@@ -230,14 +230,14 @@ public class TestSupportMainProcessPanel extends JPanel {
         //---- checkBoxUploadSynthetics ----
         checkBoxUploadSynthetics.setText("Synthetische Tests hochladen");
         checkBoxUploadSynthetics.setSelected(true);
-        add(checkBoxUploadSynthetics, new GridBagConstraints(7, 1, 2, 1, 0.0, 0.0,
+        add(checkBoxUploadSynthetics, new GridBagConstraints(6, 1, 2, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 2, 7, 7), 0, 0));
 
         //---- checkBoxUseOnlyTestCLZs ----
         checkBoxUseOnlyTestCLZs.setText("Nur Test-CLZs in VC-Liste");
         checkBoxUseOnlyTestCLZs.setSelected(true);
-        add(checkBoxUseOnlyTestCLZs, new GridBagConstraints(9, 1, 1, 1, 0.0, 0.0,
+        add(checkBoxUseOnlyTestCLZs, new GridBagConstraints(8, 1, 2, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 2, 7, 7), 0, 0));
 
@@ -285,16 +285,16 @@ public class TestSupportMainProcessPanel extends JPanel {
         add(labelTestJobs, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 6, 6), 0, 0));
-        add(comboBoxTestJobs, new GridBagConstraints(1, 4, 5, 1, 0.0, 0.0,
+        add(comboBoxTestJobs, new GridBagConstraints(1, 4, 4, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 6, 6), 0, 0));
 
         //---- labelTestPhase ----
         labelTestPhase.setText("Test-Phase:");
-        add(labelTestPhase, new GridBagConstraints(6, 4, 1, 1, 0.0, 0.0,
+        add(labelTestPhase, new GridBagConstraints(5, 4, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
-        add(comboBoxTestPhase, new GridBagConstraints(7, 4, 2, 1, 0.0, 0.0,
+        add(comboBoxTestPhase, new GridBagConstraints(6, 4, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(4, 1, 6, 6), 0, 0));
 
@@ -304,9 +304,9 @@ public class TestSupportMainProcessPanel extends JPanel {
         buttonStartTestJob.setPreferredSize(new Dimension(58, 24));
         buttonStartTestJob.setMinimumSize(new Dimension(18, 24));
         buttonStartTestJob.setMaximumSize(new Dimension(88, 24));
-        add(buttonStartTestJob, new GridBagConstraints(9, 4, 2, 1, 0.0, 0.0,
+        add(buttonStartTestJob, new GridBagConstraints(7, 4, 3, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-           new Insets(2, 1, 6, 1), 0, 0));
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- labelJobParams ----
         labelJobParams.setText("Job-Params:");
@@ -314,7 +314,7 @@ public class TestSupportMainProcessPanel extends JPanel {
         add(labelJobParams, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 1, 6), 0, 0));
-        add(textFieldJobParams, new GridBagConstraints(1, 5, 8, 1, 0.0, 0.0,
+        add(textFieldJobParams, new GridBagConstraints(1, 5, 9, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 1, 6), 0, 0));
 
