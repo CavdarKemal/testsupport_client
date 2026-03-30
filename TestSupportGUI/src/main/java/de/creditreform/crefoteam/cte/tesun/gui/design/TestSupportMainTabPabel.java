@@ -43,7 +43,6 @@ public class TestSupportMainTabPabel extends JTabbedPane {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        ResourceBundle bundle = ResourceBundle.getBundle("de.cavdar.gui.design.form");
         panelLogs = new JPanel();
         scrollPaneTaskListenerInfo = new JScrollPane();
         textAreaTaskListenerInfo = new JTextArea();
@@ -57,51 +56,51 @@ public class TestSupportMainTabPabel extends JTabbedPane {
 
         //======== panelLogs ========
         {
-            panelLogs.setLayout(new GridBagLayout());
-            ((GridBagLayout)panelLogs.getLayout()).columnWidths = new int[] {0, 0, 0};
-            ((GridBagLayout)panelLogs.getLayout()).rowHeights = new int[] {0, 0, 0};
-            ((GridBagLayout)panelLogs.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-            ((GridBagLayout)panelLogs.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
+           panelLogs.setLayout(new GridBagLayout());
+           ((GridBagLayout)panelLogs.getLayout()).columnWidths = new int[] {0, 0, 0};
+           ((GridBagLayout)panelLogs.getLayout()).rowHeights = new int[] {0, 0, 0};
+           ((GridBagLayout)panelLogs.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+           ((GridBagLayout)panelLogs.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
 
-            //======== scrollPaneTaskListenerInfo ========
-            {
+           //======== scrollPaneTaskListenerInfo ========
+           {
 
-                //---- textAreaTaskListenerInfo ----
-                textAreaTaskListenerInfo.setTabSize(4);
-                textAreaTaskListenerInfo.setLineWrap(true);
-                textAreaTaskListenerInfo.setEditable(false);
-                textAreaTaskListenerInfo.setBackground(Color.white);
-                textAreaTaskListenerInfo.setFont(new Font("Verdana", Font.PLAIN, 12));
-                textAreaTaskListenerInfo.setMinimumSize(new Dimension(455, 16));
-                scrollPaneTaskListenerInfo.setViewportView(textAreaTaskListenerInfo);
-            }
-            panelLogs.add(scrollPaneTaskListenerInfo, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(0, 0, 0, 0), 0, 0));
+              //---- textAreaTaskListenerInfo ----
+              textAreaTaskListenerInfo.setTabSize(4);
+              textAreaTaskListenerInfo.setLineWrap(true);
+              textAreaTaskListenerInfo.setEditable(false);
+              textAreaTaskListenerInfo.setBackground(Color.white);
+              textAreaTaskListenerInfo.setFont(new Font("Verdana", Font.PLAIN, 12));
+              textAreaTaskListenerInfo.setMinimumSize(new Dimension(455, 16));
+              scrollPaneTaskListenerInfo.setViewportView(textAreaTaskListenerInfo);
+           }
+           panelLogs.add(scrollPaneTaskListenerInfo, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+              GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+              new Insets(0, 0, 0, 0), 0, 0));
 
-            //---- checkBoxScrollToEnd ----
-            checkBoxScrollToEnd.setText(bundle.getString("TestSupportMainTabPabel.checkBoxScrollToEnd.text"));
-            panelLogs.add(checkBoxScrollToEnd, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(2, 2, 2, 2), 0, 0));
+           //---- checkBoxScrollToEnd ----
+           checkBoxScrollToEnd.setText("Auto-Scroll");
+           panelLogs.add(checkBoxScrollToEnd, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+              GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+              new Insets(2, 2, 2, 2), 0, 0));
 
-            //---- buttonClearLOGPanel ----
-            buttonClearLOGPanel.setIcon(new ImageIcon(getClass().getResource("/icons/table_replace.png")));
-            buttonClearLOGPanel.setActionCommand(bundle.getString("TestSupportMainTabPabel.buttonClearLOGPanel.actionCommand"));
-            buttonClearLOGPanel.setToolTipText(bundle.getString("TestSupportMainTabPabel.buttonClearLOGPanel.toolTipText"));
-            buttonClearLOGPanel.setText(bundle.getString("TestSupportMainTabPabel.buttonClearLOGPanel.text"));
-            panelLogs.add(buttonClearLOGPanel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(2, 2, 2, 2), 0, 0));
+           //---- buttonClearLOGPanel ----
+           buttonClearLOGPanel.setIcon(new ImageIcon(getClass().getResource("/icons/table_replace.png")));
+           buttonClearLOGPanel.setActionCommand("LOG's leeren");
+           buttonClearLOGPanel.setToolTipText("");
+           buttonClearLOGPanel.setText("LOG-Panel leeren");
+           panelLogs.add(buttonClearLOGPanel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+              GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+              new Insets(2, 2, 2, 2), 0, 0));
         }
-        addTab(bundle.getString("TestSupportMainTabPabel.panelLogs.tab.title"), panelLogs);
+        addTab("Logs", panelLogs);
 
         //======== scrollPanelProcessImage ========
         {
-            scrollPanelProcessImage.setViewportView(labelProcessImage);
+           scrollPanelProcessImage.setViewportView(labelProcessImage);
         }
-        addTab(bundle.getString("TestSupportMainTabPabel.scrollPanelProcessImage.tab.title"), scrollPanelProcessImage);
-        addTab(bundle.getString("TestSupportMainTabPabel.viewTestResults.tab.title"), viewTestResults);
+        addTab("Prozess-Image", scrollPanelProcessImage);
+        addTab("Test-Results", viewTestResults);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 

@@ -126,7 +126,6 @@ public class TestSupportMainProcessPanel extends JPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        ResourceBundle bundle = ResourceBundle.getBundle("de.cavdar.gui.design.form");
         labelTestType3 = new JLabel();
         comboBoxTestType = new JComboBox();
         labelTestTestSource = new JLabel();
@@ -163,161 +162,161 @@ public class TestSupportMainProcessPanel extends JPanel {
         ((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
         //---- labelTestType3 ----
-        labelTestType3.setText(bundle.getString("TestSupportMainProcessPanel.labelTestType3.text"));
+        labelTestType3.setText("Test-Typ:");
         add(labelTestType3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
         add(comboBoxTestType, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
 
         //---- labelTestTestSource ----
-        labelTestTestSource.setText(bundle.getString("TestSupportMainProcessPanel.labelTestTestSource.text"));
+        labelTestTestSource.setText("Test-Source:");
         add(labelTestTestSource, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
         add(comboBoxTestSource, new GridBagConstraints(4, 0, 2, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
 
         //---- labelITSQRevision ----
-        labelITSQRevision.setText(bundle.getString("TestSupportMainProcessPanel.labelITSQRevision.text"));
+        labelITSQRevision.setText("Branch:");
         add(labelITSQRevision, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
         add(comboBoxITSQRevision, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
 
         //---- checkBoxDemoMode ----
-        checkBoxDemoMode.setText(bundle.getString("TestSupportMainProcessPanel.checkBoxDemoMode.text"));
+        checkBoxDemoMode.setText("Demo");
         add(checkBoxDemoMode, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(0, 0, 5, 5), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(0, 0, 5, 5), 0, 0));
 
         //---- buttonStartProcess ----
-        buttonStartProcess.setText(bundle.getString("TestSupportMainProcessPanel.buttonStartProcess.text"));
+        buttonStartProcess.setText("Prozess starten...");
         buttonStartProcess.setIcon(new ImageIcon(getClass().getResource("/icons/gear_run.png")));
         buttonStartProcess.setMinimumSize(new Dimension(80, 24));
         buttonStartProcess.setMaximumSize(new Dimension(120, 24));
         buttonStartProcess.setPreferredSize(new Dimension(80, 24));
         add(buttonStartProcess, new GridBagConstraints(9, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- buttonStopUserTasksThread ----
         buttonStopUserTasksThread.setIcon(new ImageIcon(getClass().getResource("/icons/cancel.png")));
-        buttonStopUserTasksThread.setActionCommand(bundle.getString("TestSupportMainProcessPanel.buttonStopUserTasksThread.actionCommand"));
-        buttonStopUserTasksThread.setToolTipText(bundle.getString("TestSupportMainProcessPanel.buttonStopUserTasksThread.toolTipText"));
+        buttonStopUserTasksThread.setActionCommand("UT-Thread starten..");
+        buttonStopUserTasksThread.setToolTipText("TestSupportMainProcessPanel.buttonStopUserTasksThread.toolTip");
         buttonStopUserTasksThread.setMinimumSize(new Dimension(24, 24));
         buttonStopUserTasksThread.setMaximumSize(new Dimension(24, 24));
         buttonStopUserTasksThread.setPreferredSize(new Dimension(24, 24));
         add(buttonStopUserTasksThread, new GridBagConstraints(10, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 1), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 1), 0, 0));
 
         //---- labelTestCasesPath ----
-        labelTestCasesPath.setText(bundle.getString("TestSupportMainProcessPanel.labelTestCasesPath.text"));
+        labelTestCasesPath.setText("Testfälle:");
         add(labelTestCasesPath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- textFieldTestCasesPath ----
         textFieldTestCasesPath.setEditable(false);
         add(textFieldTestCasesPath, new GridBagConstraints(1, 1, 5, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- checkBoxUploadSynthetics ----
-        checkBoxUploadSynthetics.setText(bundle.getString("TestSupportMainProcessPanel.checkBoxUploadSynthetics.text"));
+        checkBoxUploadSynthetics.setText("Synthetische Tests hochladen");
         checkBoxUploadSynthetics.setSelected(true);
         add(checkBoxUploadSynthetics, new GridBagConstraints(7, 1, 2, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 2, 7, 7), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 2, 7, 7), 0, 0));
 
         //---- checkBoxUseOnlyTestCLZs ----
-        checkBoxUseOnlyTestCLZs.setText(bundle.getString("TestSupportMainProcessPanel.checkBoxUseOnlyTestCLZs.text"));
+        checkBoxUseOnlyTestCLZs.setText("Nur Test-CLZs in VC-Liste");
         checkBoxUseOnlyTestCLZs.setSelected(true);
         add(checkBoxUseOnlyTestCLZs, new GridBagConstraints(9, 1, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 2, 7, 7), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 2, 7, 7), 0, 0));
 
         //---- labelFachwertConfig ----
-        labelFachwertConfig.setText(bundle.getString("TestSupportMainProcessPanel.labelFachwertConfig.text"));
+        labelFachwertConfig.setText("FW-Konfiguration:");
         add(labelFachwertConfig, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- radioButtonFWConfigNewest ----
-        radioButtonFWConfigNewest.setText(bundle.getString("TestSupportMainProcessPanel.radioButtonFWConfigNewest.text"));
+        radioButtonFWConfigNewest.setText("Neu");
         add(radioButtonFWConfigNewest, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- radioButtonFWConfigLikePRE ----
-        radioButtonFWConfigLikePRE.setText(bundle.getString("TestSupportMainProcessPanel.radioButtonFWConfigLikePRE.text"));
+        radioButtonFWConfigLikePRE.setText("PRE");
         add(radioButtonFWConfigLikePRE, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- labelExportFormat ----
-        labelExportFormat.setText(bundle.getString("TestSupportMainProcessPanel.labelExportFormat.text"));
+        labelExportFormat.setText("Export-Format:");
         add(labelExportFormat, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- radioButtonExportFormatNewest ----
-        radioButtonExportFormatNewest.setText(bundle.getString("TestSupportMainProcessPanel.radioButtonExportFormatNewest.text"));
+        radioButtonExportFormatNewest.setText("Neu");
         add(radioButtonExportFormatNewest, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- radioButtonExportFormatLikePRE ----
-        radioButtonExportFormatLikePRE.setText(bundle.getString("TestSupportMainProcessPanel.radioButtonExportFormatLikePRE.text"));
+        radioButtonExportFormatLikePRE.setText("PRE");
         add(radioButtonExportFormatLikePRE, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
         add(separator1, new GridBagConstraints(0, 3, 11, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 1), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 1), 0, 0));
 
         //---- labelTestJobs ----
-        labelTestJobs.setText(bundle.getString("TestSupportMainProcessPanel.labelTestJobs.text"));
+        labelTestJobs.setText("Test-Jobs:");
         add(labelTestJobs, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
         add(comboBoxTestJobs, new GridBagConstraints(1, 4, 5, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 6), 0, 0));
 
         //---- labelTestPhase ----
-        labelTestPhase.setText(bundle.getString("TestSupportMainProcessPanel.labelTestPhase.text"));
+        labelTestPhase.setText("Test-Phase:");
         add(labelTestPhase, new GridBagConstraints(6, 4, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
         add(comboBoxTestPhase, new GridBagConstraints(7, 4, 2, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(4, 1, 6, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(4, 1, 6, 6), 0, 0));
 
         //---- buttonStartTestJob ----
-        buttonStartTestJob.setText(bundle.getString("TestSupportMainProcessPanel.buttonStartTestJob.text"));
+        buttonStartTestJob.setText("JOB starten...");
         buttonStartTestJob.setIcon(new ImageIcon(getClass().getResource("/icons/gear_run.png")));
         buttonStartTestJob.setPreferredSize(new Dimension(58, 24));
         buttonStartTestJob.setMinimumSize(new Dimension(18, 24));
         buttonStartTestJob.setMaximumSize(new Dimension(88, 24));
         add(buttonStartTestJob, new GridBagConstraints(9, 4, 2, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 6, 1), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 6, 1), 0, 0));
 
         //---- labelJobParams ----
-        labelJobParams.setText(bundle.getString("TestSupportMainProcessPanel.labelJobParams.text"));
+        labelJobParams.setText("Job-Params:");
         labelJobParams.setFocusable(false);
         add(labelJobParams, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 1, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 1, 6), 0, 0));
         add(textFieldJobParams, new GridBagConstraints(1, 5, 8, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-            new Insets(2, 1, 1, 6), 0, 0));
+           GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+           new Insets(2, 1, 1, 6), 0, 0));
 
         //---- buttonGroup1 ----
         var buttonGroup1 = new ButtonGroup();
