@@ -130,7 +130,7 @@
         <ctreader.version>1.24.3</ctreader.version>
         <bouncycastle.version>1.70</bouncycastle.version>
         <sftp-fs.version>2.0.6</sftp-fs.version>
-        <activiti-process.version>1.0.1-SNAPSHOT</activiti-process.version>
+        <activiti-process.version>2.0.0-SNAPSHOT</activiti-process.version>
     </properties>
 
     <modules>
