@@ -1,10 +1,6 @@
 JFDML JFormDesigner: "8.3" encoding: "UTF-8"
 
 new FormModel {
-	"i18n.autoExternalize": true
-	"i18n.bundlePackage": "de.cavdar.gui.design"
-	"i18n.bundleName": "form"
-	"i18n.keyPrefix": "TestSupportMainControlsPanel"
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
@@ -21,7 +17,7 @@ new FormModel {
 			}
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelEnvironment"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelEnvironment.text" )
+				"text": "Umgebung:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -40,9 +36,9 @@ new FormModel {
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "buttonRefreshEnvironment"
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_refresh.png" )
-				"actionCommand": new FormMessage( null, "TestSupportMainControlsPanel.buttonRefreshEnvironment.actionCommand" )
-				"toolTipText": new FormMessage( null, "TestSupportMainControlsPanel.buttonRefreshEnvironment.toolTipText" )
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.buttonRefreshEnvironment.text" )
+				"actionCommand": "UT-Thread starten..."
+				"toolTipText": "UT-Thread starten..."
+				"text": "Aktualisieren"
 				"minimumSize": new java.awt.Dimension( 24, 24 )
 				"preferredSize": new java.awt.Dimension( 24, 24 )
 				auxiliary() {
@@ -55,9 +51,9 @@ new FormModel {
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "buttonManageJVMs"
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_out.png" )
-				"actionCommand": new FormMessage( null, "TestSupportMainControlsPanel.buttonManageJVMs.actionCommand" )
-				"toolTipText": new FormMessage( null, "TestSupportMainControlsPanel.buttonManageJVMs.toolTipText" )
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.buttonManageJVMs.text" )
+				"actionCommand": "UT-Thread starten..."
+				"toolTipText": "BPMN's aktualisieren"
+				"text": "JVM's..."
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -69,7 +65,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelActivitiHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelActivitiHost.text" )
+				"text": "Activiti-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -90,7 +86,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelRestServicesHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelRestServicesHost.text" )
+				"text": "RestServices-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -111,7 +107,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelBatchGUIHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelBatchGUIHost.text" )
+				"text": "Batch-GUI-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -132,7 +128,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelImpCycleHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelImpCycleHost.text" )
+				"text": "ImportCycle-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -153,7 +149,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelInsoHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelInsoHost.text" )
+				"text": "INSO-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -174,7 +170,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "labelInsoBackEndHost"
-				"text": new FormMessage( null, "TestSupportMainControlsPanel.labelInsoBackEndHost.text" )
+				"text": "INSO-Backend-Host:"
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}

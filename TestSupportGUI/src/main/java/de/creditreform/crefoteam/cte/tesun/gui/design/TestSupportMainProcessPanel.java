@@ -158,7 +158,7 @@ public class TestSupportMainProcessPanel extends JPanel {
         setLayout(new GridBagLayout());
         ((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         ((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
-        ((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+        ((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
         ((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
         //---- labelTestType3 ----
@@ -206,8 +206,8 @@ public class TestSupportMainProcessPanel extends JPanel {
 
         //---- buttonStopUserTasksThread ----
         buttonStopUserTasksThread.setIcon(new ImageIcon(getClass().getResource("/icons/cancel.png")));
-        buttonStopUserTasksThread.setActionCommand("UT-Thread starten..");
-        buttonStopUserTasksThread.setToolTipText("TestSupportMainProcessPanel.buttonStopUserTasksThread.toolTip");
+        buttonStopUserTasksThread.setActionCommand("UT-Thread starten...");
+        buttonStopUserTasksThread.setToolTipText("UT-Thread starten...");
         buttonStopUserTasksThread.setMinimumSize(new Dimension(24, 24));
         buttonStopUserTasksThread.setMaximumSize(new Dimension(24, 24));
         buttonStopUserTasksThread.setPreferredSize(new Dimension(24, 24));
@@ -216,7 +216,7 @@ public class TestSupportMainProcessPanel extends JPanel {
            new Insets(2, 1, 6, 1), 0, 0));
 
         //---- labelTestCasesPath ----
-        labelTestCasesPath.setText("Testfälle:");
+        labelTestCasesPath.setText("Testf\ufffdlle:");
         add(labelTestCasesPath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
            new Insets(2, 1, 6, 6), 0, 0));

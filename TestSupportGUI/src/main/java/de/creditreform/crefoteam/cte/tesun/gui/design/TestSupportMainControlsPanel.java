@@ -129,7 +129,7 @@ public class TestSupportMainControlsPanel extends JPanel {
         //---- buttonManageJVMs ----
         buttonManageJVMs.setIcon(new ImageIcon(getClass().getResource("/icons/folder_out.png")));
         buttonManageJVMs.setActionCommand("UT-Thread starten...");
-        buttonManageJVMs.setToolTipText("JVM's aktualisieren");
+        buttonManageJVMs.setToolTipText("BPMN's aktualisieren");
         buttonManageJVMs.setText("JVM's...");
         add(buttonManageJVMs, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
