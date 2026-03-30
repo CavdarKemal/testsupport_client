@@ -145,8 +145,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         waitForStopButtonEnabled(120_000);
 
         boolean[] enabled = {false};
-        SwingUtilities.invokeAndWait(() ->
-                enabled[0] = testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().isEnabled());
+        SwingUtilities.invokeAndWait(() -> enabled[0] = testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().isEnabled());
         assertTrue("Stop-Button muss nach Prozessstart aktiviert sein", enabled[0]);
     }
 
@@ -162,7 +161,6 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @Test
     public void test2_laufendenProzessFortsetzten() throws Exception {
-
         // --- Phase 1: Unterbrechung + Fortsetzung ---
         // Prozess direkt auf Activiti starten — GUI erkennt ihn und setzt fort
         startProcessOnActiviti();
@@ -176,14 +174,11 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
         // GUI muss den Phase-1-Task in der Konsole ausgeben — beweist korrekte Fortsetzung
-        assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen",
-                waitForTaskNameInConsole(taskPhase1.getName(), 60_000, 0));
+        assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen", waitForTaskNameInConsole(taskPhase1.getName(), 60_000, 0));
 
         // --- Phase 2: GUI läuft weiter (verarbeitet Phase 1), auf Phase-2-Task warten ---
         CteActivitiTask taskPhase2 = waitForTaskInPhase(TEST_PHASE.PHASE_2, 120_000);
-        Assume.assumeNotNull(
-                "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen",
-                taskPhase2);
+        Assume.assumeNotNull( "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen", taskPhase2);
 
         // Konsolenposition merken, damit Phase-2-Check nur neuen Text prüft
         int consoleLengthBeforePhase2Resume = getConsoleLength();
@@ -198,17 +193,14 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
         // Prüfen ob Phase-2-Task nach der Unterbrechung noch auf Activiti vorhanden ist
         CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
-        Assume.assumeNotNull(
-                "Phase-2-Task nach Unterbrechung nicht mehr auf Activiti — Phase-2-Check übersprungen",
-                taskPhase2ForResume);
+        Assume.assumeNotNull( "Phase-2-Task nach Unterbrechung nicht mehr auf Activiti — Phase-2-Check übersprungen", taskPhase2ForResume);
 
         // Im selben GUI-Frame fortsetzen: "Prozess starten" → "Ja"
         new JButtonOperator(frameOperator, "Prozess starten").push();
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
 
         // Konsole (nur neuer Inhalt) muss Phase-2-Task-Namen enthalten
-        assertTrue("GUI muss nach Fortsetzung bei Phase-2-Task '" + taskPhase2ForResume.getName() + "' beginnen",
-                waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000, consoleLengthBeforePhase2Resume));
+        assertTrue("GUI muss nach Fortsetzung bei Phase-2-Task '" + taskPhase2ForResume.getName() + "' beginnen", waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000, consoleLengthBeforePhase2Resume));
     }
 
     // -----------------------------------------------------------------------

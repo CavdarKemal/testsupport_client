@@ -66,6 +66,7 @@ public class ActivitiProcessController {
         callback.notifyClientJob(Level.INFO, "\n===========   Activiti-Process gestartet.   ===========");
         TimelineLogger.info(ActivitiProcessController.class, "\n===========    Activiti-Process gestartet.    ===========");
 /* CLAUDE_MODE
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = (Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>>) taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVE_CUSTOMERS);
         helper.checkStartCoinditions(activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_2), true);
 */
         processThread = new Thread(this::runLoop);
