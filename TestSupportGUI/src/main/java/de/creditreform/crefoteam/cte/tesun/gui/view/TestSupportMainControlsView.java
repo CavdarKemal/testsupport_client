@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,38 +46,37 @@ public class TestSupportMainControlsView extends TestSupportMainControlsPanel {
     }
 
     public void initEnvironmentsComboBox(EnvironmentConfig currentEnvironment) {
-        DefaultComboBoxModel environmentsModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> environmentsModel = new DefaultComboBoxModel<>();
         Map<String, File> environmentsMap = currentEnvironment.getEnvironmentsMap();
-        Iterator<String> it = environmentsMap.keySet().iterator();
-        while (it.hasNext()) {
-            environmentsModel.addElement(it.next());
+        for (String env : environmentsMap.keySet()) {
+            environmentsModel.addElement(env);
         }
         getComboBoxEnvironment().setModel(environmentsModel);
         getComboBoxEnvironment().setSelectedItem(currentEnvironment.getCurrentEnvName());
     }
 
     public void initHostsFields(EnvironmentConfig currentEnvironment) throws PropertiesException {
-        getComboBoxActivitiHost().setModel(new DefaultComboBoxModel());
+        getComboBoxActivitiHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForActiviti().forEach(c ->
                 getComboBoxActivitiHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
 
-        getComboBoxRestServicesHost().setModel(new DefaultComboBoxModel());
+        getComboBoxRestServicesHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForMasterkonsole().forEach(c ->
                 getComboBoxRestServicesHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
 
-        getComboBoxBatchGUIHost().setModel(new DefaultComboBoxModel());
+        getComboBoxBatchGUIHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForBatchGUI().forEach(c ->
                 getComboBoxBatchGUIHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
 
-        getComboBoxImpCycleHost().setModel(new DefaultComboBoxModel());
+        getComboBoxImpCycleHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForJvmImpCycle().forEach(c ->
                 getComboBoxImpCycleHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
 
-        getComboBoxInsoHost().setModel(new DefaultComboBoxModel());
+        getComboBoxInsoHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForJvmInso().forEach(c ->
                 getComboBoxInsoHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
 
-        getComboBoxInsoBackEndHost().setModel(new DefaultComboBoxModel());
+        getComboBoxInsoBackEndHost().setModel(new DefaultComboBoxModel<RestInvokerConfigCbItem>());
         currentEnvironment.getRestServiceConfigsForJvmInsoBackend().forEach(c ->
                 getComboBoxInsoBackEndHost().addItem(new RestInvokerConfigCbItem(c.getServiceURL(), c)));
     }

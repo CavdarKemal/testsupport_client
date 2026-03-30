@@ -37,6 +37,9 @@ import org.apache.log4j.Level;
 public class TestSupportView extends TestSupportPanel implements TesunClientJobListener, CommandExecutorListener {
 
     private static final String APP_TITLE = "CTE-Testautomatisierung";
+    private static final int MAIN_DIVIDER_POSITION = 500;
+    private static final int JVM_DIALOG_OPEN_DELAY_MS = 1000;
+    private static final int EXIT_CODE_CONFIG_MISSING = -1;
 
     private ActivitiProcessController activitiController;
     List<JComponent> componentsToOnOff;
@@ -73,7 +76,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
         enableComponentsToOnOff(false);
 
-        getSplitPaneMain().setDividerLocation(500);
+        getSplitPaneMain().setDividerLocation(MAIN_DIVIDER_POSITION);
         getTabbedPaneMonitor().getCheckBoxScrollToEnd().setSelected(true);
 
         initForEnvironment();
@@ -202,7 +205,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         if ((environmentsMap == null) || (environmentsMap.isEmpty())) {
             String exceptionErr = "Es konnten im aktuellen Verzeichnis '" + System.getProperty("user.dir") + "'\nkeine Konfigurationsdateien '{ENE|GEE|ABE}-config.properties' gefunden werden!";
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(this, "Konfiguration laden", new RuntimeException(exceptionErr)));
-            System.exit(-1);
+            System.exit(EXIT_CODE_CONFIG_MISSING);
         }
         getViewTestSupportMainControls().initEnvironmentsComboBox(currentEnvironment);
     }
@@ -211,7 +214,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         String newEnv = getViewTestSupportMainControls().getSelectedEnvironmentName();
         try {
             EnvironmentConfig environmentConfig = new EnvironmentConfig(newEnv);
-            checkEnvionmentLock(environmentConfig, newEnv);
+            checkEnvironmentLock(environmentConfig, newEnv);
             TestSupportClientKonstanten.TEST_TYPES selectedTestType = getViewTestSupportMainProcess().getSelectedTestType();
             if (!TimelineLogger.configure(
                     currentEnvironment.getLogOutputsRootForEnv(getViewTestSupportMainControls().getSelectedEnvironmentName()),
@@ -234,7 +237,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         }
     }
 
-    private static void checkEnvionmentLock(EnvironmentConfig environmentConfig, String newEnv) throws PropertiesException {
+    private static void checkEnvironmentLock(EnvironmentConfig environmentConfig, String newEnv) throws PropertiesException {
         File lockDir = environmentConfig.getLogOutputsRootForEnv(newEnv);
         if (EnvironmentLockManager.isLocked(lockDir)) {
             throw new RuntimeException("Die Umgebung " + environmentConfig.getCurrentEnvName() + " ist gesperrt, da eine andere Instanz in dieser Umgebung läuft.");
@@ -323,9 +326,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         SystemInfo systemInfo = tesunRestServiceWLS.getSystemPropertiesInfo();
 */
         notifyClientJob(Level.INFO, "\n\tErmittle KundenKonfigList für die Kunden...");
-        Iterator<TestSupportClientKonstanten.TEST_PHASE> iterator = customerTestInfoMapMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            TestSupportClientKonstanten.TEST_PHASE testPhase = iterator.next();
+        for (TestSupportClientKonstanten.TEST_PHASE testPhase : customerTestInfoMapMap.keySet()) {
             Map<String, TestCustomer> testCustomerMap = customerTestInfoMapMap.get(testPhase);
             notifyClientJob(Level.INFO, "\n" + testCustomerMap.size() + " Kunden sind für den Test in " + testPhase + " ausgewählt.");
             testCustomerMap.entrySet().forEach(testCustomerEntry -> {
@@ -346,9 +347,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private void doManageJVMs() {
         GUIStaticUtils.setWaitCursor(this, true);
-        ManageJvmsDlg theView = new ManageJvmsDlgView(GUIStaticUtils.getParentFrame(this), "Verfügbare JVMs und Jobs", currentEnvironment);
-        GUIStaticUtils.warteBisken(1000);
-        theView.setVisible(true);
+        ManageJvmsDlg manageJvmsDialog = new ManageJvmsDlgView(GUIStaticUtils.getParentFrame(this), "Verfügbare JVMs und Jobs", currentEnvironment);
+        GUIStaticUtils.warteBisken(JVM_DIALOG_OPEN_DELAY_MS);
+        manageJvmsDialog.setVisible(true);
         GUIStaticUtils.setWaitCursor(this, false);
     }
 
@@ -517,7 +518,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     private String createErrorFilesInfo(List<File> errorTxtFiles) {
         StringBuilder strErrBuilder = new StringBuilder("Folgende Fehlerdateien wurden erstellt:");
         for (File errorTxtFile : errorTxtFiles) {
-            strErrBuilder.append("\n\t->" + errorTxtFile.getAbsolutePath());
+            strErrBuilder.append("\n\t->").append(errorTxtFile.getAbsolutePath());
         }
         strErrBuilder.append("\nBitte überprüfen und OK wenn trotzdem weiter?");
         return strErrBuilder.toString();
