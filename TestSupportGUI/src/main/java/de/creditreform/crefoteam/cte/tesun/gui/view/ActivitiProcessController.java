@@ -258,7 +258,8 @@ public class ActivitiProcessController {
         if (running) {
             running = false;
             try {
-                cteActivitiServices.signalEventReceived(taskVariablesMap.get(environmentConfig.getCurrentEnvName()) + "cancelProcessSignal");
+                String signalName = environmentConfig.getCurrentEnvName() + "cancelProcessSignal";
+                cteActivitiServices.signalEventReceived(signalName);
             } catch (Exception ex) {
                 // Activiti schließt die Verbindung wenn der Prozess durch das Signal beendet wird
                 // → ConnectionClosedException ist kein Fehler, running ist bereits false
