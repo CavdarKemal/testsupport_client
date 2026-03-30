@@ -302,6 +302,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private void checkAndSetTestsSource(String testSetSource) throws Exception {
+        // CTEWE-1984::
         File sourceDir = new File(currentEnvironment.getTestResourcesRoot(), testSetSource);
         if (sourceDir.exists()) {
             currentEnvironment.setTestResourcesDir(sourceDir);
