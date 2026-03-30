@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import org.apache.http.impl.execchain.RequestAbortedException;
@@ -134,15 +135,19 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                     GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
                 });
             }
-        }).start();
+        }, "activiti-process-runner").start();
+    }
+
+    private void showAndRethrow(String message, Exception ex) {
+        GUIStaticUtils.showExceptionMessage(this, message, ex);
+        throw new RuntimeException(ex.getMessage());
     }
 
     private void doChangeComboBoxesHost() {
         try {
             testSupportHelper = getTestSupportHelper();
         } catch (Exception ex) {
-            GUIStaticUtils.showExceptionMessage(this, "Fehler beim Wechseln des Hosts!", ex);
-            throw new RuntimeException(ex.getMessage());
+            showAndRethrow("Fehler beim Wechseln des Hosts!", ex);
         }
     }
 
@@ -160,8 +165,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             getViewTestSupportMainProcess().initTestTypesComboBox(currentEnvironment);
             getViewCustomersSelection().setTestCustomersTableModelMap(new HashMap<>());
         } catch (Exception ex) {
-            GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Test-Typen!", ex);
-            throw new RuntimeException(ex.getMessage());
+            showAndRethrow("Fehler beim Initialisieren der Test-Typen!", ex);
         }
     }
 
@@ -177,8 +181,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         try {
             getViewTestSupportMainControls().initHostsFields(currentEnvironment);
         } catch (Exception ex) {
-            GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Hosts!", ex);
-            throw new RuntimeException(ex.getMessage());
+            showAndRethrow("Fehler beim Initialisieren der Hosts!", ex);
         }
     }
 
@@ -186,8 +189,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         try {
             getViewTestSupportMainProcess().initTestSourcesComboBox(currentEnvironment);
         } catch (Exception ex) {
-            GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Test-Sourcen!", ex);
-            throw new RuntimeException(ex.getMessage());
+            showAndRethrow("Fehler beim Initialisieren der Test-Sourcen!", ex);
         }
     }
 
@@ -195,8 +197,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         try {
             getViewTestSupportMainProcess().initITSQRevisionsComboBox(currentEnvironment);
         } catch (Exception ex) {
-            GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der ITSQ-Revisions!", ex);
-            throw new RuntimeException(ex.getMessage());
+            showAndRethrow("Fehler beim Initialisieren der ITSQ-Revisions!", ex);
         }
     }
 
@@ -271,7 +272,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 enableComponentsToOnOff(true);
                 SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, false));
             }
-        }).start();
+        }, "environment-init").start();
     }
 
     private TestSupportHelper getTestSupportHelper() throws Exception {
@@ -419,7 +420,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                         enableComponentsToOnOff(true);
                     });
                 }
-            }).start();
+            }, "user-task-runner").start();
         } catch (Exception ex) {
             notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(this, "UserTask starten!", ex));
             enableComponentsToOnOff(true);
@@ -449,35 +450,35 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         return taskVariablesMap;
     }
 
-    private void doChangeTestResources() {
+    private void runInWorkerThread(String threadName, ThrowingRunnable task, Consumer<Exception> onError) {
         new Thread(() -> {
             enableComponentsToOnOff(false);
             SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, true));
             try {
-                initCustomers();
-                String testSetSource = getViewTestSupportMainProcess().getSelectedTestSource();
-                currentEnvironment.setLastTestSource(testSetSource);
+                task.run();
             } catch (Exception ex) {
-                notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Quelle für Test-Resourcen ändern", ex));
+                if (onError != null) onError.accept(ex);
             } finally {
                 SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, false));
                 enableComponentsToOnOff(true);
             }
-        }).start();
+        }, threadName).start();
+    }
+
+    @FunctionalInterface
+    private interface ThrowingRunnable {
+        void run() throws Exception;
+    }
+
+    private void doChangeTestResources() {
+        runInWorkerThread("test-resources-change", () -> {
+            initCustomers();
+            currentEnvironment.setLastTestSource(getViewTestSupportMainProcess().getSelectedTestSource());
+        }, ex -> notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Quelle für Test-Resourcen ändern", ex)));
     }
 
     private void doChangeITSQRevision() {
-        // Fix: added finally block to always re-enable after disable
-        new Thread(() -> {
-            enableComponentsToOnOff(false);
-            SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, true));
-            try {
-                initCustomers();
-            } finally {
-                SwingUtilities.invokeLater(() -> GUIStaticUtils.setWaitCursor(TestSupportView.this, false));
-                enableComponentsToOnOff(true);
-            }
-        }).start();
+        runInWorkerThread("itsq-revision-change", this::initCustomers, null);
     }
 
     protected void doChangeTestType() {
@@ -570,57 +571,84 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     @Override
     public Object askClientJob(TesunClientJobListener.ASK_FOR askFor, Object userObject) {
         try {
-            if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_RETRY)) {
-                return (GUIStaticUtils.showConfirmDialog(this, (userObject.toString() + "\nErneut versuchen?"), APP_TITLE));
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CONTINUE)) {
-                return (GUIStaticUtils.showConfirmDialog(this, userObject.toString(), APP_TITLE, JOptionPane.YES_NO_CANCEL_OPTION));
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CTE_VERSION)) {
-                return Integer.valueOf(currentEnvironment.getCteVersion());
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_TEST_TYPE)) {
-                return getViewTestSupportMainProcess().getSelectedTestType();
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_USE_ITSQ_TEST_RESOURCES)) {
-                return getViewTestSupportMainProcess().getSelectedTestSource();
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_REF_EXPORTS_PATH)) {
-                File tmpFile = new File(getViewTestSupportMainProcess().getTestCasesPath());
-                tmpFile = new File(tmpFile.getParentFile(), TestSupportClientKonstanten.REF_EXPORTS);
-                return tmpFile.getAbsolutePath();
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_TEST_CASES_PATH)) {
-                return GUIStaticUtils.chooseDirectory(this, currentEnvironment.getItsqRefExportsRoot().getAbsolutePath(), "Verzeichnis für die Testfälle angeben");
-            } else if (askFor.equals(ASK_FOR.ASK_NEW_TEST_CASES_PATH)) {
-                return getViewTestSupportMainProcess().getTestCasesPath();
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CHECK_DOWNLOADS)) {
-                String strErr = createErrorFilesInfo((List<File>) userObject);
-                return (JOptionPane.showConfirmDialog(this, ("Fehler bei Download!\n" + strErr), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_WAIT_FOR_TEST_SYSTEM)) {
-                return (JOptionPane.showConfirmDialog(this, ("Sind die Testfälle im Test-System abgearbeitet?"), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_COPY_EXPORTS_TO_INPUTS)) {
-                String strInfo = String.format("Bitte die Kunden-Exporte nach \n\t%s\nim jewewiligen Unterverzeichnis kopieren...", currentEnvironment.getItsqRefExportsRoot());
-                strInfo += String.format("\nz.B für 'bvd' das Verzeichnis\n'y:/bvd/export/delta/2016-02-23_15-28'\nnach\n'%s/EXPORTS/bvd/export/delta/'\nkopieren.", currentEnvironment.getItsqRefExportsRoot());
-                JOptionPane.showMessageDialog(this, strInfo, APP_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                return Boolean.TRUE;
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_CREATE_NEW_SOLL)) {
-                return (JOptionPane.showConfirmDialog(this, ("Sollen neue SOLL Dateien generiert werden?"), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_ANAYLSE_CHECKS)) {
-                JOptionPane.showMessageDialog(this, "Bitte Check-Ergebnisse prüfen...", APP_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                return Boolean.TRUE;
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_CHECK_COLLECTS)) {
-                String strErr = createErrorFilesInfo((List<File>) userObject);
-                return (JOptionPane.showConfirmDialog(this, ("Fehler bei Collect!\n" + strErr), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
-            } else if (askFor.equals(TesunClientJobListener.ASK_FOR.ASK_OBJECT_EXCEPTION)) {
-                Throwable throwable = (Throwable) userObject;
-                String errMsg = TesunUtilites.buildExceptionMessage(throwable, 10);
-                String s = errMsg != null ? errMsg.replaceAll("\\n", "") : throwable.getClass().getName();
-                String strLog = "\n!!!\n\t" + s + "\n!!!\n";
-                TimelineLogger.error(this.getClass(), strLog);
-                getTabbedPaneMonitor().appendToConsole(strLog);
-                return Boolean.TRUE;
-            } else {
-                throw new PropertiesException("Unbekannte Rückfrage: " + askFor + "!");
+            switch (askFor) {
+                case ASK_OBJECT_RETRY:
+                    return GUIStaticUtils.showConfirmDialog(this, (userObject.toString() + "\nErneut versuchen?"), APP_TITLE);
+                case ASK_OBJECT_CONTINUE:
+                    return GUIStaticUtils.showConfirmDialog(this, userObject.toString(), APP_TITLE, JOptionPane.YES_NO_CANCEL_OPTION);
+                case ASK_OBJECT_CTE_VERSION:
+                    return Integer.valueOf(currentEnvironment.getCteVersion());
+                case ASK_OBJECT_TEST_TYPE:
+                    return getViewTestSupportMainProcess().getSelectedTestType();
+                case ASK_OBJECT_USE_ITSQ_TEST_RESOURCES:
+                    return getViewTestSupportMainProcess().getSelectedTestSource();
+                case ASK_REF_EXPORTS_PATH:
+                    return handleAskRefExportsPath();
+                case ASK_TEST_CASES_PATH:
+                    return GUIStaticUtils.chooseDirectory(this, currentEnvironment.getItsqRefExportsRoot().getAbsolutePath(), "Verzeichnis für die Testfälle angeben");
+                case ASK_NEW_TEST_CASES_PATH:
+                    return getViewTestSupportMainProcess().getTestCasesPath();
+                case ASK_OBJECT_CHECK_DOWNLOADS:
+                    return handleAskCheckDownloads(userObject);
+                case ASK_WAIT_FOR_TEST_SYSTEM:
+                    return JOptionPane.showConfirmDialog(this, "Sind die Testfälle im Test-System abgearbeitet?", APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+                case ASK_OBJECT_COPY_EXPORTS_TO_INPUTS:
+                    return handleAskCopyExports();
+                case ASK_OBJECT_CREATE_NEW_SOLL:
+                    return JOptionPane.showConfirmDialog(this, "Sollen neue SOLL Dateien generiert werden?", APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+                case ASK_OBJECT_ANAYLSE_CHECKS:
+                    return handleAskAnalyseChecks();
+                case ASK_CHECK_COLLECTS:
+                    return handleAskCheckCollects(userObject);
+                case ASK_OBJECT_EXCEPTION:
+                    return handleAskException(userObject);
+                default:
+                    throw new PropertiesException("Unbekannte Rückfrage: " + askFor + "!");
             }
         } catch (Exception ex) {
             GUIStaticUtils.showExceptionMessage(this, "! Fehler !", ex);
         }
         return null;
+    }
+
+    private String handleAskRefExportsPath() {
+        File tmpFile = new File(getViewTestSupportMainProcess().getTestCasesPath());
+        tmpFile = new File(tmpFile.getParentFile(), TestSupportClientKonstanten.REF_EXPORTS);
+        return tmpFile.getAbsolutePath();
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean handleAskCheckDownloads(Object userObject) {
+        String strErr = createErrorFilesInfo((List<File>) userObject);
+        return JOptionPane.showConfirmDialog(this, ("Fehler bei Download!\n" + strErr), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+    }
+
+    private boolean handleAskCopyExports() {
+        String strInfo = String.format("Bitte die Kunden-Exporte nach \n\t%s\nim jewewiligen Unterverzeichnis kopieren...", currentEnvironment.getItsqRefExportsRoot());
+        strInfo += String.format("\nz.B für 'bvd' das Verzeichnis\n'y:/bvd/export/delta/2016-02-23_15-28'\nnach\n'%s/EXPORTS/bvd/export/delta/'\nkopieren.", currentEnvironment.getItsqRefExportsRoot());
+        JOptionPane.showMessageDialog(this, strInfo, APP_TITLE, JOptionPane.INFORMATION_MESSAGE);
+        return true;
+    }
+
+    private boolean handleAskAnalyseChecks() {
+        JOptionPane.showMessageDialog(this, "Bitte Check-Ergebnisse prüfen...", APP_TITLE, JOptionPane.INFORMATION_MESSAGE);
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean handleAskCheckCollects(Object userObject) {
+        String strErr = createErrorFilesInfo((List<File>) userObject);
+        return JOptionPane.showConfirmDialog(this, ("Fehler bei Collect!\n" + strErr), APP_TITLE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+    }
+
+    private boolean handleAskException(Object userObject) {
+        Throwable throwable = (Throwable) userObject;
+        String errMsg = TesunUtilites.buildExceptionMessage(throwable, 10);
+        String s = errMsg != null ? errMsg.replaceAll("\\n", "") : throwable.getClass().getName();
+        String strLog = "\n!!!\n\t" + s + "\n!!!\n";
+        TimelineLogger.error(this.getClass(), strLog);
+        getTabbedPaneMonitor().appendToConsole(strLog);
+        return true;
     }
 
     /***************************************** TesunClientJobListener ******************************************/
