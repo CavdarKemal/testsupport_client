@@ -8,11 +8,8 @@ import de.creditreform.crefoteam.cte.tesun.activiti.handlers.UserTaskRunnable;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.GUIStaticUtils;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.TestSupportHelper;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
-import de.creditreform.crefoteam.cte.tesun.util.TestCustomer;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
-import org.apache.log4j.Level;
-
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -20,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.apache.log4j.Level;
 
 public class ActivitiProcessController {
 
     private final TesunClientJobListener callback;
-    private final Runnable onCustomersReload;
 
     // Process state — set in runProcess(), used in runLoop() and stop()
     private volatile Thread processThread;
@@ -32,20 +29,14 @@ public class ActivitiProcessController {
     private EnvironmentConfig environmentConfig;
     private Map<String, Object> taskVariablesMap;
     private CteActivitiService cteActivitiServices;
-    private Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> selectedCustomersMapMap;
     private Integer processInstanceID;
     private Integer mainProcessInstanceID;
     private CteActivitiTask activitUserTaskToContinue;
 
-    public ActivitiProcessController(TesunClientJobListener callback, Runnable onCustomersReload) {
+    public ActivitiProcessController(TesunClientJobListener callback) {
         this.callback = callback;
-        this.onCustomersReload = onCustomersReload;
     }
 
-    /**
-     * Sync part: checks/handles Activiti status (BPMN deploy or continue existing process).
-     * Called on EDT. Throws RequestAbortedException if user aborts.
-     */
     public CteActivitiTask prepareStart(TestSupportHelper helper, EnvironmentConfig env) throws Exception {
         CteActivitiService activitiRestService = helper.getActivitiRestService();
         CteActivitiTask cteActivitiTask = helper.killOrContinueRunningActivitiProcess(env.getActivitProcessKey(), env.getActivitiProcessName(), true);
@@ -63,11 +54,10 @@ public class ActivitiProcessController {
     /**
      * Async part: starts the process loop in a new thread. No GUI calls here.
      */
-    public void runProcess(TestSupportHelper helper, EnvironmentConfig environmentConfig, Map<String, Object> taskVariablesMap, Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap, CteActivitiTask cteActivitiTask) throws Exception {
+    public void runProcess(TestSupportHelper helper, EnvironmentConfig environmentConfig, Map<String, Object> taskVariablesMap, CteActivitiTask cteActivitiTask) throws Exception {
         this.environmentConfig = environmentConfig;
         this.taskVariablesMap = taskVariablesMap;
         this.cteActivitiServices = helper.getActivitiRestService();
-        this.selectedCustomersMapMap = activeTestCustomersMapMap;
         this.activitUserTaskToContinue = cteActivitiTask;
         this.running = true;
 
@@ -186,13 +176,11 @@ public class ActivitiProcessController {
 
     /**
      * Baut eine minimale Query-Map mit nur MEIN_KEY.
-     * Wird für isProcessEnded() und findMainProcessInstanceId() verwendet,
-     * damit die Activiti-Abfrage unabhängig von der Variablenmenge im taskVariablesMap funktioniert.
+     * Wird für isProcessEnded() und findMainProcessInstanceId() verwendet, damit die Activiti-Abfrage unabhängig von der Variablenmenge im taskVariablesMap funktioniert.
      */
     private Map<String, Object> buildMinimalQueryMap() {
         Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,
-                taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY));
+        queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, taskVariablesMap.get(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY));
         return queryMap;
     }
 
@@ -203,8 +191,7 @@ public class ActivitiProcessController {
      */
     private Integer findMainProcessInstanceId() {
         try {
-            List<CteActivitiProcess> procs = cteActivitiServices.queryProcessInstances(
-                    environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
+            List<CteActivitiProcess> procs = cteActivitiServices.queryProcessInstances(environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
             if (procs != null && !procs.isEmpty()) {
                 return procs.get(0).getId();
             }
@@ -216,10 +203,9 @@ public class ActivitiProcessController {
 
     private boolean isProcessEnded() {
         try {
-            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(
-                    environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
-            TimelineLogger.info(ActivitiProcessController.class, "isProcessEnded: MainProcessInstanceID=" + mainProcessInstanceID +
-                    ", gefundene Instanzen=" + (processes == null ? "null" : processes.size()));
+            List<CteActivitiProcess> processes = cteActivitiServices.queryProcessInstances(environmentConfig.getActivitiProcessName(), buildMinimalQueryMap());
+            TimelineLogger.info(ActivitiProcessController.class, "isProcessEnded: MainProcessInstanceID=" + mainProcessInstanceID
+                    + ", gefundene Instanzen=" + (processes == null ? "null" : processes.size()));
             return processes == null || processes.stream().noneMatch(p -> mainProcessInstanceID.equals(p.getId()));
         } catch (Exception e) {
             return false;
@@ -267,11 +253,6 @@ public class ActivitiProcessController {
         return constructor.newInstance(environmentConfig, callback);
     }
 
-    /**
-     * Stops the running process. Safe to call even if no process is running.
-     * running = false wird ZUERST gesetzt, damit runLoop beim nächsten Zyklus
-     * sicher abbricht — unabhängig davon ob das Signal erfolgreich gesendet wird.
-     */
     public void stop() {
         if (running) {
             running = false;

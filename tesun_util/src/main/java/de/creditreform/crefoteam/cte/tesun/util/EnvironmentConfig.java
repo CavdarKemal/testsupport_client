@@ -200,7 +200,7 @@ public class EnvironmentConfig {
             // Eine Ebene höher gehen
             currentPath = currentPath.getParent();
         }
-        throw new RuntimeException("Verzeichnis " + testRscDir +" konnte im Pfadbaum nicht gefunden werden!");
+        throw new RuntimeException("Verzeichnis " + testRscDir + " konnte im Pfadbaum nicht gefunden werden!");
     }
 
     public File getEnvironmentConfigFile() {
@@ -588,7 +588,7 @@ public class EnvironmentConfig {
         List<RestInvokerConfig> restInvokerConfigList = new ArrayList<>();
         // --> "tesuntestene@tesuntestene::http://rhsctem015.ecofis.de:7077;tesuntestene@tesuntestene::http://localhost:7001"
         String[] urlsArray = strUrls.split(";"); // --> "tesuntestene@tesuntestene::http://rhsctem015.ecofis.de:7077" und "tesuntestene@tesuntestene::http://localhost:7001"
-        if(urlsArray[0].startsWith("?")) {
+        if (urlsArray[0].startsWith("?")) {
             return restInvokerConfigList;
         }
         for (String strUrl : urlsArray) {

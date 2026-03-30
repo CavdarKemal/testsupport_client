@@ -39,11 +39,7 @@ public class TestSupportHelper {
     private final TesunClientJobListener tesunClientJobListener;
     private final EnvironmentConfig environmentConfig;
 
-    public TestSupportHelper(EnvironmentConfig environmentConfig,
-                             RestInvokerConfig activitiRestInvokerConfig,
-                             RestInvokerConfig masterConsoleRestInvokerConfig,
-                             RestInvokerConfig impCyleRestInvokerConfig,
-                             TesunClientJobListener tesunClientJobListener) throws Exception {
+    public TestSupportHelper(EnvironmentConfig environmentConfig, RestInvokerConfig activitiRestInvokerConfig, RestInvokerConfig masterConsoleRestInvokerConfig, RestInvokerConfig impCyleRestInvokerConfig, TesunClientJobListener tesunClientJobListener) throws Exception {
         this.environmentConfig = environmentConfig;
         this.tesunClientJobListener = tesunClientJobListener;
         cteActivitiService = new CteActivitiServiceRestImpl(activitiRestInvokerConfig);

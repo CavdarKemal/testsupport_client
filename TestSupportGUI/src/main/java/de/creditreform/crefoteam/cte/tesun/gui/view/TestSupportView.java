@@ -60,20 +60,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         initHostsFields();
         initTestPhasesComboBox();
 
-        getViewTestSupportMainControls().init(
-                this,
-                this::doChangeComboBoxesHost,
-                this::initForEnvironment,
-                this::doManageJVMs,
-                this::doChangeEnvironment);
-
-        getViewTestSupportMainProcess().init(
-                this::startActivitiProcess,
-                this::stopActivitiProcess,
-                this::startSelectedTestJob,
-                this::doChangeTestResources,
-                this::doChangeITSQRevision,
-                this::doChangeTestType,
+        getViewTestSupportMainControls().init(this, this::doChangeComboBoxesHost, this::initForEnvironment, this::doManageJVMs, this::doChangeEnvironment);
+        getViewTestSupportMainProcess().init(this::startActivitiProcess, this::stopActivitiProcess, this::startSelectedTestJob, this::doChangeTestResources, this::doChangeITSQRevision, this::doChangeTestType,
                 () -> currentEnvironment.setLastUseOnlyTestClz(getViewTestSupportMainProcess().isUseOnlyTestCLZs()),
                 currentEnvironment);
 
@@ -90,7 +78,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
         initForEnvironment();
         initListeners();
-        activitiController = new ActivitiProcessController(this, this::initCustomers);
+        activitiController = new ActivitiProcessController(this);
     }
 
     private void initListeners() {
@@ -107,10 +95,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     protected void startActivitiProcess() {
-        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap =
-                getViewCustomersSelection().getActiveTestCustomersMapMap();
-        activeTestCustomersMapMap.keySet().forEach(testPhase ->
-                activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewCustomersSelection().getActiveTestCustomersMapMap();
+        activeTestCustomersMapMap.keySet().forEach(testPhase -> activeTestCustomersMapMap.get(testPhase).values().forEach(TestCustomer::emptyTestResultsMapForCommands));
 
         CteActivitiTask cteActivitiTask;
         enableComponentsToOnOff(false);
@@ -126,13 +112,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
             enableComponentsToOnOff(true);
         }
-
-        // Capture GUI state on EDT before handing off to worker thread.
         final boolean isDemoMode = getViewTestSupportMainProcess().isDemoMode();
-        final Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers =
-                getViewCustomersSelection().getActiveTestCustomersMapMap();
+        final Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers = getViewCustomersSelection().getActiveTestCustomersMapMap();
         final CteActivitiTask finalTask = cteActivitiTask;
-
         new Thread(() -> {
             SwingUtilities.invokeLater(() -> {
                 GUIStaticUtils.setWaitCursor(TestSupportView.this, true);
@@ -141,7 +123,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
             });
             try {
                 Map<String, Object> taskVariablesMap = setTaskVariablesMap(isDemoMode, activeCustomers);
-                activitiController.runProcess(testSupportHelper, currentEnvironment, taskVariablesMap, activeCustomers, finalTask);
+                activitiController.runProcess(testSupportHelper, currentEnvironment, taskVariablesMap, finalTask);
             } catch (Exception ex) {
                 notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, "Fehler beim Starten des Activiti-Prozesses!", ex));
                 SwingUtilities.invokeLater(() -> {
@@ -272,8 +254,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         initHostsFields();
         new Thread(() -> {
             try {
-                notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...",
-                        getViewTestSupportMainControls().getSelectedEnvironmentName()));
+                notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...", getViewTestSupportMainControls().getSelectedEnvironmentName()));
                 testSupportHelper = getTestSupportHelper();
 /* CLAUDE_MODE
                 TesunSystemInfo tesunSystemInfo = testSupportHelper.getTesunRestServiceWLS().getTesunSystemInfo();
@@ -291,9 +272,9 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     private TestSupportHelper getTestSupportHelper() throws Exception {
-        RestInvokerConfig activitiConfig     = getViewTestSupportMainControls().getSelectedActivitiConfig();
+        RestInvokerConfig activitiConfig = getViewTestSupportMainControls().getSelectedActivitiConfig();
         RestInvokerConfig restServicesConfig = getViewTestSupportMainControls().getSelectedRestServicesConfig();
-        RestInvokerConfig impCycleConfig     = getViewTestSupportMainControls().getSelectedImpCycleConfig();
+        RestInvokerConfig impCycleConfig = getViewTestSupportMainControls().getSelectedImpCycleConfig();
         if (activitiConfig == null || restServicesConfig == null || impCycleConfig == null) {
             return null;
         }
@@ -372,8 +353,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
 
     private Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> getAndCheckActiveCustomers() {
         Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> resultMap = new HashMap<>();
-        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap =
-                getViewCustomersSelection().getActiveTestCustomersMapMap();
+        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeTestCustomersMapMap = getViewCustomersSelection().getActiveTestCustomersMapMap();
         if (activeTestCustomersMapMap.isEmpty()) {
             RuntimeException ex = new RuntimeException("Es sind keine Kunden aktiviert!\nBitte zuerst mindestens einen Kunden mit mindestens einen Terst-Scenario aktivieren.");
             GUIStaticUtils.showExceptionMessage(this, "Fehler beim Initialisieren der Kunden!", ex);
@@ -430,8 +410,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                         lastUserTaskVariablesMap = userTaskRunnable.runTask(taskVariablesMap);
                     }
                 } catch (Exception ex) {
-                    notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this,
-                            String.format("\nFehler beim Start des User-Tasks %s!", testJobsComboBoxItem.getTestJobNamesList()), ex));
+                    notifyClientJob(Level.ERROR, GUIStaticUtils.showExceptionMessage(TestSupportView.this, String.format("\nFehler beim Start des User-Tasks %s!", testJobsComboBoxItem.getTestJobNamesList()), ex));
                 } finally {
                     SwingUtilities.invokeLater(() -> {
                         GUIStaticUtils.setWaitCursor(TestSupportView.this, false);
@@ -447,9 +426,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     }
 
     // Fix: receives pre-captured GUI values — no longer reads Swing state from worker thread.
-    private Map<String, Object> setTaskVariablesMap(
-            boolean isDemoMode,
-            Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers) throws PropertiesException {
+    private Map<String, Object> setTaskVariablesMap(boolean isDemoMode, Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> activeCustomers) throws PropertiesException {
         Map<String, Object> taskVariablesMap = new HashMap<>();
         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_DEMO_MODE, isDemoMode);
         taskVariablesMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, currentEnvironment.getActivitProcessKey());
@@ -504,9 +481,7 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     protected void doChangeTestType() {
         try {
             TestSupportClientKonstanten.TEST_TYPES selectedTestType = getViewTestSupportMainProcess().getSelectedTestType();
-            if (!TimelineLogger.configure(
-                    currentEnvironment.getLogOutputsRootForEnv(getViewTestSupportMainControls().getSelectedEnvironmentName()),
-                    (selectedTestType + ".log"), "TimeLine.log")) {
+            if (!TimelineLogger.configure(currentEnvironment.getLogOutputsRootForEnv(getViewTestSupportMainControls().getSelectedEnvironmentName()), (selectedTestType + ".log"), "TimeLine.log")) {
                 notifyClientJob(Level.ERROR, "Exception beim Konfigurieren der LOG-Dateien!\n");
             }
             notifyClientJob(Level.INFO, String.format("\nInitialisiere für den Test-Typ %s...", selectedTestType.getDescription()));
@@ -517,13 +492,6 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         }
     }
 
-    /**
-     * Enables or disables all managed components.
-     * Fix 1: Thread-safe — dispatches to EDT if called from a worker thread.
-     * Fix 2: NPE-safe — null-checks getSelectedItem() before calling equals().
-     * Fix 3: No longer throws RuntimeException — logs instead, so finally-blocks
-     *         in worker threads are not disrupted by a GUI state error.
-     */
     private void enableComponentsToOnOff(boolean enable) {
         Runnable task = () -> {
             for (JComponent component : componentsToOnOff) {
@@ -561,31 +529,21 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
     /***********************************************************************************************************/
     /***************************************** TesunClientJobListener ******************************************/
 
-    /**
-     * Fix: all Swing operations are now safely dispatched to the EDT.
-     * This method may be called from any thread (EDT or Activiti worker threads).
-     */
     @Override
     public void notifyClientJob(Level level, Object notifyObject) {
         if (notifyObject instanceof CteActivitiTask) {
             CteActivitiTask userTask = (CteActivitiTask) notifyObject;
             Object testPhaseObj = userTask.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
-            String msg = String.format(
-                    "\n\nUser-Task:\n\tName : %s\n\tTest-Phase : %s\n\tID : %d\n\tProcessDefinition : %s\n\tProcessInstance : %d",
-                    userTask.getName(),
-                    testPhaseObj != null ? testPhaseObj.toString() : "?",
-                    userTask.getId(), userTask.getProcessDefinitionId(), userTask.getProcessInstanceId());
+            String msg = String.format("\n\nUser-Task:\n\tName : %s\n\tTest-Phase : %s\n\tID : %d\n\tProcessDefinition : %s\n\tProcessInstance : %d",
+                    userTask.getName(), testPhaseObj != null ? testPhaseObj.toString() : "?", userTask.getId(), userTask.getProcessDefinitionId(), userTask.getProcessInstanceId());
             appendToConsole(msg);
-
         } else if (notifyObject instanceof InputStream) {
             getTabbedPaneMonitor().setProcessImage((InputStream) notifyObject);
-
         } else if (notifyObject instanceof String) {
             String msg = (String) notifyObject;
             if (!msg.equals(".")) {
                 appendToConsole(msg);
             }
-
         } else if (notifyObject == null) {
             TimelineLogger.info(this.getClass(), "===========    Activiti-Process beendet.    ===========");
             String msg = "\n***********    UserTasks-Thread beendet.    ***********\n===========    Activiti-Process beendet.    ===========\nTest-Results sind im Output-Ordner gespeichert";
@@ -600,10 +558,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
                 enableComponentsToOnOff(true);
                 GUIStaticUtils.setWaitCursor(this, false);
             });
-
         } else if (notifyObject instanceof Exception) {
             appendToConsole(((Exception) notifyObject).getMessage());
-
         } else {
             appendToConsole("?! Unbekanntes Notify-Objekt !?");
         }

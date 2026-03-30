@@ -9,12 +9,17 @@ import org.apache.http.impl.execchain.RequestAbortedException;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  * Tests für ActivitiProcessController#prepareStart().
- *
+ * <p>
  * Dokumentiert das korrigierte Verhalten: callback.askClientJob() liefert Integer
  * (JOptionPane.YES_OPTION = 0 bzw. NO_OPTION = 1).
  * Der Fix behebt den früheren Boolean-Cast und die falsche Logik.
@@ -31,14 +36,14 @@ public class ActivitiProcessControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        callback          = createMock(TesunClientJobListener.class);
+        callback = createMock(TesunClientJobListener.class);
         onCustomersReload = createMock(Runnable.class);
-        helper            = createMock(TestSupportHelper.class);
-        activitiService   = createMock(CteActivitiService.class);
-        existingTask      = createMock(CteActivitiTask.class);
-        env               = createMock(EnvironmentConfig.class);
+        helper = createMock(TestSupportHelper.class);
+        activitiService = createMock(CteActivitiService.class);
+        existingTask = createMock(CteActivitiTask.class);
+        env = createMock(EnvironmentConfig.class);
 
-        controller = new ActivitiProcessController(callback, onCustomersReload);
+        controller = new ActivitiProcessController(callback);
     }
 
     // -----------------------------------------------------------------------
@@ -49,9 +54,7 @@ public class ActivitiProcessControllerTest {
         expect(helper.getActivitiRestService()).andReturn(activitiService);
         expect(env.getActivitProcessKey()).andReturn("ENE");
         expect(env.getActivitiProcessName()).andReturn("ENE-TestAutomationProcess");
-        expect(helper.killOrContinueRunningActivitiProcess(
-                "ENE", "ENE-TestAutomationProcess", true))
-                .andReturn(existingTask);
+        expect(helper.killOrContinueRunningActivitiProcess("ENE", "ENE-TestAutomationProcess", true)).andReturn(existingTask);
     }
 
     // -----------------------------------------------------------------------
@@ -66,8 +69,7 @@ public class ActivitiProcessControllerTest {
     public void testPrepareStart_booleanTrueEqualsInteger0_isAlwaysFalse() {
         // Dokumentiert das Logikproblem — kein Controller-Aufruf nötig
         Integer yesOption = 0;
-        assertFalse("Boolean.TRUE.equals(Integer(0)) muss false sein — daher immer Abbruch",
-                Boolean.TRUE.equals(yesOption));
+        assertFalse("Boolean.TRUE.equals(Integer(0)) muss false sein — daher immer Abbruch", Boolean.TRUE.equals(yesOption));
     }
 
     // -----------------------------------------------------------------------
@@ -80,9 +82,7 @@ public class ActivitiProcessControllerTest {
         expectExistingTask();
         // askClientJob darf NICHT aufgerufen werden — Dialog liegt in killOrContinueRunningActivitiProcess
         replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
-
         CteActivitiTask result = controller.prepareStart(helper, env);
-
         assertSame("Der zurückgegebene Task muss der existingTask sein", existingTask, result);
         verify(callback, onCustomersReload, helper, env);
     }
@@ -97,19 +97,14 @@ public class ActivitiProcessControllerTest {
         expect(helper.getActivitiRestService()).andReturn(activitiService);
         expect(env.getActivitProcessKey()).andReturn("ENE");
         expect(env.getActivitiProcessName()).andReturn("ENE-TestAutomationProcess");
-        expect(helper.killOrContinueRunningActivitiProcess(
-                "ENE", "ENE-TestAutomationProcess", true))
-                .andThrow(new RequestAbortedException("Aborted!"));
-
+        expect(helper.killOrContinueRunningActivitiProcess("ENE", "ENE-TestAutomationProcess", true)).andThrow(new RequestAbortedException("Aborted!"));
         replay(callback, onCustomersReload, helper, activitiService, existingTask, env);
-
         try {
             controller.prepareStart(helper, env);
             fail("RequestAbortedException erwartet");
         } catch (RequestAbortedException e) {
             // erwartet — CANCEL-Antwort im Dialog von killOrContinueRunningActivitiProcess
         }
-
         verify(callback, onCustomersReload, helper, env);
     }
 }

@@ -211,11 +211,9 @@ public class ActivitiTestAutomatisierung implements TesunClientJobListener, Comm
 
     public void startACTIVITPorocess() throws Exception {
         Map<String, Object> taskVariablesMap = setTaskVariablesMap(false);
-        testCaseFilesFromRepo.tagAndPushITSQProject(
-                environmentConfig.getTestResourcesDir().getAbsolutePath(),
-                environmentConfig.getItsqTagName(TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2.name()));
-        activitiController = new ActivitiProcessController(ActivitiTestAutomatisierung.this, () -> {});
-        activitiController.runProcess(testSupportHelper, environmentConfig, taskVariablesMap, testCustomerMapMap, null);
+        testCaseFilesFromRepo.tagAndPushITSQProject( environmentConfig.getTestResourcesDir().getAbsolutePath(), environmentConfig.getItsqTagName(TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2.name()));
+        activitiController = new ActivitiProcessController(ActivitiTestAutomatisierung.this);
+        activitiController.runProcess(testSupportHelper, environmentConfig, taskVariablesMap, null);
         while (!activitProcessEnded) {
             Thread.sleep(100000);
         }
