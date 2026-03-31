@@ -4,15 +4,19 @@ import de.creditreform.crefoteam.activiti.CteActivitiService;
 import de.creditreform.crefoteam.activiti.CteActivitiServiceRestImpl;
 import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
+import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
 import org.apache.log4j.Level;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,6 +34,11 @@ public class ActivitiTestAutomatisierungTest {
         RestInvokerConfig restServiceActiviti = environmentConfig.getRestServiceConfigsForActiviti().get(0);
         cteActivitiService = new CteActivitiServiceRestImpl(restServiceActiviti);
         URL resource = getClass().getResource("/activiti-tests");
+        // testResourcesDir muss explizit gesetzt werden, da ActivitiTestAutomatisierung
+        // den WLS-Server für initForEnvironment() benötigt, der im Test nicht verfügbar ist.
+        File localDir = new File(environmentConfig.getTestResourcesRoot(), "LOCAL");
+        localDir.mkdirs();
+        environmentConfig.setTestResourcesDir(localDir);
     }
 
     @After
@@ -47,7 +56,9 @@ public class ActivitiTestAutomatisierungTest {
         cut.notifyClientJob(Level.INFO, String.format("Das Verzeichnis %s wird gezippt...", srcFile.getAbsolutePath()));
         cut.addDirToArchive(zipOutputStream, srcFile.getParentFile(), srcFile);
         File logFile = new File(environmentConfig.getTestResourcesRoot().getParentFile().getParentFile().getAbsolutePath(), "testsupport_client.log");
-        cut.addFileToArchive(zipOutputStream, logFile.getParentFile(), logFile);
+        if (logFile.exists()) {
+            cut.addFileToArchive(zipOutputStream, logFile.getParentFile(), logFile);
+        }
         zipOutputStream.close();
     }
 
@@ -60,10 +71,20 @@ public class ActivitiTestAutomatisierungTest {
 
     @Test
     public void testSendEmail() throws Exception {
+        Assume.assumeTrue("SMTP-Server " + TestSupportClientKonstanten.EMAIL_HOST_NAME + ":" + TestSupportClientKonstanten.EMAIL_PORT + " nicht erreichbar — Test wird übersprungen", isSmtpReachable());
         ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "LOCAL", "");
         String emailContent = "Test-Email";
         String attachmentFileName = "src/test/java/de/creditreform/crefoteam/cte/tesun/auto/ActivitiTestAutomatisierungTest.java";
         String emailSubject = "CTE Test-Automatisierung: " + environmentConfig.getCurrentEnvName();
         TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, attachmentFileName);
+    }
+
+    private boolean isSmtpReachable() {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(TestSupportClientKonstanten.EMAIL_HOST_NAME, TestSupportClientKonstanten.EMAIL_PORT), 2000);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
