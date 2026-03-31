@@ -70,6 +70,7 @@ public class ActivitiProcessController {
         helper.checkStartCoinditions(activeTestCustomersMapMap.get(TestSupportClientKonstanten.TEST_PHASE.PHASE_2), true);
 */
         processThread = new Thread(this::runLoop);
+        processThread.setDaemon(true); // verhindert dass JVM nach GUI-Close blockiert
         processThread.start();
     }
 

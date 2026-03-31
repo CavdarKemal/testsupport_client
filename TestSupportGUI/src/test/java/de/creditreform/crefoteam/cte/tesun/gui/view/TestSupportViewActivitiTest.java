@@ -53,6 +53,8 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     private static EnvironmentConfig ENV_CONFIG;
     private static CteActivitiService activitiService;
     private static HashMap<String, Object> paramsMap = new HashMap<>();
+    /** Query-Map ohne TEST_PHASE — für listTasks/queryProcessInstances, damit Ergebnis phasenunabhängig ist. */
+    private static HashMap<String, Object> queryMap = new HashMap<>();
 
     private TestSupportView testSupportView;
 
@@ -71,6 +73,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
+            // queryMap enthält kein TEST_PHASE — damit listTasks/queryProcessInstances phasenunabhängig suchen
+            queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
+            queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
             for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, paramsMap)) {
                 activitiService.deleteProcessInstance(p.getId());
             }
@@ -237,7 +242,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     private List<CteActivitiProcess> queryRunningProcesses() throws Exception {
-        return activitiService.queryProcessInstances(PROCESS_KEY, paramsMap);
+        return activitiService.queryProcessInstances(PROCESS_KEY, queryMap);
     }
 
     private void deleteAllRunningProcesses() throws Exception {
@@ -253,7 +258,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     private CteActivitiTask waitForTaskInPhase(TEST_PHASE expectedPhase, long timeoutMs) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            List<CteActivitiTask> tasks = activitiService.listTasks(paramsMap);
+            List<CteActivitiTask> tasks = activitiService.listTasks(queryMap);
             for (CteActivitiTask task : tasks) {
                 String phase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
                 if (expectedPhase.name().equals(phase)) {
