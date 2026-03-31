@@ -36,6 +36,18 @@ public class TestSupportMainTabView extends TestSupportMainTabPabel {
                 doResize();
             }
         });
+        getButtonACTITIExporer().addActionListener(e -> doOpenACTIVITIExplorer());
+    }
+
+    private void doOpenACTIVITIExplorer() {
+        try {
+            var config = testSupportHelperSupplier.get().getActivitiRestService().getActivitiRestInvokerConfig();
+            var uri = new java.net.URI("http://" + config.getServiceHost() + ":" + config.getServicePort() + "/process-explorer/");
+            Desktop.getDesktop().browse(uri);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Browser konnte nicht geöffnet werden:\n" + ex.getMessage(),
+                    "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void appendToConsole(String message) {
