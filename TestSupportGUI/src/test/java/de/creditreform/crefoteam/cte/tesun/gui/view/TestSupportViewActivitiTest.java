@@ -53,8 +53,10 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     private static EnvironmentConfig ENV_CONFIG;
     private static CteActivitiService activitiService;
     private static HashMap<String, Object> paramsMap = new HashMap<>();
-    /** Query-Map ohne TEST_PHASE — für listTasks/queryProcessInstances, damit Ergebnis phasenunabhängig ist. */
+    /** Query-Map ohne TEST_PHASE — für queryProcessInstances, damit Ergebnis phasenunabhängig ist. */
     private static HashMap<String, Object> queryMap = new HashMap<>();
+    /** Task-Query-Map nur mit MEIN_KEY — für listTasks, damit auch Sub-Prozess-Tasks gefunden werden. */
+    private static HashMap<String, Object> taskQueryMap = new HashMap<>();
 
     private TestSupportView testSupportView;
 
@@ -73,9 +75,12 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
             paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
-            // queryMap enthält kein TEST_PHASE — damit listTasks/queryProcessInstances phasenunabhängig suchen
+            // queryMap ohne TEST_PHASE — für queryProcessInstances
             queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
             queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
+            // taskQueryMap nur MEIN_KEY — für listTasks, kein processDefinitionKey-Filter
+            // damit Tasks in Sub-Prozessen (andere processDefinitionKey) ebenfalls gefunden werden
+            taskQueryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
             for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, paramsMap)) {
                 activitiService.deleteProcessInstance(p.getId());
             }
@@ -258,7 +263,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     private CteActivitiTask waitForTaskInPhase(TEST_PHASE expectedPhase, long timeoutMs) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            List<CteActivitiTask> tasks = activitiService.listTasks(queryMap);
+            List<CteActivitiTask> tasks = activitiService.listTasks(taskQueryMap);
             for (CteActivitiTask task : tasks) {
                 String phase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
                 if (expectedPhase.name().equals(phase)) {
