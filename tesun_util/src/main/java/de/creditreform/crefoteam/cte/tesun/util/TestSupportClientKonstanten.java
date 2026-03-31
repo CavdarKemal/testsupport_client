@@ -11,8 +11,8 @@ public interface TestSupportClientKonstanten {
     int EMAIL_PORT = 25;
     String TEST_CLZ_412 = "412";
     String TEST_CLZ_912 = "912";
-    String TEST_CLZ_918 = "912";
-    int[] TEST_CLZ_LIST = new int[]{Integer.valueOf(TEST_CLZ_412).intValue(), Integer.valueOf(TEST_CLZ_912).intValue()};
+    String TEST_CLZ_918 = "918";
+    int[] TEST_CLZ_LIST = new int[]{Integer.valueOf(TEST_CLZ_412).intValue(), Integer.valueOf(TEST_CLZ_912).intValue(), Integer.valueOf(TEST_CLZ_918).intValue()};
     String ALGORITHM_SSH_RSA = "ssh-rsa";
     String DEFAUL_TESTS_SOURCE = "ITSQ";
     TEST_TYPES DEFAUL_TESTS_TYPE = TEST_TYPES.PHASE1_AND_PHASE2;

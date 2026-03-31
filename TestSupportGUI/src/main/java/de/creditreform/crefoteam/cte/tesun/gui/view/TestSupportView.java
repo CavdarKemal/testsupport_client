@@ -224,8 +224,8 @@ public class TestSupportView extends TestSupportPanel implements TesunClientJobL
         new Thread(() -> {
             try {
                 notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...", getViewTestSupportMainControls().getSelectedEnvironmentName()));
-                testSupportHelper = getTestSupportHelper();
 /* CLAUDE_MODE
+                testSupportHelper = getTestSupportHelper();
                 TesunSystemInfo tesunSystemInfo = testSupportHelper.getTesunRestServiceWLS().getTesunSystemInfo();
                 String versionsInfoInTitle = String.format("[ %s ] - [ CTE-Version: %s ]", currentEnvironment.getAppVersionsInfo(), tesunSystemInfo.getCteVersion());
                 guiFrame.setVersionsInfoInTitle(versionsInfoInTitle);

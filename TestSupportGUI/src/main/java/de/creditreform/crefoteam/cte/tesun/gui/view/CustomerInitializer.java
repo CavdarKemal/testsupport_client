@@ -60,8 +60,8 @@ class CustomerInitializer {
         view.notifyClientJob(Level.INFO, "\n\tLese die Test-Crefos-Konfiguration aus dem ITSQ-Verzeichnis...");
         Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> customerTestInfoMapMap = view.currentEnvironment.getCustomerTestInfoMapMap();
         view.notifyClientJob(Level.INFO, "\n\tErmittle TesunConfigInfo für die Kunden...");
-        TesunRestService tesunRestServiceWLS = view.testSupportHelper.getTesunRestServiceWLS();
 /* CLAUDE_MODE
+        TesunRestService tesunRestServiceWLS = view.testSupportHelper.getTesunRestServiceWLS();
         SystemInfo systemInfo = tesunRestServiceWLS.getSystemPropertiesInfo();
 */
         view.notifyClientJob(Level.INFO, "\n\tErmittle KundenKonfigList für die Kunden...");
