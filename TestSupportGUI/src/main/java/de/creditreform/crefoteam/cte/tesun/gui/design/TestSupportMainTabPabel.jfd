@@ -1,10 +1,6 @@
 JFDML JFormDesigner: "8.3" encoding: "UTF-8"
 
 new FormModel {
-	"i18n.autoExternalize": true
-	"i18n.bundlePackage": "de.cavdar.gui.design"
-	"i18n.bundleName": "form"
-	"i18n.keyPrefix": "TestSupportMainTabPabel"
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
@@ -38,7 +34,7 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JCheckBox" ) {
 					name: "checkBoxScrollToEnd"
-					"text": new FormMessage( null, "TestSupportMainTabPabel.checkBoxScrollToEnd.text" )
+					"text": "Auto-Scroll"
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 1
 					"insets": new java.awt.Insets( 2, 2, 2, 2 )
@@ -46,9 +42,9 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "buttonClearLOGPanel"
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/table_replace.png" )
-					"actionCommand": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.actionCommand" )
-					"toolTipText": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.toolTipText" )
-					"text": new FormMessage( null, "TestSupportMainTabPabel.buttonClearLOGPanel.text" )
+					"actionCommand": "clearLOGs"
+					"toolTipText": "LOG's aus dem Panel löschen"
+					"text": "LOG's löschen"
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 1
 					"gridx": 1
@@ -56,7 +52,7 @@ new FormModel {
 					"hAlign": 4
 				} )
 			}, new FormLayoutConstraints( null ) {
-				"title": new FormMessage( null, "TestSupportMainTabPabel.panelLogs.tab.title" )
+				"title": "LOG's"
 			} )
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "scrollPanelProcessImage"
@@ -67,7 +63,7 @@ new FormModel {
 					name: "labelProcessImage"
 				} )
 			}, new FormLayoutConstraints( null ) {
-				"title": new FormMessage( null, "TestSupportMainTabPabel.scrollPanelProcessImage.tab.title" )
+				"title": "Prozess"
 			} )
 			add( new FormComponent( "de.creditreform.crefoteam.cte.tesun.gui.view.TestResultsView" ) {
 				name: "viewTestResults"
@@ -75,7 +71,16 @@ new FormModel {
 					"JavaCodeGenerator.variableGetter": true
 				}
 			}, new FormLayoutConstraints( null ) {
-				"title": new FormMessage( null, "TestSupportMainTabPabel.viewTestResults.tab.title" )
+				"title": "Test-Results"
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "buttonACTITIExporer"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+			}, new FormLayoutConstraints( null ) {
+				"title": "ACTITI-Exporer"
+				"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/xhtml.png" )
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
