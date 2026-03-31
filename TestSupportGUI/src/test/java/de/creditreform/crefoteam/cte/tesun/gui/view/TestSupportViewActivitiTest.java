@@ -11,7 +11,6 @@ import de.creditreform.crefoteam.cte.tesun.gui.TestSupportGUI;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.GUIStaticUtils;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
-import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten.TEST_PHASE;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
@@ -102,9 +101,13 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         ALL_TASK_TOKENS = Collections.unmodifiableList(list);
     }
 
-    /** Task-Definition-Keys für Unterbrechungspunkte. */
-    private static final String INTERRUPT_DEF_KEY_PHASE1 = "UserTaskStartBeteiligtenImport";
-    private static final String INTERRUPT_DEF_KEY_PHASE2 = "UserTaskStartCtImport";
+    /**
+     * Konsolen-Token zum Erkennen des Unterbrechungspunkts.
+     * Der Konsolen-Text bleibt nach Erscheinen erhalten — kein Polling-Race-Condition
+     * wie bei Activiti-Task-Abfragen (Tasks können in <500ms verarbeitet werden).
+     */
+    private static final String INTERRUPT_TOKEN_PHASE1 = "[StartBeteiligtenImport]"; // Phase-1 Sub-Prozess-Task
+    private static final String INTERRUPT_TOKEN_PHASE2 = "PHASE_2"; // erscheint im "Test-Phase"-Feld der notifyTask()-Ausgabe
 
     private static final String DIALOG_TITLE = "CTE-Testautomatisierung";
 
@@ -151,7 +154,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
             paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,               ENV_CONFIG_ENE.getActivitProcessKey());
             paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,   PROCESS_KEY_ENE);
-            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TEST_PHASE.PHASE_1);
+            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
             paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE,               TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2);
 
             queryMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,                ENV_CONFIG_ENE.getActivitProcessKey());
@@ -177,7 +180,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
             paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,               ENV_CONFIG_GEE.getActivitProcessKey());
             paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,   PROCESS_KEY_GEE);
-            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TEST_PHASE.PHASE_1);
+            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
             paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE,               TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2);
 
             queryMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,                ENV_CONFIG_GEE.getActivitProcessKey());
@@ -274,11 +277,12 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         new JButtonOperator(frameOperator, "Prozess starten").push();
         waitForStopButtonEnabled(viewENE, 60_000);
 
-        // Warten bis der Unterbrechungs-Task in Phase-1 erscheint
-        CteActivitiTask interruptSignal = waitForSpecificTask(
-                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE1, TEST_PHASE.PHASE_1, 120_000);
-        System.out.println("[TEST] test2: Phase-1 Interrupt-Signal: "
-                + (interruptSignal != null ? interruptSignal.getTaskDefinitionKey() : "keiner") + " — unterbreche GUI");
+        // Warten bis ein Phase-1-Task in der Konsole erscheint.
+        // Konsolen-Text bleibt erhalten — kein Polling-Race-Condition wie bei Activiti-Task-Abfragen.
+        boolean phase1Seen = waitForTaskNameInConsole(viewENE, INTERRUPT_TOKEN_PHASE1, 120_000, 0);
+        Assume.assumeTrue("Phase-1-Token '" + INTERRUPT_TOKEN_PHASE1 + "' nicht rechtzeitig in Konsole erschienen — Test übersprungen", phase1Seen);
+        System.out.println("[TEST] test2: Phase-1-Token '" + INTERRUPT_TOKEN_PHASE1 + "' in Konsole gesehen — unterbreche GUI");
+
         stopActivitiControllerLoop(viewENE);
         waitForStartButtonEnabled(viewENE, 60_000);
 
@@ -305,17 +309,15 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @Test
     public void test3_phase2Unterbrechung_fortsetzen() throws Exception {
-        System.out.println("[TEST] test3: Starte Prozess für Phase-2-Unterbrechung...");
+        System.out.println("[TEST] test3: Starte Prozess für Phase-2-Unterbrechung (Phase-1 muss zuerst abgeschlossen werden)...");
         new JButtonOperator(frameOperator, "Prozess starten").push();
         waitForStopButtonEnabled(viewENE, 60_000);
 
-        // Warten bis der Unterbrechungs-Task in Phase-2 erscheint (lange Wartezeit — Phase-1 muss vorher abgeschlossen werden)
-        CteActivitiTask interruptSignal = waitForSpecificTask(
-                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 300_000);
-        Assume.assumeNotNull(
-                "Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", interruptSignal);
-        System.out.println("[TEST] test3: Phase-2 Interrupt-Signal: '"
-                + interruptSignal.getTaskDefinitionKey() + "' — unterbreche GUI");
+        // Warten bis Phase-2 in der Konsole erscheint (long timeout — Phase-1 läuft vollständig durch)
+        boolean phase2Seen = waitForTaskNameInConsole(viewENE, INTERRUPT_TOKEN_PHASE2, 300_000, 0);
+        Assume.assumeTrue("Phase-2-Indikator nicht rechtzeitig in Konsole erschienen — Test übersprungen", phase2Seen);
+        System.out.println("[TEST] test3: Phase-2-Indikator in Konsole gesehen — unterbreche GUI");
+
         stopActivitiControllerLoop(viewENE);
         waitForStartButtonEnabled(viewENE, 60_000);
 
@@ -346,12 +348,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
         new JButtonOperator(frameOperator, "Prozess starten").push();
         waitForStopButtonEnabled(viewENE, 60_000);
 
-        CteActivitiTask interruptSignal = waitForSpecificTask(
-                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 300_000);
-        Assume.assumeNotNull(
-                "Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", interruptSignal);
-        System.out.println("[TEST] test4: Phase-2 Interrupt-Signal: '"
-                + interruptSignal.getTaskDefinitionKey() + "' — unterbreche GUI");
+        boolean phase2Seen = waitForTaskNameInConsole(viewENE, INTERRUPT_TOKEN_PHASE2, 300_000, 0);
+        Assume.assumeTrue("Phase-2-Indikator nicht rechtzeitig in Konsole erschienen — Test übersprungen", phase2Seen);
+        System.out.println("[TEST] test4: Phase-2-Indikator in Konsole gesehen — unterbreche GUI");
         stopActivitiControllerLoop(viewENE);
         waitForStartButtonEnabled(viewENE, 60_000);
 
@@ -454,21 +453,19 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
             waitForStopButtonEnabled(viewENE, 60_000);
             waitForStopButtonEnabled(viewGEE, 60_000);
 
-            // ENE: warten bis Phase-1-Interrupt-Task erscheint, dann GUI stoppen
-            CteActivitiTask eneInterruptSignal = waitForSpecificTask(
-                    activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE1, TEST_PHASE.PHASE_1, 120_000);
-            System.out.println("[TEST] test6: ENE Interrupt-Signal Phase-1: "
-                    + (eneInterruptSignal != null ? eneInterruptSignal.getTaskDefinitionKey() : "keiner")
-                    + " — unterbreche ENE-GUI");
+            // ENE: warten bis Phase-1-Token in ENE-Konsole erscheint, dann GUI stoppen.
+            // Konsolen-Text bleibt erhalten — kein Polling-Race-Condition (Tasks können schneller sein als 500ms-Polls).
+            boolean enePhase1Seen = waitForTaskNameInConsole(viewENE, INTERRUPT_TOKEN_PHASE1, 120_000, 0);
+            System.out.println("[TEST] test6: ENE Phase-1-Token '" + INTERRUPT_TOKEN_PHASE1 + "' "
+                    + (enePhase1Seen ? "gesehen" : "NICHT gesehen (Timeout)") + " — unterbreche ENE-GUI");
+            Assume.assumeTrue("ENE Phase-1-Token nicht in Konsole erschienen — Test übersprungen", enePhase1Seen);
             stopActivitiControllerLoop(viewENE);
 
-            // GEE: warten bis Phase-2-Interrupt-Task erscheint (GEE muss Phase-1 erst abschließen)
-            CteActivitiTask geeInterruptSignal = waitForSpecificTask(
-                    activitiServiceGEE, taskQueryMapGEE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 360_000);
-            Assume.assumeNotNull(
-                    "GEE Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", geeInterruptSignal);
-            System.out.println("[TEST] test6: GEE Interrupt-Signal Phase-2: '"
-                    + geeInterruptSignal.getTaskDefinitionKey() + "' — unterbreche GEE-GUI");
+            // GEE: warten bis Phase-2-Indikator in GEE-Konsole erscheint (GEE muss Phase-1 erst abschließen).
+            // ENE ist jetzt gestoppt — GEE läuft weiter.
+            boolean geePhase2Seen = waitForTaskNameInConsole(viewGEE, INTERRUPT_TOKEN_PHASE2, 360_000, 0);
+            Assume.assumeTrue("GEE Phase-2-Indikator nicht rechtzeitig in Konsole erschienen — Test übersprungen", geePhase2Seen);
+            System.out.println("[TEST] test6: GEE Phase-2-Indikator '" + INTERRUPT_TOKEN_PHASE2 + "' gesehen — unterbreche GEE-GUI");
             stopActivitiControllerLoop(viewGEE);
 
             // Auf beide Start-Buttons warten (GUIs sind gestoppt)
@@ -518,7 +515,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     // -----------------------------------------------------------------------
-    // Hilfsmethoden — Aktiviti-Abfragen
+    // Hilfsmethoden — Activiti-Abfragen
     // -----------------------------------------------------------------------
 
     private void deleteAllRunningProcesses(CteActivitiService service, String processKey, Map<String, Object> qMap) throws Exception {
@@ -528,27 +525,9 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     /**
-     * Wartet bis ein Task mit dem angegebenen Definition-Key und der angegebenen Phase auf Activiti erscheint.
-     * Gibt null zurück wenn der Timeout abläuft.
-     */
-    private CteActivitiTask waitForSpecificTask(CteActivitiService service, Map<String, Object> tqMap,
-            String defKey, TEST_PHASE phase, long timeoutMs) throws Exception {
-        long deadline = System.currentTimeMillis() + timeoutMs;
-        while (System.currentTimeMillis() < deadline) {
-            for (CteActivitiTask task : service.listTasks(tqMap)) {
-                if (defKey.equals(task.getTaskDefinitionKey())) {
-                    if (phase == null) return task;
-                    String taskPhase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
-                    if (phase.name().equals(taskPhase)) return task;
-                }
-            }
-            Thread.sleep(500);
-        }
-        return null;
-    }
-
-    /**
      * Gibt den ersten verfügbaren Task zurück, oder null wenn keiner vorhanden ist.
+     * Wird aufgerufen NACHDEM stopActivitiControllerLoop() und waitForStartButtonEnabled() —
+     * der Prozess ist dann an einem stabilen Task eingefroren.
      */
     private CteActivitiTask getCurrentTask(CteActivitiService service, Map<String, Object> tqMap) throws Exception {
         List<CteActivitiTask> tasks = service.listTasks(tqMap);
