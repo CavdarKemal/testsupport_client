@@ -36,10 +36,9 @@ public class TestSupportMainTabView extends TestSupportMainTabPabel {
                 doResize();
             }
         });
-        getButtonACTITIExporer().addActionListener(e -> doOpenACTIVITIExplorer());
     }
 
-    private void doOpenACTIVITIExplorer() {
+    public void doShowProcessExplorer() {
         try {
             var config = testSupportHelperSupplier.get().getActivitiRestService().getActivitiRestInvokerConfig();
             var uri = new java.net.URI("http://" + config.getServiceHost() + ":" + config.getServicePort() + "/process-explorer/");
