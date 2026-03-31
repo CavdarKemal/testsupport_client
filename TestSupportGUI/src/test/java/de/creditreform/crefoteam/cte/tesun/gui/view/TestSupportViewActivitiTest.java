@@ -19,9 +19,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,33 +36,106 @@ import static org.junit.Assert.*;
  * GUI-Tests für TestSupportView#startActivitiProcess und #stopActivitiProcess.
  *
  * Voraussetzungen:
- *   - Gültige ENE-config.properties im Classpath (test/resources)
- *     mit ACTIVITI_URLS=CAVDARK-ENE@cavdark::http://localhost:9090
+ *   - Gültige ENE-config.properties und GEE-config.properties im Classpath (test/resources)
  *   - Laufender Activiti-Docker-Container auf localhost:9090
- *   - BPMN-Datei bpmns/TestAutomationProcess.bpmn im Classpath (test/resources/bpmns/)
- *
- * Fehlen Voraussetzungen, werden alle Tests automatisch übersprungen (Assume).
+ *   - BPMN-Dateien bpmns/CteAutomatedTestProcess.bpmn + CteAutomatedTestProcessSUB.bpmn
  *
  * Test-Szenarien:
- *   1. Frisch-Start: Stop-Button wird nach dem Prozessstart aktiviert.
- *   2. Prozess fortsetzen: Unterbrechung bei Phase-1- und Phase-2-UserTask,
- *      anschließend Fortsetzung — geprüft ob GUI genau beim unterbrochenen Task weitermacht.
- *   3. Prozess neu starten (Nein-Dialog): alte Instanz gelöscht, neue gestartet.
+ *   1. Vollständiger Durchlauf — alle 44 Tasks (Main-Start + Phase-1 + Phase-2 + Main-End) in richtiger Reihenfolge
+ *   2. Phase-1-Unterbrechung + Fortsetzen — Prozess stoppt im Phase-1-Sub-Prozess, GUI setzt an korrektem Task fort
+ *   3. Phase-2-Unterbrechung + Fortsetzen — dasselbe für Phase-2
+ *   4. Phase-2-Unterbrechung + Neu-Start (Nein) — alte Instanz gelöscht, neue gestartet
+ *   5. Parallel ENE + GEE — beide laufen vollständig durch
+ *   6. Parallel ENE + GEE — ENE bei Phase-1, GEE bei Phase-2 unterbrochen, beide fortgesetzt
  */
 public class TestSupportViewActivitiTest extends BaseGUITest {
 
-    private static final String PROCESS_KEY  = "ENE-TestAutomationProcess";
+    // -----------------------------------------------------------------------
+    // Task-Suchtoken für verifyTaskOrder() (erscheinen im Konsolen-Text)
+    // Quelle: task.getName() via notifyTask() — "Name : <name>"
+    // -----------------------------------------------------------------------
+
+    /** Token aus dem Hauptprozess, vor den Sub-Prozessen. */
+    private static final String[] TASK_TOKENS_MAIN_START = {
+        "Systemeinstellungen für",      // UserTaskPrepareTestSystem
+        "[GeneratePseudoCrefos]"        // UserTaskGeneratePseudoCrefos
+    };
+
+    /** Token der 20 Sub-Prozess-Tasks (Phase-1 und Phase-2 verwenden dieselbe Liste). */
+    private static final String[] TASK_TOKENS_PHASE = {
+        "[StartUploads]",
+        "[WaittUploads]",
+        "[StartBeteiligtenImport]",
+        "[WaitForBeteiligtenImport]",
+        "[StartEntgBerechnung]",
+        "[WaitForEntgBerechnung]",
+        "[StartBtlgAktualisierung]",
+        "[WaitForBtlgAktualisierung]",
+        "[WaittCtImport]",
+        "[StartCtImport]",
+        "[WaitForCtImport]",
+        "[TaskWaitBeforeExport]",
+        "[StartExports]",
+        "[StartCollect]",
+        "[CheckCollects]",
+        "[StartRestore]",
+        "[CheckRefExports]",
+        "[CheckExportProtokoll]",
+        "[StartSftpUploads]",
+        "[CheckSftpUploads]"
+    };
+
+    /** Token aus dem Hauptprozess, nach den Sub-Prozessen. */
+    private static final String[] TASK_TOKENS_MAIN_END = {
+        "Erfolgs-Mail",                 // UserTaskSuccessMail
+        "Restauriert System"            // UserTaskRestoreTestSystem
+    };
+
+    /** Vollständige Tokenliste: Main-Start + Phase-1 + Phase-2 + Main-End (44 Einträge). */
+    private static final List<String> ALL_TASK_TOKENS;
+    static {
+        List<String> list = new ArrayList<>();
+        list.addAll(Arrays.asList(TASK_TOKENS_MAIN_START));
+        list.addAll(Arrays.asList(TASK_TOKENS_PHASE));  // Phase-1
+        list.addAll(Arrays.asList(TASK_TOKENS_PHASE));  // Phase-2
+        list.addAll(Arrays.asList(TASK_TOKENS_MAIN_END));
+        ALL_TASK_TOKENS = Collections.unmodifiableList(list);
+    }
+
+    /** Task-Definition-Keys für Unterbrechungspunkte. */
+    private static final String INTERRUPT_DEF_KEY_PHASE1 = "UserTaskStartBeteiligtenImport";
+    private static final String INTERRUPT_DEF_KEY_PHASE2 = "UserTaskStartCtImport";
+
     private static final String DIALOG_TITLE = "CTE-Testautomatisierung";
 
-    private static EnvironmentConfig ENV_CONFIG;
-    private static CteActivitiService activitiService;
-    private static HashMap<String, Object> paramsMap = new HashMap<>();
-    /** Query-Map ohne TEST_PHASE — für queryProcessInstances, damit Ergebnis phasenunabhängig ist. */
-    private static HashMap<String, Object> queryMap = new HashMap<>();
-    /** Task-Query-Map nur mit MEIN_KEY — für listTasks, damit auch Sub-Prozess-Tasks gefunden werden. */
-    private static HashMap<String, Object> taskQueryMap = new HashMap<>();
+    // -----------------------------------------------------------------------
+    // ENE — Statische Felder
+    // -----------------------------------------------------------------------
 
-    private TestSupportView testSupportView;
+    private static final String PROCESS_KEY_ENE = "ENE-TestAutomationProcess";
+    private static EnvironmentConfig ENV_CONFIG_ENE;
+    private static CteActivitiService activitiServiceENE;
+    private static final Map<String, Object> paramsMapENE  = new HashMap<>();  // zum startProcess()
+    private static final Map<String, Object> queryMapENE   = new HashMap<>();  // für queryProcessInstances (kein TEST_PHASE)
+    private static final Map<String, Object> taskQueryMapENE = new HashMap<>(); // für listTasks (nur MEIN_KEY)
+
+    // -----------------------------------------------------------------------
+    // GEE — Statische Felder (nur für Tests 5 & 6 benötigt)
+    // -----------------------------------------------------------------------
+
+    private static final String PROCESS_KEY_GEE = "GEE-TestAutomationProcess";
+    private static EnvironmentConfig ENV_CONFIG_GEE;
+    private static CteActivitiService activitiServiceGEE;
+    private static final Map<String, Object> paramsMapGEE    = new HashMap<>();
+    private static final Map<String, Object> queryMapGEE     = new HashMap<>();
+    private static final Map<String, Object> taskQueryMapGEE = new HashMap<>();
+
+    // -----------------------------------------------------------------------
+    // Instanz-Felder
+    // -----------------------------------------------------------------------
+
+    /** ENE-View — gesetzt in setUp(). */
+    private TestSupportView viewENE;
 
     // -----------------------------------------------------------------------
     // Klassen-Setup / -Teardown
@@ -66,29 +143,55 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     @BeforeClass
     public static void setUpClass() {
+        // ENE
         try {
-            ENV_CONFIG = new EnvironmentConfig("ENE");
-            List<RestInvokerConfig> configs = ENV_CONFIG.getRestServiceConfigsForActiviti();
-            activitiService = new CteActivitiServiceRestImpl(configs.get(0));
-            // Verbindung testen — schlägt fehl wenn Container nicht läuft
-            // Laufende Prozesse vorab löschen, damit das Deployment gelöscht werden kann (FK-Constraint)
-            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
-            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
-            paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE, TestSupportClientKonstanten.TEST_PHASE.PHASE_1);
-            // queryMap ohne TEST_PHASE — für queryProcessInstances
-            queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
-            queryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, PROCESS_KEY);
-            // taskQueryMap nur MEIN_KEY — für listTasks, kein processDefinitionKey-Filter
-            // damit Tasks in Sub-Prozessen (andere processDefinitionKey) ebenfalls gefunden werden
-            taskQueryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, ENV_CONFIG.getActivitProcessKey());
-            for (CteActivitiProcess p : activitiService.queryProcessInstances(PROCESS_KEY, paramsMap)) {
-                activitiService.deleteProcessInstance(p.getId());
+            ENV_CONFIG_ENE = new EnvironmentConfig("ENE");
+            List<RestInvokerConfig> configs = ENV_CONFIG_ENE.getRestServiceConfigsForActiviti();
+            activitiServiceENE = new CteActivitiServiceRestImpl(configs.get(0));
+
+            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,               ENV_CONFIG_ENE.getActivitProcessKey());
+            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,   PROCESS_KEY_ENE);
+            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TEST_PHASE.PHASE_1);
+            paramsMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE,               TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2);
+
+            queryMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,                ENV_CONFIG_ENE.getActivitProcessKey());
+            queryMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,    PROCESS_KEY_ENE);
+
+            taskQueryMapENE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,             ENV_CONFIG_ENE.getActivitProcessKey());
+
+            // Laufende Prozesse vorab löschen, BPMN deployen
+            for (CteActivitiProcess p : activitiServiceENE.queryProcessInstances(PROCESS_KEY_ENE, queryMapENE)) {
+                activitiServiceENE.deleteProcessInstance(p.getId());
             }
-            // BPMN vorab deployen — damit alle Tests startProcess() aufrufen können
-            GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiService, "ENE");
+            GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiServiceENE, "ENE");
         } catch (Exception e) {
-            ENV_CONFIG = null;
-            activitiService = null;
+            ENV_CONFIG_ENE = null;
+            activitiServiceENE = null;
+        }
+
+        // GEE (optional — fehlende Konfiguration führt nur zu übersprungenen Tests 5 & 6)
+        try {
+            ENV_CONFIG_GEE = new EnvironmentConfig("GEE");
+            List<RestInvokerConfig> configs = ENV_CONFIG_GEE.getRestServiceConfigsForActiviti();
+            activitiServiceGEE = new CteActivitiServiceRestImpl(configs.get(0));
+
+            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,               ENV_CONFIG_GEE.getActivitProcessKey());
+            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,   PROCESS_KEY_GEE);
+            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE,              TEST_PHASE.PHASE_1);
+            paramsMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_TYPE,               TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2);
+
+            queryMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,                ENV_CONFIG_GEE.getActivitProcessKey());
+            queryMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME,    PROCESS_KEY_GEE);
+
+            taskQueryMapGEE.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY,             ENV_CONFIG_GEE.getActivitProcessKey());
+
+            for (CteActivitiProcess p : activitiServiceGEE.queryProcessInstances(PROCESS_KEY_GEE, queryMapGEE)) {
+                activitiServiceGEE.deleteProcessInstance(p.getId());
+            }
+            GUIStaticUtils.uploadActivitiProcessesFromClassPath(activitiServiceGEE, "GEE");
+        } catch (Exception e) {
+            ENV_CONFIG_GEE = null;
+            activitiServiceGEE = null;
         }
     }
 
@@ -110,164 +213,333 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     public void setUp() {
         Assume.assumeNotNull(
                 "Activiti-Container oder ENE-config.properties nicht verfügbar — Test übersprungen",
-                activitiService, ENV_CONFIG);
+                activitiServiceENE, ENV_CONFIG_ENE);
         try {
-            deleteAllRunningProcesses();
+            deleteAllRunningProcesses(activitiServiceENE, PROCESS_KEY_ENE, queryMapENE);
         } catch (Exception e) {
             Assume.assumeNoException("Activiti-Verbindung fehlgeschlagen — Test übersprungen", e);
         }
         try {
-            guiFrame = new TestSupportGUI(ENV_CONFIG); // frisches Frame pro Test — kein Zustand aus Vortests
+            guiFrame = new TestSupportGUI(ENV_CONFIG_ENE);
         } catch (RuntimeException e) {
             Assume.assumeNoException(
-                    "TestSupportGUI konnte nicht gestartet werden (Umgebung gesperrt oder andere externe Instanz läuft) — Test übersprungen",
-                    e);
+                    "TestSupportGUI konnte nicht gestartet werden (Umgebung gesperrt) — Test übersprungen", e);
         }
-        guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // verhindert System.exit() beim dispose() im Test
+        guiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         super.setUp(); // setzt frameOperator
-        testSupportView = extractTestSupportView();
-        waitForStartButtonEnabled(30_000);
+        viewENE = extractViewFrom((TestSupportGUI) guiFrame);
+        waitForStartButtonEnabled(viewENE, 30_000);
     }
 
     @Override
     public void tearDown() {
-        // Warten bis der Activiti-Prozess komplett durchgelaufen ist (Demo-Mode: alle UserTasks automatisch erledigt).
-        // Erst dann dispose() aufrufen, damit Surefire die JVM nicht vorzeitig beendet und processThread
-        // alle UserTasks verarbeiten kann.
-        if (testSupportView != null) {
-            waitForStartButtonEnabled(120_000);
+        if (viewENE != null) {
+            waitForStartButtonEnabled(viewENE, 120_000);
         }
         if (guiFrame != null) {
             guiFrame.setVisible(false);
             guiFrame.dispose();
             guiFrame = null;
         }
+        viewENE = null;
     }
 
     // -----------------------------------------------------------------------
-    // Test 1: Frisch-Start — Stop-Button wird nach dem Prozessstart aktiviert
+    // Test 1: Vollständiger Durchlauf — Task-Reihenfolge verifiziert
     // -----------------------------------------------------------------------
 
     @Test
-    public void test1_frischStart_stopButtonAktiviert() throws Exception {
+    public void test1_vollstaendigerDurchlauf_TaskReihenfolgeVerifiziert() throws Exception {
+        System.out.println("[TEST] test1: Starte vollständigen Prozessdurchlauf...");
         new JButtonOperator(frameOperator, "Prozess starten").push();
 
-        waitForStopButtonEnabled(120_000);
+        waitForStopButtonEnabled(viewENE, 60_000);
+        System.out.println("[TEST] test1: Prozess läuft — warte auf vollständigen Abschluss (" + ALL_TASK_TOKENS.size() + " Tasks)...");
 
-        boolean[] enabled = {false};
-        SwingUtilities.invokeAndWait(() -> enabled[0] = testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().isEnabled());
-        assertTrue("Stop-Button muss nach Prozessstart aktiviert sein", enabled[0]);
+        waitForStartButtonEnabled(viewENE, 480_000);
+        System.out.println("[TEST] test1: Prozess abgeschlossen — prüfe Task-Reihenfolge");
+
+        String consoleText = getConsoleText(viewENE);
+        verifyTaskOrder(consoleText, ALL_TASK_TOKENS);
+        System.out.println("[TEST] test1: Task-Reihenfolge korrekt (" + ALL_TASK_TOKENS.size() + " Tokens verifiziert)");
     }
 
     // -----------------------------------------------------------------------
-    // Test 2: Prozess unterbrechen und fortsetzen (in derselben GUI-Session)
-    //         Phase 1: Prozess auf Activiti starten, auf Phase-1-UserTask warten,
-    //                  GUI fortsetzen — prüfen ob GUI genau bei diesem Task beginnt.
-    //         Phase 2: GUI verarbeitet Phase 1 durch, auf Phase-2-UserTask warten,
-    //                  GUI-Loop per Reflection unterbrechen (simuliert unerwartetes Ende,
-    //                  kein Cancel-Signal → Activiti-Prozess bleibt erhalten),
-    //                  im selben Frame fortsetzen — prüfen ob GUI beim Phase-2-Task beginnt.
+    // Test 2: Phase-1-Unterbrechung + Fortsetzen
     // -----------------------------------------------------------------------
 
     @Test
-    public void test2_laufendenProzessFortsetzten() throws Exception {
-        // --- Phase 1: Unterbrechung + Fortsetzung ---
-        // Prozess direkt auf Activiti starten — GUI erkennt ihn und setzt fort
-        startProcessOnActiviti();
+    public void test2_phase1Unterbrechung_fortsetzen() throws Exception {
+        System.out.println("[TEST] test2: Starte Prozess für Phase-1-Unterbrechung...");
+        new JButtonOperator(frameOperator, "Prozess starten").push();
+        waitForStopButtonEnabled(viewENE, 60_000);
 
-        // Warten bis Phase-1-UserTask auf Activiti erscheint
-        CteActivitiTask taskPhase1 = waitForTaskInPhase(TEST_PHASE.PHASE_1, 60_000);
-        assertNotNull("Prozess muss Phase-1-UserTask erreichen", taskPhase1);
+        // Warten bis der Unterbrechungs-Task in Phase-1 erscheint
+        CteActivitiTask interruptSignal = waitForSpecificTask(
+                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE1, TEST_PHASE.PHASE_1, 120_000);
+        System.out.println("[TEST] test2: Phase-1 Interrupt-Signal: "
+                + (interruptSignal != null ? interruptSignal.getTaskDefinitionKey() : "keiner") + " — unterbreche GUI");
+        stopActivitiControllerLoop(viewENE);
+        waitForStartButtonEnabled(viewENE, 60_000);
 
-        // GUI startet → laufender Prozess erkannt → Dialog → "Ja" (Fortsetzen)
+        // Aktuellen Task nach Unterbrechung ermitteln (Prozess könnte einen Schritt weiter sein)
+        CteActivitiTask resumeTask = getCurrentTask(activitiServiceENE, taskQueryMapENE);
+        Assume.assumeNotNull("Kein Activiti-Task nach Phase-1-Unterbrechung — Test übersprungen", resumeTask);
+        System.out.println("[TEST] test2: GUI setzt fort bei Task: '" + resumeTask.getName() + "'");
+
+        int consoleLengthBefore = getConsoleLength(viewENE);
+
+        // Fortsetzen: Dialog erscheint (laufender Prozess erkannt) → Ja
         new JButtonOperator(frameOperator, "Prozess starten").push();
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+        System.out.println("[TEST] test2: Dialog 'Fortsetzen' bestätigt (Ja)");
 
-        // GUI muss den Phase-1-Task in der Konsole ausgeben — beweist korrekte Fortsetzung
-        assertTrue("GUI muss nach Fortsetzung bei Phase-1-Task '" + taskPhase1.getName() + "' beginnen", waitForTaskNameInConsole(taskPhase1.getName(), 60_000, 0));
-
-        // --- Phase 2: GUI läuft weiter (verarbeitet Phase 1), auf Phase-2-Task warten ---
-        CteActivitiTask taskPhase2 = waitForTaskInPhase(TEST_PHASE.PHASE_2, 120_000);
-        Assume.assumeNotNull( "Phase-2-UserTask nicht rechtzeitig erschienen — Phase-2-Check übersprungen", taskPhase2);
-
-        // Konsolenposition merken, damit Phase-2-Check nur neuen Text prüft
-        int consoleLengthBeforePhase2Resume = getConsoleLength();
-
-        // GUI-Loop per Reflection unterbrechen: nur running=false, kein Cancel-Signal.
-        // Simuliert ein unerwartetes Ende der GUI (z.B. Absturz) — der Activiti-Prozess
-        // bleibt am Phase-2-Task erhalten und kann fortgesetzt werden.
-        // (Zum Vergleich: clickStopButton() würde ENEcancelProcessSignal senden
-        //  und den Activiti-Prozess abbrechen — das wäre kein "Fortsetzen"-Szenario.)
-        stopActivitiControllerLoop();
-        waitForStartButtonEnabled(30_000);
-
-        // Prüfen ob Phase-2-Task nach der Unterbrechung noch auf Activiti vorhanden ist
-        CteActivitiTask taskPhase2ForResume = waitForTaskInPhase(TEST_PHASE.PHASE_2, 10_000);
-        Assume.assumeNotNull( "Phase-2-Task nach Unterbrechung nicht mehr auf Activiti — Phase-2-Check übersprungen", taskPhase2ForResume);
-
-        // Im selben GUI-Frame fortsetzen: "Prozess starten" → "Ja"
-        new JButtonOperator(frameOperator, "Prozess starten").push();
-        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
-
-        // Konsole (nur neuer Inhalt) muss Phase-2-Task-Namen enthalten
-        assertTrue("GUI muss nach Fortsetzung bei Phase-2-Task '" + taskPhase2ForResume.getName() + "' beginnen", waitForTaskNameInConsole(taskPhase2ForResume.getName(), 60_000, consoleLengthBeforePhase2Resume));
+        assertTrue("GUI muss nach Phase-1-Fortsetzung bei Task '" + resumeTask.getName() + "' beginnen",
+                waitForTaskNameInConsole(viewENE, resumeTask.getName(), 60_000, consoleLengthBefore));
+        System.out.println("[TEST] test2: Phase-1-Fortsetzung erfolgreich verifiziert");
     }
 
     // -----------------------------------------------------------------------
-    // Test 3: Alten Prozess beenden und neu starten (Nein-Antwort im Dialog)
-    //         Check: alte Instanz gelöscht, neue Instanz gestartet
+    // Test 3: Phase-2-Unterbrechung + Fortsetzen
     // -----------------------------------------------------------------------
 
     @Test
-    public void test3_altenProzessBeendenUndNeuStarten() throws Exception {
-        CteActivitiProcess existing = startProcessOnActiviti();
-        Integer oldId = existing.getId();
-
+    public void test3_phase2Unterbrechung_fortsetzen() throws Exception {
+        System.out.println("[TEST] test3: Starte Prozess für Phase-2-Unterbrechung...");
         new JButtonOperator(frameOperator, "Prozess starten").push();
+        waitForStopButtonEnabled(viewENE, 60_000);
 
-        // Dialog abwarten und "Nein" wählen → alten Prozess beenden, neu starten
-        // (Text-basierte Suche, da VERTICAL_SCROLLBAR_ALWAYS die Button-Indizes verschiebt)
+        // Warten bis der Unterbrechungs-Task in Phase-2 erscheint (lange Wartezeit — Phase-1 muss vorher abgeschlossen werden)
+        CteActivitiTask interruptSignal = waitForSpecificTask(
+                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 300_000);
+        Assume.assumeNotNull(
+                "Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", interruptSignal);
+        System.out.println("[TEST] test3: Phase-2 Interrupt-Signal: '"
+                + interruptSignal.getTaskDefinitionKey() + "' — unterbreche GUI");
+        stopActivitiControllerLoop(viewENE);
+        waitForStartButtonEnabled(viewENE, 60_000);
+
+        // Aktuellen Task nach Unterbrechung ermitteln
+        CteActivitiTask resumeTask = getCurrentTask(activitiServiceENE, taskQueryMapENE);
+        Assume.assumeNotNull("Kein Activiti-Task nach Phase-2-Unterbrechung — Test übersprungen", resumeTask);
+        System.out.println("[TEST] test3: GUI setzt fort bei Task: '" + resumeTask.getName() + "'");
+
+        int consoleLengthBefore = getConsoleLength(viewENE);
+
+        // Fortsetzen
+        new JButtonOperator(frameOperator, "Prozess starten").push();
+        new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+        System.out.println("[TEST] test3: Dialog 'Fortsetzen' bestätigt (Ja)");
+
+        assertTrue("GUI muss nach Phase-2-Fortsetzung bei Task '" + resumeTask.getName() + "' beginnen",
+                waitForTaskNameInConsole(viewENE, resumeTask.getName(), 60_000, consoleLengthBefore));
+        System.out.println("[TEST] test3: Phase-2-Fortsetzung erfolgreich verifiziert");
+    }
+
+    // -----------------------------------------------------------------------
+    // Test 4: Phase-2-Unterbrechung + Neu-Start (Dialog: Nein)
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void test4_phase2Unterbrechung_neuStart() throws Exception {
+        System.out.println("[TEST] test4: Starte Prozess für Phase-2-Unterbrechung mit anschließendem Neu-Start...");
+        new JButtonOperator(frameOperator, "Prozess starten").push();
+        waitForStopButtonEnabled(viewENE, 60_000);
+
+        CteActivitiTask interruptSignal = waitForSpecificTask(
+                activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 300_000);
+        Assume.assumeNotNull(
+                "Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", interruptSignal);
+        System.out.println("[TEST] test4: Phase-2 Interrupt-Signal: '"
+                + interruptSignal.getTaskDefinitionKey() + "' — unterbreche GUI");
+        stopActivitiControllerLoop(viewENE);
+        waitForStartButtonEnabled(viewENE, 60_000);
+
+        // Alte Prozess-ID sichern
+        List<CteActivitiProcess> runningBefore = activitiServiceENE.queryProcessInstances(PROCESS_KEY_ENE, queryMapENE);
+        Assume.assumeFalse("Kein laufender Prozess nach Unterbrechung — Test übersprungen", runningBefore.isEmpty());
+        Integer oldId = runningBefore.get(0).getId();
+        System.out.println("[TEST] test4: Alte Prozess-ID: " + oldId + " — wähle Nein (Neu-Start)");
+
+        // Neu-Start: Dialog → Nein (alte Instanz löschen, neu starten)
+        new JButtonOperator(frameOperator, "Prozess starten").push();
         new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Nein").push();
+        System.out.println("[TEST] test4: Dialog 'Neu-Start' bestätigt (Nein)");
 
-        waitForStopButtonEnabled(120_000);
-        waitForNewProcess(oldId, 120_000);
+        waitForStopButtonEnabled(viewENE, 120_000);
+        waitForNewProcess(activitiServiceENE, PROCESS_KEY_ENE, queryMapENE, oldId, 60_000);
 
-        List<CteActivitiProcess> processes = queryRunningProcesses();
-        assertFalse("Es muss eine neue Prozess-Instanz geben", processes.isEmpty());
-        boolean oldGone = processes.stream().noneMatch(p -> oldId.equals(p.getId()));
-        assertTrue("Alte Prozess-Instanz muss gelöscht worden sein", oldGone);
+        List<CteActivitiProcess> runningAfter = activitiServiceENE.queryProcessInstances(PROCESS_KEY_ENE, queryMapENE);
+        assertFalse("Es muss eine neue Prozess-Instanz geben", runningAfter.isEmpty());
+        boolean oldGone = runningAfter.stream().noneMatch(p -> oldId.equals(p.getId()));
+        assertTrue("Alte Prozess-Instanz muss gelöscht worden sein (ID: " + oldId + ")", oldGone);
+        System.out.println("[TEST] test4: Neu-Start verifiziert — alte ID " + oldId + " ist weg, neue ID: "
+                + runningAfter.get(0).getId());
     }
 
     // -----------------------------------------------------------------------
-    // Hilfsmethoden
+    // Test 5: Parallel ENE + GEE — vollständiger Durchlauf beider Prozesse
     // -----------------------------------------------------------------------
 
-    private CteActivitiProcess startProcessOnActiviti() throws Exception {
-        return activitiService.startProcess(PROCESS_KEY, paramsMap);
+    @Test
+    public void test5_parallelENEundGEE_vollstaendigerDurchlauf() throws Exception {
+        Assume.assumeNotNull("GEE nicht verfügbar — Test übersprungen", ENV_CONFIG_GEE, activitiServiceGEE);
+
+        TestSupportGUI guiGEE = null;
+        TestSupportView viewGEE = null;
+        try {
+            // GEE vorbereiten
+            deleteAllRunningProcesses(activitiServiceGEE, PROCESS_KEY_GEE, queryMapGEE);
+            guiGEE = new TestSupportGUI(ENV_CONFIG_GEE);
+            guiGEE.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JFrameOperator frameOpGEE = new JFrameOperator(guiGEE);
+            viewGEE = extractViewFrom(guiGEE);
+            waitForStartButtonEnabled(viewGEE, 30_000);
+
+            System.out.println("[TEST] test5: Starte ENE und GEE parallel...");
+            new JButtonOperator(frameOperator, "Prozess starten").push();
+            new JButtonOperator(frameOpGEE, "Prozess starten").push();
+
+            waitForStopButtonEnabled(viewENE, 60_000);
+            waitForStopButtonEnabled(viewGEE, 60_000);
+            System.out.println("[TEST] test5: Beide Prozesse gestartet — warte auf vollständigen Abschluss...");
+
+            waitForStartButtonEnabled(viewENE, 480_000);
+            System.out.println("[TEST] test5: ENE abgeschlossen");
+            waitForStartButtonEnabled(viewGEE, 480_000);
+            System.out.println("[TEST] test5: GEE abgeschlossen");
+
+            // Task-Reihenfolge ENE prüfen
+            String consoleENE = getConsoleText(viewENE);
+            verifyTaskOrder(consoleENE, ALL_TASK_TOKENS);
+            System.out.println("[TEST] test5: ENE Task-Reihenfolge korrekt");
+
+            // Task-Reihenfolge GEE prüfen
+            String consoleGEE = getConsoleText(viewGEE);
+            verifyTaskOrder(consoleGEE, ALL_TASK_TOKENS);
+            System.out.println("[TEST] test5: GEE Task-Reihenfolge korrekt — paralleler Durchlauf verifiziert");
+
+        } finally {
+            if (guiGEE != null) {
+                if (viewGEE != null) waitForStartButtonEnabled(viewGEE, 120_000);
+                guiGEE.setVisible(false);
+                guiGEE.dispose();
+            }
+        }
     }
 
-    private List<CteActivitiProcess> queryRunningProcesses() throws Exception {
-        return activitiService.queryProcessInstances(PROCESS_KEY, queryMap);
+    // -----------------------------------------------------------------------
+    // Test 6: Parallel ENE + GEE — ENE bei Phase-1, GEE bei Phase-2 unterbrochen, beide fortgesetzt
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void test6_parallelENEundGEE_unterbrechenUndFortsetzen() throws Exception {
+        Assume.assumeNotNull("GEE nicht verfügbar — Test übersprungen", ENV_CONFIG_GEE, activitiServiceGEE);
+
+        TestSupportGUI guiGEE = null;
+        TestSupportView viewGEE = null;
+        try {
+            // GEE vorbereiten
+            deleteAllRunningProcesses(activitiServiceGEE, PROCESS_KEY_GEE, queryMapGEE);
+            guiGEE = new TestSupportGUI(ENV_CONFIG_GEE);
+            guiGEE.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JFrameOperator frameOpGEE = new JFrameOperator(guiGEE);
+            viewGEE = extractViewFrom(guiGEE);
+            waitForStartButtonEnabled(viewGEE, 30_000);
+
+            System.out.println("[TEST] test6: Starte ENE und GEE parallel...");
+            new JButtonOperator(frameOperator, "Prozess starten").push();
+            new JButtonOperator(frameOpGEE, "Prozess starten").push();
+
+            waitForStopButtonEnabled(viewENE, 60_000);
+            waitForStopButtonEnabled(viewGEE, 60_000);
+
+            // ENE: warten bis Phase-1-Interrupt-Task erscheint, dann GUI stoppen
+            CteActivitiTask eneInterruptSignal = waitForSpecificTask(
+                    activitiServiceENE, taskQueryMapENE, INTERRUPT_DEF_KEY_PHASE1, TEST_PHASE.PHASE_1, 120_000);
+            System.out.println("[TEST] test6: ENE Interrupt-Signal Phase-1: "
+                    + (eneInterruptSignal != null ? eneInterruptSignal.getTaskDefinitionKey() : "keiner")
+                    + " — unterbreche ENE-GUI");
+            stopActivitiControllerLoop(viewENE);
+
+            // GEE: warten bis Phase-2-Interrupt-Task erscheint (GEE muss Phase-1 erst abschließen)
+            CteActivitiTask geeInterruptSignal = waitForSpecificTask(
+                    activitiServiceGEE, taskQueryMapGEE, INTERRUPT_DEF_KEY_PHASE2, TEST_PHASE.PHASE_2, 360_000);
+            Assume.assumeNotNull(
+                    "GEE Phase-2 Interrupt-Task nicht rechtzeitig erschienen — Test übersprungen", geeInterruptSignal);
+            System.out.println("[TEST] test6: GEE Interrupt-Signal Phase-2: '"
+                    + geeInterruptSignal.getTaskDefinitionKey() + "' — unterbreche GEE-GUI");
+            stopActivitiControllerLoop(viewGEE);
+
+            // Auf beide Start-Buttons warten (GUIs sind gestoppt)
+            waitForStartButtonEnabled(viewENE, 60_000);
+            waitForStartButtonEnabled(viewGEE, 60_000);
+
+            // Aktuellen Task nach Unterbrechung ermitteln
+            CteActivitiTask eneResumeTask = getCurrentTask(activitiServiceENE, taskQueryMapENE);
+            CteActivitiTask geeResumeTask = getCurrentTask(activitiServiceGEE, taskQueryMapGEE);
+            Assume.assumeNotNull("Kein ENE-Task nach Unterbrechung — Test übersprungen", eneResumeTask);
+            Assume.assumeNotNull("Kein GEE-Task nach Unterbrechung — Test übersprungen", geeResumeTask);
+
+            System.out.println("[TEST] test6: ENE-Fortsetzung bei Task: '" + eneResumeTask.getName() + "'");
+            System.out.println("[TEST] test6: GEE-Fortsetzung bei Task: '" + geeResumeTask.getName() + "'");
+
+            int eneConsoleLenBefore = getConsoleLength(viewENE);
+            int geeConsoleLenBefore = getConsoleLength(viewGEE);
+
+            // ENE fortsetzen
+            new JButtonOperator(frameOperator, "Prozess starten").push();
+            new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+            System.out.println("[TEST] test6: ENE Dialog 'Fortsetzen' bestätigt (Ja)");
+
+            // GEE fortsetzen
+            new JButtonOperator(frameOpGEE, "Prozess starten").push();
+            new JDialogOperator(DIALOG_TITLE); // warten bis Dialog erscheint
+            new JButtonOperator(new JDialogOperator(DIALOG_TITLE), "Ja").push();
+            System.out.println("[TEST] test6: GEE Dialog 'Fortsetzen' bestätigt (Ja)");
+
+            // ENE-Konsole prüfen
+            assertTrue("ENE-GUI muss nach Fortsetzung bei Task '" + eneResumeTask.getName() + "' beginnen",
+                    waitForTaskNameInConsole(viewENE, eneResumeTask.getName(), 60_000, eneConsoleLenBefore));
+            System.out.println("[TEST] test6: ENE-Fortsetzung verifiziert");
+
+            // GEE-Konsole prüfen
+            assertTrue("GEE-GUI muss nach Fortsetzung bei Task '" + geeResumeTask.getName() + "' beginnen",
+                    waitForTaskNameInConsole(viewGEE, geeResumeTask.getName(), 60_000, geeConsoleLenBefore));
+            System.out.println("[TEST] test6: GEE-Fortsetzung verifiziert — parallele Unterbrechung und Fortsetzung erfolgreich");
+
+        } finally {
+            if (guiGEE != null) {
+                if (viewGEE != null) waitForStartButtonEnabled(viewGEE, 120_000);
+                guiGEE.setVisible(false);
+                guiGEE.dispose();
+            }
+        }
     }
 
-    private void deleteAllRunningProcesses() throws Exception {
-        for (CteActivitiProcess p : queryRunningProcesses()) {
-            activitiService.deleteProcessInstance(p.getId());
+    // -----------------------------------------------------------------------
+    // Hilfsmethoden — Aktiviti-Abfragen
+    // -----------------------------------------------------------------------
+
+    private void deleteAllRunningProcesses(CteActivitiService service, String processKey, Map<String, Object> qMap) throws Exception {
+        for (CteActivitiProcess p : service.queryProcessInstances(processKey, qMap)) {
+            service.deleteProcessInstance(p.getId());
         }
     }
 
     /**
-     * Fragt Activiti-Tasks nach Phase. Nutzt listTasks() mit dem MEIN_KEY-Filter,
-     * damit auch Tasks in Sub-Prozessen gefunden werden.
+     * Wartet bis ein Task mit dem angegebenen Definition-Key und der angegebenen Phase auf Activiti erscheint.
+     * Gibt null zurück wenn der Timeout abläuft.
      */
-    private CteActivitiTask waitForTaskInPhase(TEST_PHASE expectedPhase, long timeoutMs) throws Exception {
+    private CteActivitiTask waitForSpecificTask(CteActivitiService service, Map<String, Object> tqMap,
+            String defKey, TEST_PHASE phase, long timeoutMs) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            List<CteActivitiTask> tasks = activitiService.listTasks(taskQueryMap);
-            for (CteActivitiTask task : tasks) {
-                String phase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
-                if (expectedPhase.name().equals(phase)) {
-                    return task;
+            for (CteActivitiTask task : service.listTasks(tqMap)) {
+                if (defKey.equals(task.getTaskDefinitionKey())) {
+                    if (phase == null) return task;
+                    String taskPhase = task.getVariables().get(TesunClientJobListener.UT_TASK_PARAM_NAME_TEST_PHASE);
+                    if (phase.name().equals(taskPhase)) return task;
                 }
             }
             Thread.sleep(500);
@@ -276,104 +548,134 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     }
 
     /**
-     * Wartet bis der Konsolen-Text ab Position startOffset den Task-Namen enthält.
-     * startOffset=0 prüft den gesamten Text; ein höherer Wert prüft nur neu hinzugekommenen Text.
+     * Gibt den ersten verfügbaren Task zurück, oder null wenn keiner vorhanden ist.
      */
-    private boolean waitForTaskNameInConsole(String taskName, long timeoutMs, int startOffset) throws Exception {
-        long deadline = System.currentTimeMillis() + timeoutMs;
-        while (System.currentTimeMillis() < deadline) {
-            String[] consoleText = {""};
-            SwingUtilities.invokeAndWait(() ->
-                    consoleText[0] = testSupportView.getTabbedPaneMonitor()
-                            .getTextAreaTaskListenerInfo().getText());
-            String relevantText = consoleText[0].length() > startOffset
-                    ? consoleText[0].substring(startOffset)
-                    : "";
-            if (relevantText.contains(taskName)) {
-                return true;
-            }
-            Thread.sleep(200);
-        }
-        return false;
+    private CteActivitiTask getCurrentTask(CteActivitiService service, Map<String, Object> tqMap) throws Exception {
+        List<CteActivitiTask> tasks = service.listTasks(tqMap);
+        return tasks.isEmpty() ? null : tasks.get(0);
     }
 
-    /** Gibt die aktuelle Zeichenanzahl der Konsole zurück. */
-    private int getConsoleLength() throws Exception {
-        int[] len = {0};
-        SwingUtilities.invokeAndWait(() ->
-                len[0] = testSupportView.getTabbedPaneMonitor()
-                        .getTextAreaTaskListenerInfo().getText().length());
-        return len[0];
-    }
+    // -----------------------------------------------------------------------
+    // Hilfsmethoden — GUI-Zustand
+    // -----------------------------------------------------------------------
 
     /**
      * Unterbricht den GUI-Loop per Reflection (setzt running=false), ohne das
-     * Activiti-Cancel-Signal zu senden. Simuliert ein unerwartetes Ende der GUI
-     * (z.B. Absturz) — der Activiti-Prozess bleibt am aktuellen Task erhalten.
+     * Activiti-Cancel-Signal zu senden. Simuliert ein unerwartetes Ende der GUI-Session —
+     * der Activiti-Prozess bleibt am aktuellen Task erhalten und kann fortgesetzt werden.
      */
-    private void stopActivitiControllerLoop() throws Exception {
+    private void stopActivitiControllerLoop(TestSupportView view) throws Exception {
         Field controllerField = TestSupportView.class.getDeclaredField("activitiController");
         controllerField.setAccessible(true);
-        ActivitiProcessController controller = (ActivitiProcessController) controllerField.get(testSupportView);
-
+        ActivitiProcessController controller = (ActivitiProcessController) controllerField.get(view);
+        if (controller == null) return;
         Field runningField = ActivitiProcessController.class.getDeclaredField("running");
         runningField.setAccessible(true);
         runningField.set(controller, false);
     }
 
-    /**
-     * Klickt den Stop-Button der GUI auf dem EDT.
-     * Ruft ActivitiProcessController.stop() auf: setzt running=false UND sendet
-     * ENEcancelProcessSignal an Activiti → der Activiti-Prozess wird abgebrochen.
-     * Nur für Tests geeignet, die das bewusste Abbrechen testen (nicht für Fortsetzen).
-     */
-    private void clickStopButton() throws Exception {
-        SwingUtilities.invokeAndWait(() ->
-                testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().doClick());
-    }
-
-    private void waitForStartButtonEnabled(long timeoutMs) {
+    private void waitForStartButtonEnabled(TestSupportView view, long timeoutMs) {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             try {
                 boolean[] enabled = {false};
-                SwingUtilities.invokeAndWait(() -> enabled[0] = testSupportView.getViewTestSupportMainProcess().getButtonStartProcess().isEnabled());
+                SwingUtilities.invokeAndWait(() ->
+                        enabled[0] = view.getViewTestSupportMainProcess().getButtonStartProcess().isEnabled());
                 if (enabled[0]) return;
                 Thread.sleep(200);
             } catch (Exception ignored) {}
         }
-        // Kein fail() — wenn der Button nie enabled wird, schlägt der Test beim push() fehl
     }
 
-    private void waitForStopButtonEnabled(long timeoutMs) throws Exception {
+    private void waitForStopButtonEnabled(TestSupportView view, long timeoutMs) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             boolean[] enabled = {false};
             SwingUtilities.invokeAndWait(() ->
-                    enabled[0] = testSupportView.getViewTestSupportMainProcess().getButtonStopUserTasksThread().isEnabled());
+                    enabled[0] = view.getViewTestSupportMainProcess().getButtonStopUserTasksThread().isEnabled());
             if (enabled[0]) return;
             Thread.sleep(100);
         }
         fail("Stop-Button wurde nicht rechtzeitig aktiviert (Timeout: " + timeoutMs + " ms)");
     }
 
-    private void waitForNewProcess(Integer oldId, long timeoutMs) throws Exception {
+    private void waitForNewProcess(CteActivitiService service, String processKey,
+            Map<String, Object> qMap, Integer oldId, long timeoutMs) throws Exception {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            boolean newExists = queryRunningProcesses().stream()
+            boolean newExists = service.queryProcessInstances(processKey, qMap).stream()
                     .anyMatch(p -> !oldId.equals(p.getId()));
             if (newExists) return;
             Thread.sleep(200);
         }
-        fail("Neue Prozess-Instanz nicht rechtzeitig auf Activiti gestartet (Timeout: "
-                + timeoutMs + " ms)");
+        fail("Neue Prozess-Instanz nicht rechtzeitig auf Activiti gestartet (Timeout: " + timeoutMs + " ms)");
     }
 
-    private TestSupportView extractTestSupportView() {
+    // -----------------------------------------------------------------------
+    // Hilfsmethoden — Konsole
+    // -----------------------------------------------------------------------
+
+    /**
+     * Wartet bis der Konsolen-Text ab Position startOffset den gesuchten Task-Namen enthält.
+     * startOffset=0 prüft den gesamten Konsoleninhalt.
+     */
+    private boolean waitForTaskNameInConsole(TestSupportView view, String taskName,
+            long timeoutMs, int startOffset) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            String[] text = {""};
+            SwingUtilities.invokeAndWait(() ->
+                    text[0] = view.getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getText());
+            String relevant = text[0].length() > startOffset ? text[0].substring(startOffset) : "";
+            if (relevant.contains(taskName)) return true;
+            Thread.sleep(200);
+        }
+        return false;
+    }
+
+    /** Gibt die aktuelle Zeichenanzahl der Konsole zurück. */
+    private int getConsoleLength(TestSupportView view) throws Exception {
+        int[] len = {0};
+        SwingUtilities.invokeAndWait(() ->
+                len[0] = view.getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getText().length());
+        return len[0];
+    }
+
+    /** Gibt den vollständigen Konsoleninhalt zurück. */
+    private String getConsoleText(TestSupportView view) throws Exception {
+        String[] text = {""};
+        SwingUtilities.invokeAndWait(() ->
+                text[0] = view.getTabbedPaneMonitor().getTextAreaTaskListenerInfo().getText());
+        return text[0];
+    }
+
+    /**
+     * Prüft, dass alle Tokens aus expectedTokens in der gegebenen Reihenfolge im Konsolen-Text vorkommen.
+     * Phase-1 und Phase-2 verwenden dieselben Task-Namen — die Tokens werden zweimal in expectedTokens
+     * übergeben. indexOf(token, searchFrom) stellt sicher, dass jede Instanz an der richtigen Stelle gefunden wird.
+     */
+    private void verifyTaskOrder(String consoleText, List<String> expectedTokens) {
+        int searchFrom = 0;
+        for (String token : expectedTokens) {
+            int pos = consoleText.indexOf(token, searchFrom);
+            assertTrue("Task-Token '" + token + "' nicht in Konsole nach Position " + searchFrom
+                    + " gefunden. Konsoleninhalt (ab " + Math.max(0, searchFrom - 50) + "):\n"
+                    + consoleText.substring(Math.max(0, searchFrom - 50),
+                            Math.min(consoleText.length(), searchFrom + 200)),
+                    pos >= 0);
+            searchFrom = pos + token.length();
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Hilfsmethoden — Reflection
+    // -----------------------------------------------------------------------
+
+    private TestSupportView extractViewFrom(TestSupportGUI gui) {
         try {
             Field field = TestSupportGUI.class.getDeclaredField("testSupportView");
             field.setAccessible(true);
-            return (TestSupportView) field.get(guiFrame);
+            return (TestSupportView) field.get(gui);
         } catch (Exception e) {
             throw new RuntimeException("testSupportView konnte nicht extrahiert werden", e);
         }
