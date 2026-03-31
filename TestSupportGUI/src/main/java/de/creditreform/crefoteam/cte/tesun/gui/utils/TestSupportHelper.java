@@ -68,9 +68,11 @@ public class TestSupportHelper {
     }
 
     public CteActivitiTask killOrContinueRunningActivitiProcess(String prozessKey, String prozessDefName, boolean confirmDlg) throws Exception {
-        // Zweistufig: erst Process-Instance-ID ermitteln (nur nach processDefinitionKey, kein Variablen-JOIN),
+        Map<String, Object> processVarsMap = new HashMap<>();
+        processVarsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, prozessKey);
+        // Zweistufig: erst Process-Instance-ID ermitteln (GET ohne Variablen-JOIN, client-seitig gefiltert),
         // dann Tasks per processInstanceId abfragen
-        List<CteActivitiProcess> runningProcesses = cteActivitiService.queryProcessInstances(prozessDefName, null);
+        List<CteActivitiProcess> runningProcesses = cteActivitiService.queryProcessInstances(prozessDefName, processVarsMap);
         if (runningProcesses.isEmpty()) {
             return null;
         }
