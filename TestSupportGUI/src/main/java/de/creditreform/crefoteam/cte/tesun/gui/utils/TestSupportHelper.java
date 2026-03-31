@@ -79,9 +79,10 @@ public class TestSupportHelper {
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, prozessKey);
         paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, prozessDefName);
-        Integer processInstanceId = runningProcesses.get(0).getId();
+        // Tasks per MEIN_KEY suchen (nicht per processInstanceId), damit auch Tasks in
+        // Sub-Prozessen (Call Activities) gefunden werden — diese haben eine eigene processInstanceId.
         Map<String, Object> taskQueryMap = new HashMap<>();
-        taskQueryMap.put("processInstanceId", processInstanceId.toString());
+        taskQueryMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, prozessKey);
         List<CteActivitiTask> cteActivitiTasksList = cteActivitiService.listTasks(taskQueryMap);
         if (!cteActivitiTasksList.isEmpty()) {
             if (confirmDlg) {
@@ -100,7 +101,7 @@ public class TestSupportHelper {
             // Prozess läuft noch (z.B. in Service-Task oder Sub-Prozess), hat aber keinen User-Task.
             // Fortsetzen nicht möglich → automatisch löschen damit neu gestartet werden kann.
             tesunClientJobListener.notifyClientJob(Level.INFO,
-                String.format("\nLaufender Prozess ohne User-Task gefunden (ID=%d) — wird automatisch beendet.", processInstanceId));
+                String.format("\nLaufender Prozess ohne User-Task gefunden (ID=%d) — wird automatisch beendet.", runningProcesses.get(0).getId()));
             killRunningActivitiProcess(paramsMap);
         }
         return null;
