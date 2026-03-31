@@ -50,6 +50,8 @@ public class EnvironmentConfig {
     public static final String PROPNAME_ACTIVITI_TESTER_EMAIL_FROM = "ACTIVITI-TESTER-EMAIL-FROM";
     public static final String PROPNAME_ACTIVITI_TESTER_EMAIL_SUCCESS_TO = "ACTIVITI-TESTER-EMAIL-SUCCESS-TO";
     public static final String PROPNAME_ACTIVITI_TESTER_EMAIL_FAILURE_TO = "ACTIVITI-TESTER-EMAIL-FAILURE-TO";
+    public static final String PROPNAME_EMAIL_SMTP_HOST = "EMAIL-SMTP-HOST";
+    public static final String PROPNAME_EMAIL_SMTP_PORT = "EMAIL-SMTP-PORT";
     public static final String PROPNAME_TIME_BEFORE_CT_IMPORT = "TIME_BEFORE_CT_IMPORT";
     public static final String PROPNAME_TIME_BEFORE_BTLG_IMPORT = "TIME_BEFORE_BTLG_IMPORT";
     public static final String TIME_BEFORE_EXPORTS_COLLECT = "TIME_BEFORE_EXPORTS_COLLECT";
@@ -351,6 +353,14 @@ public class EnvironmentConfig {
 
     public String getActivitiFailureEmailTo() throws PropertiesException {
         return getProperty(PROPNAME_ACTIVITI_TESTER_EMAIL_FAILURE_TO, true, "k.cavdar@verband.creditreform.de");
+    }
+
+    public String getSmtpHost() throws PropertiesException {
+        return getProperty(PROPNAME_EMAIL_SMTP_HOST, true, TestSupportClientKonstanten.EMAIL_HOST_NAME);
+    }
+
+    public int getSmtpPort() throws PropertiesException {
+        return Integer.parseInt(getProperty(PROPNAME_EMAIL_SMTP_PORT, true, String.valueOf(TestSupportClientKonstanten.EMAIL_PORT)));
     }
 
     public String getRepositoryHost() throws PropertiesException {

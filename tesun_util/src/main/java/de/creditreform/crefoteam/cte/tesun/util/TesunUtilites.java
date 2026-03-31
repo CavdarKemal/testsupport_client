@@ -44,10 +44,10 @@ public class TesunUtilites {
         return shortPath(new File(thePath), maxLen);
     }
 
-    public static void sendEmail(String emailFrom, String emailTo, String emailSubject, String emailContent, String attachmentFileName) throws EmailException {
+    public static void sendEmail(String smtpHost, int smtpPort, String emailFrom, String emailTo, String emailSubject, String emailContent, String attachmentFileName) throws EmailException {
         MultiPartEmail multiPartEmail = new MultiPartEmail();
-        multiPartEmail.setHostName(TestSupportClientKonstanten.EMAIL_HOST_NAME);
-        multiPartEmail.setSmtpPort(TestSupportClientKonstanten.EMAIL_PORT);
+        multiPartEmail.setHostName(smtpHost);
+        multiPartEmail.setSmtpPort(smtpPort);
         multiPartEmail.setFrom(emailFrom);
         String[] split = emailTo.split("[,;]");
         for (String rcv : split) {

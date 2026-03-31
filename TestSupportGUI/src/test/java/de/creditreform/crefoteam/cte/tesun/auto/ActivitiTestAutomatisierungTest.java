@@ -6,12 +6,9 @@ import de.creditreform.crefoteam.cte.rest.RestInvokerConfig;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.TestSupportClientKonstanten;
 import de.creditreform.crefoteam.cte.tesun.util.TesunUtilites;
+import de.creditreform.crefoteam.cte.tesun.util.TimelineLogger;
 import org.apache.log4j.Level;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,11 +30,10 @@ public class ActivitiTestAutomatisierungTest {
         executorService = Executors.newScheduledThreadPool(1);
         RestInvokerConfig restServiceActiviti = environmentConfig.getRestServiceConfigsForActiviti().get(0);
         cteActivitiService = new CteActivitiServiceRestImpl(restServiceActiviti);
-        URL resource = getClass().getResource("/activiti-tests");
         // testResourcesDir muss explizit gesetzt werden, da ActivitiTestAutomatisierung
         // den WLS-Server für initForEnvironment() benötigt, der im Test nicht verfügbar ist.
-        File localDir = new File(environmentConfig.getTestResourcesRoot(), "LOCAL");
-        localDir.mkdirs();
+        File localDir = new File(environmentConfig.getTestResourcesRoot(), "ITSQ");
+        Assert.assertTrue(localDir.exists());
         environmentConfig.setTestResourcesDir(localDir);
     }
 
@@ -48,14 +44,14 @@ public class ActivitiTestAutomatisierungTest {
 
     @Test
     public void testAddDirToArchive() throws Exception {
-        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "LOCAL", "");
+        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "ITSQ", "");
         String zipFileName = environmentConfig.getTestResourcesRoot().getAbsolutePath() + "/test_zip.zip";
         FileOutputStream fileOutputStream = new FileOutputStream(zipFileName);
         ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
         File srcFile = environmentConfig.getTestResourcesDir();
         cut.notifyClientJob(Level.INFO, String.format("Das Verzeichnis %s wird gezippt...", srcFile.getAbsolutePath()));
         cut.addDirToArchive(zipOutputStream, srcFile.getParentFile(), srcFile);
-        File logFile = new File(environmentConfig.getTestResourcesRoot().getParentFile().getParentFile().getAbsolutePath(), "testsupport_client.log");
+        File logFile = new File(environmentConfig.getLogOutputsRootForEnv("ENE"), (TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2 + ".log"));
         if (logFile.exists()) {
             cut.addFileToArchive(zipOutputStream, logFile.getParentFile(), logFile);
         }
@@ -64,24 +60,26 @@ public class ActivitiTestAutomatisierungTest {
 
     @Test
     public void testZipOutputDirectory() throws Exception {
-        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "LOCAL", "");
-        Assert.assertEquals(environmentConfig.getTestResourcesDir().getName(), "LOCAL");
+        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "ITSQ", "");
+        Assert.assertEquals(environmentConfig.getTestResourcesDir().getName(), "ITSQ");
         cut.zipOutputDirectory();
     }
 
     @Test
     public void testSendEmail() throws Exception {
-        Assume.assumeTrue("SMTP-Server " + TestSupportClientKonstanten.EMAIL_HOST_NAME + ":" + TestSupportClientKonstanten.EMAIL_PORT + " nicht erreichbar — Test wird übersprungen", isSmtpReachable());
-        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "LOCAL", "");
+        String smtpHost = environmentConfig.getSmtpHost();
+        int smtpPort = environmentConfig.getSmtpPort();
+        Assume.assumeTrue("SMTP-Server " + smtpHost + ":" + smtpPort + " nicht erreichbar — Test wird übersprungen", isSmtpReachable(smtpHost, smtpPort));
+        ActivitiTestAutomatisierung cut = new ActivitiTestAutomatisierung(environmentConfig, "ITSQ", "");
         String emailContent = "Test-Email";
         String attachmentFileName = "src/test/java/de/creditreform/crefoteam/cte/tesun/auto/ActivitiTestAutomatisierungTest.java";
         String emailSubject = "CTE Test-Automatisierung: " + environmentConfig.getCurrentEnvName();
-        TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, attachmentFileName);
+        TesunUtilites.sendEmail(smtpHost, smtpPort, environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, attachmentFileName);
     }
 
-    private boolean isSmtpReachable() {
+    private boolean isSmtpReachable(String host, int port) {
         try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(TestSupportClientKonstanten.EMAIL_HOST_NAME, TestSupportClientKonstanten.EMAIL_PORT), 2000);
+            socket.connect(new InetSocketAddress(host, port), 2000);
             return true;
         } catch (Exception e) {
             return false;

@@ -1,13 +1,11 @@
 package de.creditreform.crefoteam.cte.tesun.auto;
 
 import de.creditreform.crefoteam.activiti.CteActivitiTask;
-import de.creditreform.crefoteam.cte.restservices.tesun.xmlbinding.systeminfo.TesunSystemInfo;
 import de.creditreform.crefoteam.cte.tesun.TesunClientJobListener;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.CommandExecutorListener;
 import de.creditreform.crefoteam.cte.tesun.gui.view.ActivitiProcessController;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.TestCaseFilesFromGit;
 import de.creditreform.crefoteam.cte.tesun.gui.utils.TestSupportHelper;
-import de.creditreform.crefoteam.cte.tesun.rest.SystemInfo;
 import de.creditreform.crefoteam.cte.tesun.rest.TesunRestService;
 import de.creditreform.crefoteam.cte.tesun.util.EnvironmentConfig;
 import de.creditreform.crefoteam.cte.tesun.util.PropertiesException;
@@ -24,10 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
@@ -62,60 +57,45 @@ public class ActivitiTestAutomatisierung implements TesunClientJobListener, Comm
     private void initForEnvironment() {
         try {
             notifyClientJob(Level.INFO, String.format("\nInitialisiere Test-Resourcen für die Umgebung %s...", environmentConfig.getCurrentEnvName()));
-            String appLogFileName = String.format("logs/%s.log", TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2.name());
-            String actionLogFileName = String.format("logs/%s.log", "TimeLine.log");
-            if (!TimelineLogger.configure(environmentConfig.getLogOutputsRoot(), appLogFileName, actionLogFileName)) {
+            if (!TimelineLogger.configure(environmentConfig.getLogOutputsRootForEnv("ENE"), (TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2 + ".log"), "TimeLine.log")) {
                 notifyClientJob(Level.ERROR, "Exception beim Konfigurieren der LOG-Dateien!\n");
             }
             notifyClientJob(Level.INFO, String.format("\nInitialisiere für die Umgebung %s...", environmentConfig.getCurrentEnvName()));
-            environmentConfig.loadEnvironmentConfig(environmentConfig.getCurrentEnvName());
-            testSupportHelper = new TestSupportHelper(environmentConfig,
-                    environmentConfig.getRestServiceConfigsForActiviti().get(0), // TODO
-                    environmentConfig.getRestServiceConfigsForMasterkonsole().get(0), // TODO
-                    environmentConfig.getRestServiceConfigsForJvmImpCycle().get(0), // TODO
-                    ActivitiTestAutomatisierung.this);
-            tesunRestServiceWLS = testSupportHelper.getTesunRestServiceWLS();
-            TesunSystemInfo tesunSystemInfo = tesunRestServiceWLS.getTesunSystemInfo();
-            environmentConfig.setCteVersion(tesunSystemInfo.getCteVersion());
-            File sourceDir;
-            if (currTestSrc.equals("LOCAL")) {
-                sourceDir = new File(environmentConfig.getTestResourcesRoot(), "LOCAL");
-            } else if (currTestSrc.equals("LOCAL-S")) {
-                sourceDir = new File(environmentConfig.getTestResourcesRoot(), "LOCAL-S");
-            } else {
-                testCaseFilesFromRepo = new TestCaseFilesFromGit(this);
-                File[] files = environmentConfig.getTestResourcesRoot().listFiles();
-                if (files != null && files.length > 0) {
-                    FileUtils.forceDelete(environmentConfig.getTestResourcesRoot());
-                }
-                sourceDir = testCaseFilesFromRepo.updateItsqTestPaket(environmentConfig.getTestResourcesRoot(), environmentConfig.getGitReposList(currRepoBranch));
-            }
+/* CLAUDE_MODE
+                testSupportHelper = getTestSupportHelper();
+                TesunSystemInfo tesunSystemInfo = testSupportHelper.getTesunRestServiceWLS().getTesunSystemInfo();
+                String versionsInfoInTitle = String.format("[ %s ] - [ CTE-Version: %s ]", currentEnvironment.getAppVersionsInfo(), tesunSystemInfo.getCteVersion());
+                guiFrame.setVersionsInfoInTitle(versionsInfoInTitle);
+*/
+            File sourceDir = new File(environmentConfig.getTestResourcesRoot(), TestSupportClientKonstanten.DEFAUL_TESTS_SOURCE);
             environmentConfig.setTestResourcesDir(sourceDir);
-            testCustomerMapMap = initTestCasesForCustomers();
+            environmentConfig.loadEnvironmentConfig(environmentConfig.getCurrentEnvName());
+            testCustomerMapMap = initTestCasesForCustomers(environmentConfig.getCustomerTestInfoMapMap());
         } catch (Throwable ex) {
             notifyClientJob(Level.ERROR, "Exception beim Laden der Konfiguration!\n" + ex.getMessage());
         }
     }
 
-    public Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> initTestCasesForCustomers() throws Exception {
-        notifyClientJob(Level.INFO, "\n\tLese die Test-Crefos-Konfiguration aus dem ITSQ-Verzeichnis...");
+    public Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> initTestCasesForCustomers(Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> customerTestInfoMapMap) throws Exception {
+/* CLAUDE_MODE
+        TesunRestService tesunRestServiceWLS = view.testSupportHelper.getTesunRestServiceWLS();
         SystemInfo systemInfo = tesunRestServiceWLS.getSystemPropertiesInfo();
-        Map<TestSupportClientKonstanten.TEST_PHASE, Map<String, TestCustomer>> customerTestInfoMapMap = environmentConfig.getCustomerTestInfoMapMap();
-        Iterator<TestSupportClientKonstanten.TEST_PHASE> iterator = customerTestInfoMapMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            TestSupportClientKonstanten.TEST_PHASE testPhase = iterator.next();
+*/
+        notifyClientJob(Level.INFO, "\n\tErmittle KundenKonfigList für die Kunden...");
+        for (TestSupportClientKonstanten.TEST_PHASE testPhase : customerTestInfoMapMap.keySet()) {
             Map<String, TestCustomer> testCustomerMap = customerTestInfoMapMap.get(testPhase);
+            notifyClientJob(Level.INFO, "\n" + testCustomerMap.size() + " Kunden sind für den Test in " + testPhase + " ausgewählt.");
             testCustomerMap.entrySet().forEach(testCustomerEntry -> {
                 try {
                     TestCustomer testCustomer = testCustomerEntry.getValue();
                     notifyClientJob(Level.INFO, "\n\t\tInitialisiere Testfälle des Kunden für " + testCustomer.getCustomerName() + " aus " + testPhase);
+/* CLAUDE_MODE
                     tesunRestServiceWLS.extendTestCustomerProperiesInfos(testCustomer, systemInfo);
+*/
                 } catch (Exception ex) {
-                    String notifyObject = "\n" + testCustomerMap.size() + "Exception beim Vervollständigen der Kundenkonfiguration!\n" + ex.getMessage();
-                    notifyClientJob(Level.ERROR, notifyObject);
+                    notifyClientJob(Level.ERROR, ex);
                 }
             });
-            notifyClientJob(Level.INFO, "\n" + testCustomerMap.size() + " Kunden sind für den Test in der " + testPhase + " ausgewählt\n");
         }
         return customerTestInfoMapMap;
     }
@@ -243,7 +223,7 @@ public class ActivitiTestAutomatisierung implements TesunClientJobListener, Comm
         appendInfo(String.format("Sende Email an '%s' mit dem Inhalt:\n%s", stringBuilderAll, attachmentFileName));
         try {
             String emailSubject = "CTE Test-Automatisierung: " + environmentConfig.getCurrentEnvName() + "." + TestSupportClientKonstanten.TEST_TYPES.PHASE1_AND_PHASE2.name();
-            TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, stringBuilderAll.toString(), attachmentFileName);
+            TesunUtilites.sendEmail(environmentConfig.getSmtpHost(), environmentConfig.getSmtpPort(), environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, stringBuilderAll.toString(), attachmentFileName);
             activitProcessExitCode = (stringBuilderAll.length() > 0) ? -1 : 0;
         } catch (Exception ex) {
             appendInfo("Fehler beim Senden der Email!\n" + ex.getMessage());

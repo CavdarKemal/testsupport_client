@@ -24,7 +24,7 @@ public class UserTaskSuccessMail extends AbstractUserTaskRunnable {
         String emailSubject = "CTE Test-Automatisierung: " + environmentConfig.getCurrentEnvName();
         String emailContent = "CTE Test-Automatisierung für " + environmentConfig.getCurrentEnvName() + " erfolgreich ausgeführt.";
         try {
-            TesunUtilites.sendEmail(environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, null);
+            TesunUtilites.sendEmail(environmentConfig.getSmtpHost(), environmentConfig.getSmtpPort(), environmentConfig.getActivitiEmailFrom(), environmentConfig.getActivitiFailureEmailTo(), emailSubject, emailContent, null);
         } catch (Exception e) {
             TimelineLogger.warn(this.getClass(), "E-Mail konnte nicht gesendet werden (SMTP nicht erreichbar?): " + e.getMessage());
             notifyUserTask(Level.WARN, "\nWARNING: E-Mail konnte nicht gesendet werden: " + e.getMessage());
