@@ -68,11 +68,20 @@ public class TestSupportHelper {
     }
 
     public CteActivitiTask killOrContinueRunningActivitiProcess(String prozessKey, String prozessDefName, boolean confirmDlg) throws Exception {
+        Map<String, Object> processVarsMap = new HashMap<>();
+        processVarsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, prozessKey);
+        // Zweistufig: erst Process-Instance-ID ermitteln, dann Tasks per processInstanceId abfragen
+        List<CteActivitiProcess> runningProcesses = cteActivitiService.queryProcessInstances(prozessDefName, processVarsMap);
+        if (runningProcesses.isEmpty()) {
+            return null;
+        }
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_MEIN_KEY, prozessKey);
         paramsMap.put(TesunClientJobListener.UT_TASK_PARAM_NAME_ACTIVITI_PROCESS_NAME, prozessDefName);
-        // TODO es fehlt noch ein Parameter, damit nur die richtige gefunden wird!!! paramsMap.put(TesunClientJobListener.???, ???);
-        List<CteActivitiTask> cteActivitiTasksList = cteActivitiService.listTasks(paramsMap);
+        Integer processInstanceId = runningProcesses.get(0).getId();
+        Map<String, Object> taskQueryMap = new HashMap<>();
+        taskQueryMap.put("processInstanceId", processInstanceId.toString());
+        List<CteActivitiTask> cteActivitiTasksList = cteActivitiService.listTasks(taskQueryMap);
         if (!cteActivitiTasksList.isEmpty()) {
             if (confirmDlg) {
                 String strInfo = String.format("Der Prozess wurde zuvor gestartet und steht beim User-Task '%s'!\nSoll der Prozess fortgesetzt oder beendet und neu gestartet werden?", cteActivitiTasksList.get(0).getTaskDefinitionKey());
