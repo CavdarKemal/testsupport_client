@@ -27,5 +27,8 @@ target/
 # Secrets
 **/cte_private_key_lieferant.asc
 
+# GUI-generierte Backup-Dateien (entstehen bei Einstellungsänderungen)
+*.properties.old
+
 # Claude Code local settings
 .claude/
