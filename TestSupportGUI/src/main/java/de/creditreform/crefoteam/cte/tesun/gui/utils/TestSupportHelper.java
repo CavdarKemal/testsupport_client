@@ -96,6 +96,12 @@ public class TestSupportHelper {
                 killRunningActivitiProcess(paramsMap);
                 return null;
             }
+        } else {
+            // Prozess läuft noch (z.B. in Service-Task oder Sub-Prozess), hat aber keinen User-Task.
+            // Fortsetzen nicht möglich → automatisch löschen damit neu gestartet werden kann.
+            tesunClientJobListener.notifyClientJob(Level.INFO,
+                String.format("\nLaufender Prozess ohne User-Task gefunden (ID=%d) — wird automatisch beendet.", processInstanceId));
+            killRunningActivitiProcess(paramsMap);
         }
         return null;
     }
