@@ -30,7 +30,7 @@
     </callActivity>
     <endEvent id="endevent2" name="End"></endEvent>
     <sequenceFlow id="flow21" sourceRef="UserTaskFailureMail" targetRef="UserTaskRestoreTestSystem"></sequenceFlow>
-    <userTask id="UserTaskPrepareTestSystem" name="Setzt die Systemeinstellungen für den Test"></userTask>
+    <userTask id="UserTaskPrepareTestSystem" name="Init Systemeinstellungen  [UserTaskPrepareTestSystem]"></userTask>
     <userTask id="UserTaskRestoreTestSystem" name="Restauriert System-Einstellungen"></userTask>
     <sequenceFlow id="flow31" sourceRef="UserTaskPrepareTestSystem" targetRef="exclusiveGatewayTestType"></sequenceFlow>
     <sequenceFlow id="flow32" sourceRef="UserTaskRestoreTestSystem" targetRef="endevent2"></sequenceFlow>
@@ -52,7 +52,7 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%-TestAutomationProcess">
     <bpmndi:BPMNPlane bpmnElement="%ENV%-TestAutomationProcess" id="BPMNPlane_%ENV%-TestAutomationProcess">
       <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
-        <omgdc:Bounds height="35.0" width="35.0" x="10.0" y="293.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="29.0" y="293.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusiveGatewayTestType" id="BPMNShape_exclusiveGatewayTestType">
         <omgdc:Bounds height="40.0" width="40.0" x="239.0" y="290.0"></omgdc:Bounds>
@@ -67,7 +67,7 @@
         <omgdc:Bounds height="35.0" width="35.0" x="1060.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskPrepareTestSystem" id="BPMNShape_UserTaskPrepareTestSystem">
-        <omgdc:Bounds height="80.0" width="110.0" x="88.0" y="271.0"></omgdc:Bounds>
+        <omgdc:Bounds height="86.0" width="110.0" x="100.0" y="268.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskRestoreTestSystem" id="BPMNShape_UserTaskRestoreTestSystem">
         <omgdc:Bounds height="80.0" width="123.0" x="889.0" y="277.0"></omgdc:Bounds>
@@ -87,7 +87,7 @@
         <omgdi:waypoint x="950.0" y="357.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
-        <omgdi:waypoint x="198.0" y="311.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="311.0"></omgdi:waypoint>
         <omgdi:waypoint x="239.0" y="310.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
@@ -99,8 +99,8 @@
         <omgdi:waypoint x="259.0" y="188.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow44" id="BPMNEdge_flow44">
-        <omgdi:waypoint x="45.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="88.0" y="311.0"></omgdi:waypoint>
+        <omgdi:waypoint x="64.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="311.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow45" id="BPMNEdge_flow45">
         <omgdi:waypoint x="355.0" y="154.0"></omgdi:waypoint>
