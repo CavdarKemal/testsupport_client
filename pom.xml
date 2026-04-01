@@ -422,12 +422,12 @@
         <dependencies>
             <dependency>
                 <groupId>activiti-process</groupId>
-                <artifactId>activiti-process-6</artifactId>
+                <artifactId>activiti-process</artifactId>
                 <version>${activiti-process.version}</version>
             </dependency>
             <dependency>
                 <groupId>activiti-process</groupId>
-                <artifactId>activiti-process-6</artifactId>
+                <artifactId>activiti-process</artifactId>
                 <classifier>sources</classifier>
                 <version>${activiti-process.version}</version>
             </dependency>

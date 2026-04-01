@@ -42,7 +42,7 @@
 
 		<dependency>
 			<groupId>activiti-process</groupId>
-			<artifactId>activiti-process-6</artifactId>
+			<artifactId>activiti-process</artifactId>
 		</dependency>
 
 		<!-- Activiti Dependencies -->
