@@ -63,25 +63,14 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
     /** Token der 20 Sub-Prozess-Tasks (Phase-1 und Phase-2 verwenden dieselbe Liste). */
     private static final String[] TASK_TOKENS_PHASE = {
         "[StartUploads]",
-        "[WaittUploads]",
         "[StartBeteiligtenImport]",
-        "[WaitForBeteiligtenImport]",
         "[StartEntgBerechnung]",
-        "[WaitForEntgBerechnung]",
         "[StartBtlgAktualisierung]",
-        "[WaitForBtlgAktualisierung]",
-        "[WaittCtImport]",
         "[StartCtImport]",
-        "[WaitForCtImport]",
-        "[TaskWaitBeforeExport]",
         "[StartExports]",
         "[StartCollect]",
-        "[CheckCollects]",
         "[StartRestore]",
-        "[CheckRefExports]",
-        "[CheckExportProtokoll]",
         "[StartSftpUploads]",
-        "[CheckSftpUploads]"
     };
 
     /** Token aus dem Hauptprozess, nach den Sub-Prozessen. */

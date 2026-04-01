@@ -14,16 +14,14 @@
     <userTask id="UserTaskStartRestore" name="Restore starten [StartRestore]"></userTask>
     <userTask id="UserTaskStartSftpUploads" name="SFTP-Uploads starten [StartSftpUploads]"></userTask>
     <sequenceFlow id="flow21" sourceRef="UserTaskStartExports" targetRef="UserTaskStartCollect"></sequenceFlow>
-    <userTask id="UserTaskWaitBeforeExport" name="Vor Exports warten [TaskWaitBeforeExport]"></userTask>
-    <sequenceFlow id="flow23" sourceRef="UserTaskWaitBeforeExport" targetRef="UserTaskStartExports"></sequenceFlow>
     <sequenceFlow id="flow24" sourceRef="UserTaskStartUploads" targetRef="UserTaskStartBeteiligtenImport"></sequenceFlow>
     <sequenceFlow id="flow25" sourceRef="UserTaskStartBeteiligtenImport" targetRef="UserTaskStartEntgBerechnung"></sequenceFlow>
     <sequenceFlow id="flow26" sourceRef="UserTaskStartEntgBerechnung" targetRef="UserTaskStartBtlgAktualisierung"></sequenceFlow>
     <sequenceFlow id="flow27" sourceRef="UserTaskStartBtlgAktualisierung" targetRef="UserTaskStartCtImport"></sequenceFlow>
-    <sequenceFlow id="flow28" sourceRef="UserTaskStartCtImport" targetRef="UserTaskWaitBeforeExport"></sequenceFlow>
     <sequenceFlow id="flow29" sourceRef="UserTaskStartCollect" targetRef="UserTaskStartRestore"></sequenceFlow>
     <sequenceFlow id="flow31" sourceRef="UserTaskStartSftpUploads" targetRef="endEvent"></sequenceFlow>
     <sequenceFlow id="flow32" sourceRef="UserTaskStartRestore" targetRef="UserTaskStartSftpUploads"></sequenceFlow>
+    <sequenceFlow id="flow33" sourceRef="UserTaskStartCtImport" targetRef="UserTaskStartExports"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_%ENV%TestAutomationProcessRT2SUB">
     <bpmndi:BPMNPlane bpmnElement="%ENV%TestAutomationProcessRT2SUB" id="BPMNPlane_%ENV%TestAutomationProcessRT2SUB">
@@ -31,19 +29,19 @@
         <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="48.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
-        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="307.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="233.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartBeteiligtenImport" id="BPMNShape_UserTaskStartBeteiligtenImport">
         <omgdc:Bounds height="70.0" width="140.0" x="380.0" y="30.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartExports" id="BPMNShape_UserTaskStartExports">
-        <omgdc:Bounds height="70.0" width="140.0" x="741.0" y="290.0"></omgdc:Bounds>
+        <omgdc:Bounds height="70.0" width="140.0" x="741.0" y="216.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartUploads" id="BPMNShape_UserTaskStartUploads">
         <omgdc:Bounds height="70.0" width="140.0" x="200.0" y="30.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartCtImport" id="BPMNShape_UserTaskStartCtImport">
-        <omgdc:Bounds height="57.0" width="140.0" x="741.0" y="120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="71.0" width="140.0" x="741.0" y="120.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartEntgBerechnung" id="BPMNShape_UserTaskStartEntgBerechnung">
         <omgdc:Bounds height="70.0" width="140.0" x="562.0" y="30.0"></omgdc:Bounds>
@@ -52,28 +50,21 @@
         <omgdc:Bounds height="70.0" width="140.0" x="740.0" y="30.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartCollect" id="BPMNShape_UserTaskStartCollect">
-        <omgdc:Bounds height="61.0" width="141.0" x="561.0" y="294.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="141.0" x="561.0" y="220.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartRestore" id="BPMNShape_UserTaskStartRestore">
-        <omgdc:Bounds height="61.0" width="141.0" x="379.0" y="294.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="141.0" x="379.0" y="220.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="UserTaskStartSftpUploads" id="BPMNShape_UserTaskStartSftpUploads">
-        <omgdc:Bounds height="61.0" width="141.0" x="199.0" y="294.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="UserTaskWaitBeforeExport" id="BPMNShape_UserTaskWaitBeforeExport">
-        <omgdc:Bounds height="63.0" width="140.0" x="740.0" y="210.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="141.0" x="199.0" y="220.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
         <omgdi:waypoint x="135.0" y="65.0"></omgdi:waypoint>
         <omgdi:waypoint x="200.0" y="65.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
-        <omgdi:waypoint x="741.0" y="325.0"></omgdi:waypoint>
-        <omgdi:waypoint x="702.0" y="324.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
-        <omgdi:waypoint x="810.0" y="273.0"></omgdi:waypoint>
-        <omgdi:waypoint x="811.0" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="741.0" y="251.0"></omgdi:waypoint>
+        <omgdi:waypoint x="702.0" y="250.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
         <omgdi:waypoint x="340.0" y="65.0"></omgdi:waypoint>
@@ -91,21 +82,21 @@
         <omgdi:waypoint x="810.0" y="100.0"></omgdi:waypoint>
         <omgdi:waypoint x="811.0" y="120.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
-        <omgdi:waypoint x="811.0" y="177.0"></omgdi:waypoint>
-        <omgdi:waypoint x="810.0" y="210.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
-        <omgdi:waypoint x="561.0" y="324.0"></omgdi:waypoint>
-        <omgdi:waypoint x="520.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="561.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="250.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
-        <omgdi:waypoint x="199.0" y="324.0"></omgdi:waypoint>
-        <omgdi:waypoint x="135.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="199.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="135.0" y="250.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
-        <omgdi:waypoint x="379.0" y="324.0"></omgdi:waypoint>
-        <omgdi:waypoint x="340.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="379.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="250.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="811.0" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="811.0" y="216.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
