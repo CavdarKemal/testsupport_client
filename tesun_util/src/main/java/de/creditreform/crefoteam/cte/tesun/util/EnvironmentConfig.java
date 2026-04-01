@@ -784,7 +784,7 @@ public class EnvironmentConfig {
     }
 
     public long getMillisForJobStatusQuerySleepTime() throws PropertiesException {
-        String strTime = getProperty(PROPNAME_JOBSTATUS_QUERY_SLEEPTIME, true, "PT10S");
+        String strTime = getProperty(PROPNAME_JOBSTATUS_QUERY_SLEEPTIME, true, "PT2S");
         return calculateTimeInMillis(strTime);
     }
 
@@ -794,7 +794,7 @@ public class EnvironmentConfig {
     }
 
     public String getStrTimeBeforeCollectExports(boolean isDemoMode) throws PropertiesException {
-        String strTime = isDemoMode ? "PT2S" : getProperty(TIME_BEFORE_EXPORTS_COLLECT, true, "PT30S");
+        String strTime = isDemoMode ? "PT1S" : getProperty(TIME_BEFORE_EXPORTS_COLLECT, true, "PT30S");
         return strTime;
     }
 
@@ -803,7 +803,7 @@ public class EnvironmentConfig {
     }
 
     public String getStrTimeBeforeCollectSftpUploads(boolean isDemoMode) throws PropertiesException {
-        String strTime = isDemoMode ? "PT2S" : getProperty(TIME_BEFORE_SFTP_COLLECT, true, "PT30S");
+        String strTime = isDemoMode ? "PT1S" : getProperty(TIME_BEFORE_SFTP_COLLECT, true, "PT30S");
         return strTime;
     }
 
