@@ -56,7 +56,7 @@ public class TestSupportViewActivitiTest extends BaseGUITest {
 
     /** Token aus dem Hauptprozess, vor den Sub-Prozessen. */
     private static final String[] TASK_TOKENS_MAIN_START = {
-        "Systemeinstellungen für",      // UserTaskPrepareTestSystem
+        "UserTaskPrepareTestSystem",      // UserTaskPrepareTestSystem
         "[GeneratePseudoCrefos]"        // UserTaskGeneratePseudoCrefos
     };
 
