@@ -19,11 +19,13 @@
     <callActivity id="CallActivityRepeatableTestAutomationProcess2SUB1" name="Sub-Prozess Phase-1" calledElement="%ENV%TestAutomationProcessRT2SUB" activiti:inheritVariables="true">
       <extensionElements>
         <activiti:in sourceExpression="${'PHASE_1'}" target="TEST_PHASE"></activiti:in>
+        <activiti:in source="MEIN_KEY" target="MEIN_KEY"></activiti:in>
       </extensionElements>
     </callActivity>
     <callActivity id="CallActivityRepeatableTestAutomationProcess2SUB2" name="Sub-Prozess Phase-2" calledElement="%ENV%TestAutomationProcessRT2SUB" activiti:inheritVariables="true">
       <extensionElements>
         <activiti:in sourceExpression="${'PHASE_2'}" target="TEST_PHASE"></activiti:in>
+        <activiti:in source="MEIN_KEY" target="MEIN_KEY"></activiti:in>
       </extensionElements>
     </callActivity>
     <endEvent id="endevent2" name="End"></endEvent>
